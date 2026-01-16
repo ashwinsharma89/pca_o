@@ -1,0 +1,342 @@
+[Config] Using SQLite fallback for tests (Postgres unavailable)
+[32m2026-01-12 08:56:40[0m | [1mINFO    [0m | [36msrc.core.utils.logger[0m:[36msetup_logger[0m:[36m137[0m - [1mLogger initialized with production features[0m
+============================= test session starts ==============================
+platform darwin -- Python 3.12.12, pytest-7.4.0, pluggy-1.6.0 -- /Users/ashwin/Desktop/pca_agent copy/.venv312/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /Users/ashwin/Desktop/pca_agent copy
+configfile: pytest.ini
+plugins: mock-3.15.1, anyio-4.12.0, asyncio-0.23.4, timeout-2.4.0, typeguard-4.4.4, cov-7.0.0
+asyncio: mode=Mode.STRICT
+collecting ... collected 2 items
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis 
+[DEBUG] Attempting to start test containers...
+[DEBUG] ⚠️ Docker unavailable (Command '['docker-compose', '-f', 'docker-compose.test.yml', 'up', '-d', 'postgres-test']' returned non-zero exit status 1.). Using current DB URL.
+[DEBUG] Test Database URL: sqlite:///./test_pca.db
+[DEBUG] Resetting database schema...
+
+[DEBUG] db_session fixture started
+
+[DEBUG] Database cleaned. Users remaining: []
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: campaign_performance_analysis v1.0.0[0m
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: channel_comparison v1.0.0[0m
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: chart_recommendation v1.0.0[0m
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: sql_generation v1.0.0[0m
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: insight_generation v1.0.0[0m
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: executive_summary v1.0.0[0m
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: rag_executive_summary v1.0.0[0m
+[32m2026-01-12 08:56:41[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: data_quality_check v1.0.0[0m
+[32m2026-01-12 08:56:42[0m | [1mINFO    [0m | [36msrc.core.utils.resilience[0m:[36m<module>[0m:[36m864[0m - [1mResilience module loaded successfully[0m
+[32m2026-01-12 08:56:43[0m | [33m[1mWARNING [0m | [36msrc.core.utils.opentelemetry_config[0m:[36m<module>[0m:[36m40[0m - [33m[1mOpenTelemetry not installed. Distributed tracing disabled.[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.core.utils.observability[0m:[36m<module>[0m:[36m1180[0m - [1mObservability module loaded successfully[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.v1[0m:[36m<module>[0m:[36m65[0m - [1mKG-RAG router mounted at /api/v1/kg[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.core.utils.logger[0m:[36msetup_logger[0m:[36m137[0m - [1mLogger initialized with production features[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.validation_handlers[0m:[36msetup_validation_handlers[0m:[36m63[0m - [1m✅ Validation error handlers configured[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.core.utils.opentelemetry_config[0m:[36minstrument_app[0m:[36m132[0m - [1mOpenTelemetry disabled or not available[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m335[0m - [1m============================================================[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m336[0m - [1mPCA Agent API v3.0 - Starting[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m337[0m - [1m============================================================[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m338[0m - [1m✅ Database persistence enabled[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m339[0m - [1m✅ JWT authentication enabled[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m340[0m - [1m✅ Rate limiting: False[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m341[0m - [1m✅ API versioning: /api/v1/[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m342[0m - [1m✅ Report regeneration implemented[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m343[0m - [1m✅ Structured error codes enabled[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m344[0m - [1m✅ Specific exception handling enabled[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m345[0m - [1m============================================================[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m353[0m - [1m✅ JWT secret key validated[0m
+[32m2026-01-12 08:56:43[0m | [33m[1mWARNING [0m | [36msrc.core.utils.encryption[0m:[36m__init__[0m:[36m26[0m - [33m[1m⚠️ ENCRYPTION_KEY not set. Generating a temporary key for this session.[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.engine.services.user_service[0m:[36mcreate_user[0m:[36m128[0m - [1mUser created: testuser (test@example.com)[0m
+[32m2026-01-12 08:56:43[0m | [1mINFO    [0m | [36msrc.interface.api.middleware.auth[0m:[36mcreate_access_token[0m:[36m182[0m - [1mCreated access token for user: testuser[0m
+
+[Sundar Mode] Initiating Data Integrity Audit...
+[Sundar Mode] Uploading mission-critical data...
+[32m2026-01-12 08:56:43[0m | [34m[1mDEBUG   [0m | [36msrc.interface.api.middleware.auth[0m:[36mget_user[0m:[36m91[0m - [34m[1mget_user connecting to DB: sqlite:///./test_pca.db (Size: 172032 bytes)[0m
+[32m2026-01-12 08:56:43[0m | [34m[1mDEBUG   [0m | [36msrc.interface.api.middleware.auth[0m:[36mget_user[0m:[36m100[0m - [34m[1mUserService imported from: src.engine.services.user_service at unknown[0m
+[32m2026-01-12 08:56:43[0m | [33m[1mWARNING [0m | [36msrc.core.utils.encryption[0m:[36m__init__[0m:[36m26[0m - [33m[1m⚠️ ENCRYPTION_KEY not set. Generating a temporary key for this session.[0m
+[32m2026-01-12 08:56:43[0m | [34m[1mDEBUG   [0m | [36msrc.engine.services.user_service[0m:[36mget_user_by_username[0m:[36m134[0m - [34m[1mUserService.get_user_by_username searching for testuser[0m
+[32m2026-01-12 08:56:43[0m | [34m[1mDEBUG   [0m | [36msrc.engine.services.user_service[0m:[36mget_user_by_username[0m:[36m137[0m - [34m[1mUserService found user: testuser (ID: 1)[0m
+[32m2026-01-12 08:56:43[0m | [33m[1mWARNING [0m | [36msrc.enterprise.audit[0m:[36mlog_event[0m:[36m102[0m - [33m[1m[AUDIT] testuser - POST /api/v1/campaigns/upload[0m
+FAILED[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mshutdown_event[0m:[36m360[0m - [1mPCA Agent API v3.0 - Shutting down[0m
+
+tests/integration/test_data_consistency.py::test_job_summary_parity 
+[DEBUG] db_session fixture started
+
+[DEBUG] Database cleaned. Users remaining: []
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m335[0m - [1m============================================================[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m336[0m - [1mPCA Agent API v3.0 - Starting[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m337[0m - [1m============================================================[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m338[0m - [1m✅ Database persistence enabled[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m339[0m - [1m✅ JWT authentication enabled[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m340[0m - [1m✅ Rate limiting: False[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m341[0m - [1m✅ API versioning: /api/v1/[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m342[0m - [1m✅ Report regeneration implemented[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m343[0m - [1m✅ Structured error codes enabled[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m344[0m - [1m✅ Specific exception handling enabled[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m345[0m - [1m============================================================[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mstartup_event[0m:[36m353[0m - [1m✅ JWT secret key validated[0m
+[32m2026-01-12 08:56:44[0m | [33m[1mWARNING [0m | [36msrc.core.utils.encryption[0m:[36m__init__[0m:[36m26[0m - [33m[1m⚠️ ENCRYPTION_KEY not set. Generating a temporary key for this session.[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.engine.services.user_service[0m:[36mcreate_user[0m:[36m128[0m - [1mUser created: testuser (test@example.com)[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.middleware.auth[0m:[36mcreate_access_token[0m:[36m182[0m - [1mCreated access token for user: testuser[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36m__init__[0m:[36m73[0m - [1mDuckDBManager Singleton Initialized[0m
+[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36mclear_data[0m:[36m911[0m - [1mCleared campaign data parquet[0m
+[32m2026-01-12 08:56:44[0m | [31m[1mERROR   [0m | [36msrc.core.database.duckdb_manager[0m:[36mget_connection[0m:[36m157[0m - [31m[1mFailed to acquire Write Lock on data/analytics.duckdb: IO Error: Could not set lock on file "/Users/ashwin/Desktop/pca_agent copy/data/analytics.duckdb": Conflicting lock is held in /opt/homebrew/Cellar/python@3.12/3.12.12/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python (PID 852) by user ashwin. See also https://duckdb.org/docs/stable/connect/concurrency[0m
+[32m2026-01-12 08:56:44[0m | [33m[1mWARNING [0m | [36msrc.core.database.duckdb_manager[0m:[36mget_connection[0m:[36m158[0m - [33m[1mFalling back to IN-MEMORY mode (Reads will work, Writes will be non-persistent)[0m
+[32m2026-01-12 08:56:44[0m | [33m[1mWARNING [0m | [36msrc.core.database.duckdb_manager[0m:[36mclear_data[0m:[36m919[0m - [33m[1mCould not clear tracking tables: Catalog Error: Table with name recommendation_feedback does not exist!
+Did you mean "pg_prepared_statements"?
+
+LINE 1: DELETE FROM recommendation_feedback
+                    ^[0m
+FAILED[32m2026-01-12 08:56:44[0m | [1mINFO    [0m | [36msrc.interface.api.main_v3[0m:[36mshutdown_event[0m:[36m360[0m - [1mPCA Agent API v3.0 - Shutting down[0m
+
+
+=================================== FAILURES ===================================
+___________________ test_kpi_consistency_upload_vs_analysis ____________________
+tests/integration/test_data_consistency.py:56: in test_kpi_consistency_upload_vs_analysis
+    assert response.status_code == 201, f"Upload failed: {response.text}"
+E   AssertionError: Upload failed: {"detail":"Not Found"}
+E   assert 404 == 201
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________________________ test_job_summary_parity ____________________________
+tests/integration/test_data_consistency.py:108: in test_job_summary_parity
+    response = client.post(
+.venv312/lib/python3.12/site-packages/starlette/testclient.py:546: in post
+    return super().post(
+.venv312/lib/python3.12/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv312/lib/python3.12/site-packages/starlette/testclient.py:445: in request
+    return super().request(
+.venv312/lib/python3.12/site-packages/httpx/_client.py:812: in request
+    request = self.build_request(
+.venv312/lib/python3.12/site-packages/httpx/_client.py:378: in build_request
+    return Request(
+.venv312/lib/python3.12/site-packages/httpx/_models.py:408: in __init__
+    headers, stream = encode_request(
+.venv312/lib/python3.12/site-packages/httpx/_content.py:212: in encode_request
+    return encode_multipart_data(data or {}, files, boundary)
+.venv312/lib/python3.12/site-packages/httpx/_content.py:155: in encode_multipart_data
+    multipart = MultipartStream(data=data, files=files, boundary=boundary)
+.venv312/lib/python3.12/site-packages/httpx/_multipart.py:242: in __init__
+    self.fields = list(self._iter_fields(data, files))
+.venv312/lib/python3.12/site-packages/httpx/_multipart.py:256: in _iter_fields
+    yield FileField(name=name, value=value)
+.venv312/lib/python3.12/site-packages/httpx/_multipart.py:159: in __init__
+    raise TypeError(
+E   TypeError: Multipart file uploads require 'io.BytesIO', not 'io.StringIO'.
+=============================== warnings summary ===============================
+src/core/database/models.py:12
+  /Users/ashwin/Desktop/pca_agent copy/src/core/database/models.py:12: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/platform/models/common.py:22: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('end_date')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/platform/models/common.py:35: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('sheet_name')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/platform/models/common.py:45: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class PCAAnalysisInput(BaseModel):
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:38: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    platforms: Optional[List[str]] = Field(None, max_items=50, description="Max 50 platforms")
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:39: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    channels: Optional[List[str]] = Field(None, max_items=50, description="Max 50 channels")
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:40: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    funnels: Optional[List[str]] = Field(None, max_items=20, description="Max 20 funnel stages")
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:46: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('end_date')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:53: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('max_spend')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:60: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('platforms', 'channels', 'funnels')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:89: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('*', pre=True)
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:96: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('end_date')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:114: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('event_type')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:118: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('source')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:133: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('question')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:149: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('analysis_depth')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:154: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('campaign_objective', 'conversion_definition', 'time_period')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:160: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    kpis: List[str] = Field(..., min_items=1, max_items=20, description="KPIs to compare (max 20)")
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:160: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    kpis: List[str] = Field(..., min_items=1, max_items=20, description="KPIs to compare (max 20)")
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:167: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('dimension', 'platforms', 'start_date', 'end_date')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:172: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('kpis')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/user_management.py:42: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('username')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/user_management.py:46: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('email')
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/user_management.py:89: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('email', pre=True)
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/health_check.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class HealthCheckRequest(BaseModel):
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/health_check.py:58: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class DeepAnalysisRequest(BaseModel):
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  <string>:9: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/google/rpc/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+    import pkg_resources
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:3146: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(pkg)
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:3146: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google.logging')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(pkg)
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:2558: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(parent)
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/google/rpc/__init__.py:20: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google.rpc')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    pkg_resources.declare_namespace(__name__)
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/engine/analytics/llm_service.py:7: FutureWarning: 
+  
+  All support for the `google.generativeai` package has ended. It will no longer be receiving 
+  updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+  See README for more details:
+  
+  https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+  
+    import google.generativeai as genai
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/core/utils/observability.py:282: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    self._start_time = datetime.utcnow()
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/upload.py:35: UserWarning: Field name "schema" in "UploadStatus" shadows an attribute in parent "BaseModel"
+    class UploadStatus(BaseModel):
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/kg_rag/config/settings.py:13: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class KGRAGSettings(BaseSettings):
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/main_v3.py:332: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/fastapi/applications.py:4576: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/main_v3.py:357: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+tests/integration/test_data_consistency.py::test_job_summary_parity
+  /Users/ashwin/Desktop/pca_agent copy/src/engine/services/user_service.py:121: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    password_changed_at=datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_data_consistency.py::test_kpi_consistency_upload_vs_analysis
+FAILED tests/integration/test_data_consistency.py::test_job_summary_parity - ...
+======================== 2 failed, 56 warnings in 3.46s ========================

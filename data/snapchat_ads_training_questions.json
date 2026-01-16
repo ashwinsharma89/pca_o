@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "question": "What is the total spend across all campaigns?",
+    "category": "basic_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Spend) as total_spend FROM campaigns"
+  },
+  {
+    "id": 2,
+    "question": "Which campaign has the highest ROAS?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Revenue) / SUM(Spend)) as roas FROM campaigns GROUP BY Campaign_Name ORDER BY roas DESC LIMIT 1"
+  },
+  {
+    "id": 3,
+    "question": "Show average swipe up rate by placement",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Placement, (SUM(Swipes) * 100.0 / SUM(Impressions)) as swipe_rate FROM campaigns GROUP BY Placement ORDER BY swipe_rate DESC"
+  },
+  {
+    "id": 4,
+    "question": "What is the total revenue from Discover placement?",
+    "category": "filtered_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Revenue) as total_revenue FROM campaigns WHERE Placement = 'Discover'"
+  },
+  {
+    "id": 5,
+    "question": "Compare video view rate between age groups",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Age, (SUM(Video_Views) * 100.0 / SUM(Impressions)) as video_view_rate FROM campaigns GROUP BY Age ORDER BY video_view_rate DESC"
+  },
+  {
+    "id": 6,
+    "question": "Which ad squad has the best conversion rate?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Ad_Squad_Name, (SUM(Conversions) * 100.0 / SUM(Swipes)) as conv_rate FROM campaigns GROUP BY Ad_Squad_Name ORDER BY conv_rate DESC LIMIT 1"
+  },
+  {
+    "id": 7,
+    "question": "Show daily spend trend for the last 30 days",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Date, SUM(Spend) as daily_spend FROM campaigns WHERE CAST(Date AS DATE) >= CURRENT_DATE - INTERVAL '30 days' GROUP BY Date ORDER BY Date"
+  },
+  {
+    "id": 8,
+    "question": "What is the average video completion rate by placement?",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, AVG(Completion_Rate) as avg_completion_rate FROM campaigns GROUP BY Placement ORDER BY avg_completion_rate DESC"
+  },
+  {
+    "id": 9,
+    "question": "Which age group has the highest swipe up rate?",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Age, (SUM(Swipes) * 100.0 / SUM(Impressions)) as swipe_rate FROM campaigns GROUP BY Age ORDER BY swipe_rate DESC LIMIT 1"
+  },
+  {
+    "id": 10,
+    "question": "Show top 5 campaigns by total revenue",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Revenue) as total_revenue FROM campaigns GROUP BY Campaign_Name ORDER BY total_revenue DESC LIMIT 5"
+  },
+  {
+    "id": 11,
+    "question": "What is the eCPSwipe by objective?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Objective, (SUM(Spend) / SUM(Swipes)) as ecpswipe FROM campaigns GROUP BY Objective ORDER BY ecpswipe"
+  },
+  {
+    "id": 12,
+    "question": "Compare male vs female performance by ROAS",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Gender, (SUM(Revenue) / SUM(Spend)) as roas FROM campaigns GROUP BY Gender ORDER BY roas DESC"
+  },
+  {
+    "id": 13,
+    "question": "Which placement has the highest engagement per impression?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, (SUM(Swipes) * 1.0 / SUM(Impressions)) as engagement_per_impression FROM campaigns GROUP BY Placement ORDER BY engagement_per_impression DESC LIMIT 1"
+  },
+  {
+    "id": 14,
+    "question": "Show weekly spend trend",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as week, SUM(Spend) as weekly_spend FROM campaigns GROUP BY week ORDER BY week"
+  },
+  {
+    "id": 15,
+    "question": "What is the average frequency by campaign?",
+    "category": "reach_frequency",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Impressions) * 1.0 / SUM(Reach)) as frequency FROM campaigns GROUP BY Campaign_Name ORDER BY frequency DESC"
+  },
+  {
+    "id": 16,
+    "question": "Which campaigns have ROAS greater than 5?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Revenue) / SUM(Spend)) as roas FROM campaigns GROUP BY Campaign_Name HAVING (SUM(Revenue) / SUM(Spend)) > 5"
+  },
+  {
+    "id": 17,
+    "question": "Show total impressions and reach by placement",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Placement, SUM(Impressions) as total_impressions, SUM(Reach) as total_reach FROM campaigns GROUP BY Placement"
+  },
+  {
+    "id": 18,
+    "question": "What is the video quartile 3 completion rate by placement?",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, (SUM(Quartile_3) * 100.0 / SUM(Video_Views)) as q3_rate FROM campaigns GROUP BY Placement ORDER BY q3_rate DESC"
+  },
+  {
+    "id": 19,
+    "question": "Compare video views between age groups",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Age, SUM(Video_Views) as total_video_views FROM campaigns GROUP BY Age ORDER BY total_video_views DESC"
+  },
+  {
+    "id": 20,
+    "question": "What is the total screen time by campaign?",
+    "category": "engagement_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Screen_Time_Millis) as total_screen_time FROM campaigns GROUP BY Campaign_Name ORDER BY total_screen_time DESC"
+  },
+  {
+    "id": 21,
+    "question": "Show campaigns with swipe up rate above 2%",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Swipes) * 100.0 / SUM(Impressions)) as swipe_rate FROM campaigns GROUP BY Campaign_Name HAVING (SUM(Swipes) * 100.0 / SUM(Impressions)) > 2"
+  },
+  {
+    "id": 22,
+    "question": "What is the eCPM by placement?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, (SUM(Spend) / SUM(Impressions) * 1000) as ecpm FROM campaigns GROUP BY Placement ORDER BY ecpm"
+  },
+  {
+    "id": 23,
+    "question": "Which objective generates the most conversions?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Objective, SUM(Conversions) as total_conversions FROM campaigns GROUP BY Objective ORDER BY total_conversions DESC LIMIT 1"
+  },
+  {
+    "id": 24,
+    "question": "Show month-over-month revenue growth",
+    "category": "time_series",
+    "difficulty": "hard",
+    "expected_sql": "SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as month, SUM(Revenue) as monthly_revenue FROM campaigns GROUP BY month ORDER BY month"
+  },
+  {
+    "id": 25,
+    "question": "What is the average screen time per swipe by age group?",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Age, (SUM(Screen_Time_Millis) / SUM(Swipes)) as avg_screen_time_per_swipe FROM campaigns GROUP BY Age ORDER BY avg_screen_time_per_swipe DESC"
+  },
+  {
+    "id": 26,
+    "question": "Compare video quartile completion rates by placement",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, (SUM(Quartile_1) * 100.0 / SUM(Video_Views)) as q1_rate, (SUM(Quartile_2) * 100.0 / SUM(Video_Views)) as q2_rate, (SUM(Quartile_3) * 100.0 / SUM(Video_Views)) as q3_rate FROM campaigns GROUP BY Placement"
+  },
+  {
+    "id": 27,
+    "question": "Which campaigns have the lowest eCPSwipe?",
+    "category": "efficiency_metrics",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Spend) / SUM(Swipes)) as ecpswipe FROM campaigns GROUP BY Campaign_Name ORDER BY ecpswipe LIMIT 5"
+  },
+  {
+    "id": 28,
+    "question": "Show total reach by gender and age",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Gender, Age, SUM(Reach) as total_reach FROM campaigns GROUP BY Gender, Age ORDER BY total_reach DESC"
+  },
+  {
+    "id": 29,
+    "question": "What is the conversion rate by objective?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Objective, (SUM(Conversions) * 100.0 / SUM(Swipes)) as conv_rate FROM campaigns GROUP BY Objective ORDER BY conv_rate DESC"
+  },
+  {
+    "id": 30,
+    "question": "Show campaigns where spend exceeds $40,000",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Spend) as total_spend FROM campaigns GROUP BY Campaign_Name HAVING SUM(Spend) > 40000 ORDER BY total_spend DESC"
+  }
+]

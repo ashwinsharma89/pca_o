@@ -1,0 +1,304 @@
+[Config] Using local fallback database
+[32m2026-01-12 00:21:33[0m | [1mINFO    [0m | [36msrc.core.utils.logger[0m:[36msetup_logger[0m:[36m137[0m - [1mLogger initialized with production features[0m
+============================= test session starts ==============================
+platform darwin -- Python 3.12.12, pytest-7.4.0, pluggy-1.6.0 -- /Users/ashwin/Desktop/pca_agent copy/.venv312/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /Users/ashwin/Desktop/pca_agent copy
+configfile: pytest.ini
+plugins: mock-3.15.1, anyio-4.12.0, asyncio-0.23.4, timeout-2.4.0, typeguard-4.4.4, cov-7.0.0
+asyncio: mode=Mode.STRICT
+collecting ... [32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: campaign_performance_analysis v1.0.0[0m
+[32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: channel_comparison v1.0.0[0m
+[32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: chart_recommendation v1.0.0[0m
+[32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: sql_generation v1.0.0[0m
+[32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: insight_generation v1.0.0[0m
+[32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: executive_summary v1.0.0[0m
+[32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: rag_executive_summary v1.0.0[0m
+[32m2026-01-12 00:21:33[0m | [34m[1mDEBUG   [0m | [36msrc.engine.agents.prompt_templates[0m:[36mregister[0m:[36m336[0m - [34m[1mRegistered prompt: data_quality_check v1.0.0[0m
+[32m2026-01-12 00:21:34[0m | [1mINFO    [0m | [36msrc.core.utils.resilience[0m:[36m<module>[0m:[36m864[0m - [1mResilience module loaded successfully[0m
+[32m2026-01-12 00:21:35[0m | [33m[1mWARNING [0m | [36msrc.core.utils.opentelemetry_config[0m:[36m<module>[0m:[36m40[0m - [33m[1mOpenTelemetry not installed. Distributed tracing disabled.[0m
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.core.utils.observability[0m:[36m<module>[0m:[36m1180[0m - [1mObservability module loaded successfully[0m
+collected 1 item
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end 
+[DEBUG] db_session fixture started
+
+[DEBUG] Database cleaned. Users remaining: []
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.interface.api.v1[0m:[36m<module>[0m:[36m65[0m - [1mKG-RAG router mounted at /api/v1/kg[0m
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.core.utils.logger[0m:[36msetup_logger[0m:[36m137[0m - [1mLogger initialized with production features[0m
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.interface.api.validation_handlers[0m:[36msetup_validation_handlers[0m:[36m63[0m - [1m✅ Validation error handlers configured[0m
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.core.utils.opentelemetry_config[0m:[36minstrument_app[0m:[36m132[0m - [1mOpenTelemetry disabled or not available[0m
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36m__init__[0m:[36m73[0m - [1mDuckDBManager Singleton Initialized[0m
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36mclear_data[0m:[36m911[0m - [1mCleared campaign data[0m
+[32m2026-01-12 00:21:35[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36msave_campaigns[0m:[36m342[0m - [1mSaving campaigns with columns: ['Date', 'Spend', 'Conversions', 'Platform', 'year', 'month'][0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36mget_connection[0m:[36m148[0m - [1mDuckDB Connected (Read/Write) to data/analytics.duckdb[0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36minitialize[0m:[36m107[0m - [1mEnterprise tracking tables verified in DuckDB[0m
+[32m2026-01-12 00:21:36[0m | [34m[1mDEBUG   [0m | [36msrc.core.database.duckdb_manager[0m:[36mensure_indexes[0m:[36m257[0m - [34m[1mCreated index idx_date on Date[0m
+[32m2026-01-12 00:21:36[0m | [34m[1mDEBUG   [0m | [36msrc.core.database.duckdb_manager[0m:[36mensure_indexes[0m:[36m257[0m - [34m[1mCreated index idx_platform on Platform[0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36mensure_indexes[0m:[36m280[0m - [1mCreated 3 performance indexes in 0.02s[0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.core.database.duckdb_manager[0m:[36msave_campaigns[0m:[36m358[0m - [1mSaved 30 campaigns to data/campaigns (partitioned)[0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m146[0m - [1mStarting regression pipeline: target=Conversions, features=['Spend'][0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m159[0m - [1mData split: 24 train, 6 test[0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m166[0m - [1mFeatures scaled (StandardScaler)[0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m169[0m - [1mAnalyzing features (VIF, correlation, coverage)...[0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m178[0m - [1mTraining models: ['Ridge', 'Random Forest', 'XGBoost'][0m
+[32m2026-01-12 00:21:36[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.model_trainer[0m:[36mtrain_ridge[0m:[36m123[0m - [1mRidge: Best α=0.1, CV R²=0.9954, Time=0.01s[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.model_trainer[0m:[36mtrain_random_forest[0m:[36m202[0m - [1mRandom Forest: Best params={'n_estimators': 300, 'min_samples_split': 5, 'min_samples_leaf': 2, 'max_depth': None}, CV R²=0.9980, Time=2.18s[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.model_trainer[0m:[36mtrain_xgboost[0m:[36m290[0m - [1mXGBoost: Best params={'subsample': 0.7, 'n_estimators': 300, 'max_depth': 3, 'learning_rate': 0.01, 'colsample_bytree': 0.7}, CV R²=0.8918, Time=0.23s[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m185[0m - [1mBest model: Random Forest[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m188[0m - [1mEvaluating model performance...[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.shap_explainer[0m:[36mcompute_shap_values[0m:[36m32[0m - [1mCalculating SHAP values (type=tree)...[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.pipeline[0m:[36m_run[0m:[36m244[0m - [1mPipeline complete in 2.50s![0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.regression.recommendation_engine[0m:[36m_persist[0m:[36m173[0m - [1mPersisted 1 recommendations to DuckDB[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m114[0m - [1mImpact calc: Pre-rows=14, Post-rows=14 using col 'Date'[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m135[0m - [1mEfficiency: Pre=0.0988, Post=0.2018, ROI=104.24%[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m114[0m - [1mImpact calc: Pre-rows=14, Post-rows=14 using col 'Date'[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m135[0m - [1mEfficiency: Pre=0.0988, Post=0.2018, ROI=104.24%[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m114[0m - [1mImpact calc: Pre-rows=14, Post-rows=14 using col 'Date'[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m135[0m - [1mEfficiency: Pre=0.0988, Post=0.2018, ROI=104.24%[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m114[0m - [1mImpact calc: Pre-rows=14, Post-rows=14 using col 'Date'[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m135[0m - [1mEfficiency: Pre=0.0988, Post=0.2018, ROI=104.24%[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m114[0m - [1mImpact calc: Pre-rows=14, Post-rows=14 using col 'Date'[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m135[0m - [1mEfficiency: Pre=0.0988, Post=0.2018, ROI=104.24%[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m114[0m - [1mImpact calc: Pre-rows=14, Post-rows=14 using col 'Date'[0m
+[32m2026-01-12 00:21:38[0m | [1mINFO    [0m | [36msrc.engine.analytics.feedback_loop[0m:[36m_calculate_impact[0m:[36m135[0m - [1mEfficiency: Pre=0.0988, Post=0.2018, ROI=104.24%[0m
+FAILED
+
+=================================== FAILURES ===================================
+________________________ test_feedback_loop_end_to_end _________________________
+tests/integration/test_feedback_loop.py:82: in test_feedback_loop_end_to_end
+    assert impact['recommendation_id'] == rec_id
+E   AssertionError: assert 'c8bf7fd3-909...-e4dd9f625d2c' == 'a0fc7d5e-218...-3c59da0f04d3'
+E     - a0fc7d5e-2181-4cf6-a0d5-3c59da0f04d3
+E     + c8bf7fd3-909d-45ea-85fd-e4dd9f625d2c
+------------------------------ Captured log setup ------------------------------
+ERROR    src.core.database.connection:connection.py:110 Failed to initialize database: catching classes that do not inherit from BaseException is not allowed
+WARNING  src.core.database.connection:connection.py:188 ⚠️ PostgreSQL unavailable: catching classes that do not inherit from BaseException is not allowed
+WARNING  src.core.database.connection:connection.py:189 App will continue - DuckDB/Parquet features work without SQL database
+=============================== warnings summary ===============================
+src/core/database/models.py:12
+  /Users/ashwin/Desktop/pca_agent copy/src/core/database/models.py:12: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+<string>:9
+<string>:9
+<string>:9
+<string>:9
+<string>:9
+<string>:9
+<string>:9
+<string>:9
+  <string>:9: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+.venv312/lib/python3.12/site-packages/google/rpc/__init__.py:18
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/google/rpc/__init__.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+    import pkg_resources
+
+.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:3146
+.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:3146
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:3146: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(pkg)
+
+.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:3146
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:3146: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google.logging')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(pkg)
+
+.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:2558
+.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:2558
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/pkg_resources/__init__.py:2558: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(parent)
+
+.venv312/lib/python3.12/site-packages/google/rpc/__init__.py:20
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/google/rpc/__init__.py:20: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google.rpc')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    pkg_resources.declare_namespace(__name__)
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+src/engine/analytics/llm_service.py:7
+  /Users/ashwin/Desktop/pca_agent copy/src/engine/analytics/llm_service.py:7: FutureWarning: 
+  
+  All support for the `google.generativeai` package has ended. It will no longer be receiving 
+  updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+  See README for more details:
+  
+  https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+  
+    import google.generativeai as genai
+
+src/core/utils/observability.py:282
+  /Users/ashwin/Desktop/pca_agent copy/src/core/utils/observability.py:282: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    self._start_time = datetime.utcnow()
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/tests/conftest.py:145: SAWarning: The engine provided as bind produced a connection that is already in a transaction. This is usually caused by a core event, such as 'engine_connect', that has left a transaction open. The effective join transaction mode used by this session is 'create_savepoint'. To silence this warning, do not leave transactions open
+    session.query(User).delete()
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/tests/conftest.py:146: SAWarning: The engine provided as bind produced a connection that is already in a transaction. This is usually caused by a core event, such as 'engine_connect', that has left a transaction open. The effective join transaction mode used by this session is 'create_savepoint'. To silence this warning, do not leave transactions open
+    session.query(QueryHistory).delete()
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/tests/conftest.py:147: SAWarning: The engine provided as bind produced a connection that is already in a transaction. This is usually caused by a core event, such as 'engine_connect', that has left a transaction open. The effective join transaction mode used by this session is 'create_savepoint'. To silence this warning, do not leave transactions open
+    session.query(LLMUsage).delete()
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/tests/conftest.py:149: SAWarning: The engine provided as bind produced a connection that is already in a transaction. This is usually caused by a core event, such as 'engine_connect', that has left a transaction open. The effective join transaction mode used by this session is 'create_savepoint'. To silence this warning, do not leave transactions open
+    users = session.query(User).all()
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/platform/models/common.py:22: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('end_date')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/platform/models/common.py:35: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('sheet_name')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/platform/models/common.py:45: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class PCAAnalysisInput(BaseModel):
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:38: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    platforms: Optional[List[str]] = Field(None, max_items=50, description="Max 50 platforms")
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:39: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    channels: Optional[List[str]] = Field(None, max_items=50, description="Max 50 channels")
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:40: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    funnels: Optional[List[str]] = Field(None, max_items=20, description="Max 20 funnel stages")
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:46: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('end_date')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:53: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('max_spend')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:60: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('platforms', 'channels', 'funnels')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:89: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('*', pre=True)
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:96: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('end_date')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:114: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('event_type')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:118: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('source')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:133: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('question')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:149: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('analysis_depth')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:154: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('campaign_objective', 'conversion_definition', 'time_period')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:160: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    kpis: List[str] = Field(..., min_items=1, max_items=20, description="KPIs to compare (max 20)")
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:160: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    kpis: List[str] = Field(..., min_items=1, max_items=20, description="KPIs to compare (max 20)")
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:167: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('dimension', 'platforms', 'start_date', 'end_date')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/models.py:172: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('kpis')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/user_management.py:42: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('username')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/user_management.py:46: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('email')
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/user_management.py:89: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    @validator('email', pre=True)
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/health_check.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class HealthCheckRequest(BaseModel):
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/health_check.py:58: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class DeepAnalysisRequest(BaseModel):
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/v1/upload.py:35: UserWarning: Field name "schema" in "UploadStatus" shadows an attribute in parent "BaseModel"
+    class UploadStatus(BaseModel):
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/kg_rag/config/settings.py:13: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class KGRAGSettings(BaseSettings):
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/main_v3.py:332: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/fastapi/applications.py:4576: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+  /Users/ashwin/Desktop/pca_agent copy/src/interface/api/main_v3.py:357: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_feedback_loop.py::test_feedback_loop_end_to_end
+======================== 1 failed, 58 warnings in 5.64s ========================

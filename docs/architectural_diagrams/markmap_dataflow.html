@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+.markmap-dark {
+  background: #27272a;
+  color: white;
+}
+</style>
+
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js"></script><script>((getMarkmap, getOptions, root2, jsonOptions) => {
+              const markmap = getMarkmap();
+              window.mm = markmap.Markmap.create(
+                "svg#mindmap",
+                (getOptions || markmap.deriveOptions)(jsonOptions),
+                root2
+              );
+              if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.classList.add("markmap-dark");
+              }
+            })(() => window.markmap,null,{"content":"&#x1f30a; Data Physics (Flow)","children":[{"content":"1. Ingestion (Input)","children":[{"content":"<strong>Raw Sources</strong>","children":[{"content":"Screenshots (Images)","children":[],"payload":{"tag":"li","lines":"9,10"}},{"content":"CSV/Excel (Files)","children":[],"payload":{"tag":"li","lines":"10,11"}},{"content":"API Streams (JSON)","children":[],"payload":{"tag":"li","lines":"11,12"}}],"payload":{"tag":"li","lines":"8,12"}},{"content":"<strong>Processing</strong>","children":[{"content":"Normalization (Standard Schema)","children":[],"payload":{"tag":"li","lines":"13,14"}},{"content":"Sanitation (PII Removal)","children":[],"payload":{"tag":"li","lines":"14,15"}},{"content":"Validation (Data Quality)","children":[],"payload":{"tag":"li","lines":"15,17"}}],"payload":{"tag":"li","lines":"12,17"}}],"payload":{"tag":"h2","lines":"7,8"}},{"content":"2. Storage (Memory)","children":[{"content":"<strong>Hot Path</strong> (Vector)","children":[{"content":"Embedding (OpenAI)","children":[],"payload":{"tag":"li","lines":"19,20"}},{"content":"Indexing","children":[],"payload":{"tag":"li","lines":"20,21"}},{"content":"Similarity Search","children":[],"payload":{"tag":"li","lines":"21,22"}}],"payload":{"tag":"li","lines":"18,22"}},{"content":"<strong>Cold Path</strong> (Graph)","children":[{"content":"Node Creation (Campaigns)","children":[],"payload":{"tag":"li","lines":"23,24"}},{"content":"Edge Creation (Relationships)","children":[],"payload":{"tag":"li","lines":"24,25"}},{"content":"Property Mapping (Metrics)","children":[],"payload":{"tag":"li","lines":"25,26"}}],"payload":{"tag":"li","lines":"22,26"}},{"content":"<strong>Structured</strong> (SQL)","children":[{"content":"Aggregation Tables","children":[],"payload":{"tag":"li","lines":"27,28"}},{"content":"Time-series Data","children":[],"payload":{"tag":"li","lines":"28,30"}}],"payload":{"tag":"li","lines":"26,30"}}],"payload":{"tag":"h2","lines":"17,18"}},{"content":"3. Retrieval (Recall)","children":[{"content":"<strong>Hybrid Search</strong>","children":[{"content":"Semantic (Vector) + Structural (Graph)","children":[],"payload":{"tag":"li","lines":"32,33"}}],"payload":{"tag":"li","lines":"31,33"}},{"content":"<strong>Context Window</strong>","children":[{"content":"RAG Injection","children":[],"payload":{"tag":"li","lines":"34,35"}},{"content":"History Replay","children":[],"payload":{"tag":"li","lines":"35,37"}}],"payload":{"tag":"li","lines":"33,37"}}],"payload":{"tag":"h2","lines":"30,31"}},{"content":"4. Inference (Thought)","children":[{"content":"<strong>LLM Processing</strong>","children":[{"content":"Prompt Engineering","children":[],"payload":{"tag":"li","lines":"39,40"}},{"content":"Reasoning Chain","children":[],"payload":{"tag":"li","lines":"40,41"}},{"content":"Tool Invocation","children":[],"payload":{"tag":"li","lines":"41,43"}}],"payload":{"tag":"li","lines":"38,43"}}],"payload":{"tag":"h2","lines":"37,38"}},{"content":"5. Response (Output)","children":[{"content":"<strong>Synthesis</strong>","children":[{"content":"Natural Language","children":[],"payload":{"tag":"li","lines":"45,46"}},{"content":"JSON Data","children":[],"payload":{"tag":"li","lines":"46,47"}},{"content":"Visualization Config","children":[],"payload":{"tag":"li","lines":"47,48"}}],"payload":{"tag":"li","lines":"44,48"}}],"payload":{"tag":"h2","lines":"43,44"}}],"payload":{"tag":"h1","lines":"5,6"}},null)</script>
+</body>
+</html>

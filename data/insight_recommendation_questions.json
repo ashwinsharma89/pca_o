@@ -1,0 +1,305 @@
+{
+  "description": "Strategic insight discovery and actionable recommendation questions for PCA Agent",
+  "version": "1.0",
+  "last_updated": "2024-11-17",
+  "question_types": {
+    "insights": "Questions that uncover deep understanding of 'why' and 'what's happening'",
+    "recommendations": "Questions that provide specific, actionable next steps with quantified impact"
+  },
+  "strategic_questions": [
+    {
+      "id": "insight_001",
+      "type": "Strategic Insight - Performance Deep Dive",
+      "difficulty": "Expert",
+      "question": "What's the underlying story behind our campaign performance in the last 2 months? Identify the key drivers of success or failure and explain the 'why' behind the numbers.",
+      "sql_approach": "Multi-step analysis: (1) Overall metrics, (2) Trend analysis, (3) Segment breakdown, (4) Correlation analysis",
+      "expected_insight_structure": {
+        "narrative": "Tell the story of what happened",
+        "key_drivers": "Identify 3-5 main factors driving performance",
+        "quantified_impact": "Show how much each driver contributed",
+        "why_explanation": "Explain causation, not just correlation",
+        "business_implications": "So what? What does this mean for the business?"
+      },
+      "example_insight": "Campaign performance declined 18% in the last 2 months, driven primarily by three factors: (1) 25% CTR drop due to creative fatigue (campaigns running 60+ days without refresh), contributing -12% to overall decline, (2) 15% CPM increase from heightened competition in core audiences, contributing -8% decline, and (3) 5% conversion rate improvement from landing page optimization, offsetting -2% of the decline. The net story: creative fatigue is the primary culprit, masking positive gains from conversion optimization."
+    },
+    {
+      "id": "insight_002",
+      "type": "Strategic Insight - Efficiency Evolution",
+      "difficulty": "Hard",
+      "question": "Analyze our campaign efficiency evolution over the last 6 months. Are we getting better or worse at converting spend into results? What inflection points exist?",
+      "sql_approach": "Monthly trend analysis with efficiency metrics (ROAS, CPA, conversion rate) and inflection point detection",
+      "expected_insight_structure": {
+        "trend_direction": "Improving, declining, or flat",
+        "inflection_points": "When did major changes occur?",
+        "magnitude": "How much better/worse?",
+        "contributing_factors": "What changed at inflection points?",
+        "sustainability": "Is current trajectory sustainable?"
+      }
+    },
+    {
+      "id": "insight_003",
+      "type": "Root Cause Analysis",
+      "difficulty": "Expert",
+      "question": "Our CPA increased by 35% in the last month. Conduct a root cause analysis. Break down the contribution of each factor (CTR decline, CPM increase, conversion rate drop) to this increase.",
+      "sql_approach": "Decomposition analysis: CPA = (CPM / 1000) / (CTR * Conversion_Rate). Calculate each component's change and contribution.",
+      "expected_insight_structure": {
+        "problem_statement": "CPA increased 35% from $X to $Y",
+        "factor_breakdown": [
+          "CTR changed from A% to B% → contributed C% to CPA increase",
+          "CPM changed from $D to $E → contributed F% to CPA increase",
+          "Conv Rate changed from G% to H% → contributed I% to CPA increase"
+        ],
+        "primary_culprit": "Identify the #1 driver",
+        "root_cause": "Why did that factor change?",
+        "validation": "Sum of contributions should equal total change"
+      },
+      "example_calculation": "CPA increase breakdown: CTR declined 20% (from 2.5% to 2.0%) → +25% CPA impact. CPM increased 10% (from $8 to $8.80) → +10% CPA impact. Conversion rate flat → 0% impact. Total: 25% + 10% = 35% CPA increase. Primary driver: CTR decline due to creative fatigue."
+    },
+    {
+      "id": "insight_004",
+      "type": "Strategic Insight - Hidden Patterns",
+      "difficulty": "Hard",
+      "question": "What hidden patterns exist in our top-performing campaigns from the last quarter? Look for commonalities in targeting, creative, timing, or messaging that aren't immediately obvious.",
+      "sql_approach": "Identify top 20% campaigns, then analyze common attributes using GROUP BY and pattern detection",
+      "expected_insight_structure": {
+        "pattern_identification": "What do top performers have in common?",
+        "statistical_significance": "Is this pattern real or random?",
+        "non_obvious_insights": "What surprised you?",
+        "actionable_takeaway": "How can we replicate this?"
+      }
+    },
+    {
+      "id": "recommendation_001",
+      "type": "Actionable Recommendation - Budget Optimization",
+      "difficulty": "Expert",
+      "question": "Based on the last quarter's performance, how should we reallocate our budget next month to maximize conversions while maintaining target CPA? Provide specific dollar amounts and expected outcomes.",
+      "sql_approach": "Calculate current allocation, ROAS by channel, marginal efficiency, then optimize allocation",
+      "expected_recommendation_structure": {
+        "recommendation": "Reallocate $X from Channel A to Channel B, $Y from Channel C to Channel D",
+        "rationale": "Channel B has 2.5x higher ROAS and shows no saturation up to $Z spend level",
+        "expected_impact": "Increase conversions by 150-180 (+15-18%) while maintaining CPA at $42 (target: $45)",
+        "implementation": "Week 1: Shift 50% of reallocation. Week 2-3: Monitor and adjust. Week 4: Complete shift if metrics hold.",
+        "risks": "Channel B may saturate faster than expected. Mitigation: Monitor daily CPA and scale gradually.",
+        "success_metrics": "Track daily CPA (target: $40-45), conversion volume (target: +15%), ROAS (target: maintain 3.5x+)",
+        "priority": "High - Expected $45K additional revenue with minimal risk"
+      }
+    },
+    {
+      "id": "recommendation_002",
+      "type": "Actionable Recommendation - Campaign Optimization",
+      "difficulty": "Hard",
+      "question": "Create a prioritized optimization roadmap for the next 30 days based on insights from the last 2 months. Include expected impact, effort level, and implementation sequence.",
+      "sql_approach": "Identify all optimization opportunities, score by impact and effort, prioritize",
+      "expected_recommendation_structure": {
+        "roadmap": [
+          {
+            "week": 1,
+            "action": "Refresh creative for 5 fatigued campaigns (60+ days old)",
+            "expected_impact": "15-20% CTR improvement, 10-12% CPA reduction",
+            "effort": "Medium (2-3 days design + 1 day implementation)",
+            "priority": "High"
+          },
+          {
+            "week": 2,
+            "action": "Reallocate $15K from low-ROAS campaigns to top performers",
+            "expected_impact": "+120 conversions, maintain CPA",
+            "effort": "Low (1 day)",
+            "priority": "High"
+          },
+          {
+            "week": 3,
+            "action": "Expand lookalike audiences for top 3 campaigns",
+            "expected_impact": "+50-70 conversions, +5-8% CPA",
+            "effort": "Low (half day)",
+            "priority": "Medium"
+          },
+          {
+            "week": 4,
+            "action": "A/B test new landing page variant",
+            "expected_impact": "Potential 10-15% conversion rate lift",
+            "effort": "High (1 week dev + QA)",
+            "priority": "Medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "recommendation_003",
+      "type": "Actionable Recommendation - Scaling Strategy",
+      "difficulty": "Expert",
+      "question": "We want to double conversion volume in the next quarter. Based on the last 3 months, provide a detailed scaling playbook with budget requirements, expected efficiency changes, and risk mitigation.",
+      "sql_approach": "Analyze current efficiency curves, identify saturation points, model scaling scenarios",
+      "expected_recommendation_structure": {
+        "recommendation": "3-phase scaling approach: (1) Scale proven winners 50%, (2) Expand audiences 30%, (3) Test new channels 20%",
+        "rationale": "Current top 5 campaigns show headroom to $X spend before saturation. Lookalike expansion tested successfully at small scale. New channels needed for full 2x goal.",
+        "budget_requirements": "Increase from $150K/month to $320K/month (+$170K). Phase 1: +$85K, Phase 2: +$50K, Phase 3: +$35K",
+        "expected_impact": "Month 1: +40% conversions. Month 2: +70% conversions. Month 3: +100% conversions (2x goal achieved)",
+        "efficiency_changes": "Expect CPA to increase 15-20% from $42 to $48-50 due to audience expansion and new channel learning curves",
+        "risks": [
+          "Audience saturation faster than projected → Mitigation: Daily monitoring, ready to pivot to new segments",
+          "New channels underperform → Mitigation: Cap new channel spend at 20%, reallocate if ROAS < 2.0",
+          "Market competition increases → Mitigation: Creative refresh pipeline, bid optimization"
+        ],
+        "success_metrics": "Weekly conversion volume (target: +10% week-over-week), CPA (acceptable range: $42-52), ROAS (floor: 2.8x)",
+        "priority": "High - Strategic growth initiative"
+      }
+    },
+    {
+      "id": "recommendation_004",
+      "type": "Actionable Recommendation - Crisis Response",
+      "difficulty": "Expert",
+      "question": "Performance has declined 40% in the last 3 weeks. Provide an emergency action plan with immediate, short-term, and long-term recommendations based on root cause analysis.",
+      "sql_approach": "Identify when decline started, what changed, decompose factors, prioritize fixes",
+      "expected_recommendation_structure": {
+        "immediate_actions": [
+          "Pause bottom 20% of campaigns by ROAS (free up $12K budget) - Execute today",
+          "Increase bids 15% on top 3 performing campaigns to capture lost volume - Execute today",
+          "Refresh creative on 8 fatigued campaigns - Execute within 48 hours"
+        ],
+        "short_term_actions": [
+          "Week 1: Audit tracking and attribution - ensure data accuracy",
+          "Week 1-2: Expand lookalike audiences for proven winners",
+          "Week 2: Launch 3 new creative variants based on past winners"
+        ],
+        "long_term_actions": [
+          "Month 1: Diversify into 2 new channels to reduce concentration risk",
+          "Month 2: Implement automated bidding with custom ROAS targets",
+          "Month 3: Build creative testing framework to prevent future fatigue"
+        ],
+        "expected_recovery": "Immediate actions: recover 15-20% of lost performance within 3 days. Short-term: recover 60-70% within 2 weeks. Long-term: exceed previous baseline by 10% within 3 months.",
+        "priority": "Critical - Business continuity at risk"
+      }
+    },
+    {
+      "id": "recommendation_005",
+      "type": "Actionable Recommendation - Testing Roadmap",
+      "difficulty": "Hard",
+      "question": "Design an A/B testing roadmap for the next quarter based on insights and knowledge gaps from the last 6 months. Prioritize tests by potential impact and learning value.",
+      "sql_approach": "Identify high-variance metrics, untested hypotheses, and high-impact variables",
+      "expected_recommendation_structure": {
+        "testing_roadmap": [
+          {
+            "test_name": "Audience Expansion: Lookalike 1% vs 3% vs 5%",
+            "hypothesis": "Broader lookalikes maintain efficiency while increasing scale",
+            "priority": "High",
+            "potential_impact": "20-30% volume increase if successful",
+            "learning_value": "High - informs all future scaling",
+            "timeline": "Week 1-2",
+            "budget": "$5K test budget",
+            "success_criteria": "3% or 5% lookalike achieves CPA within 15% of 1% baseline"
+          },
+          {
+            "test_name": "Creative Format: Video vs Carousel vs Static",
+            "hypothesis": "Video drives higher engagement and conversion despite higher CPM",
+            "priority": "High",
+            "potential_impact": "15-25% conversion rate improvement",
+            "learning_value": "High - informs creative strategy",
+            "timeline": "Week 3-4",
+            "budget": "$8K test budget",
+            "success_criteria": "Video achieves 20%+ higher conversion rate to justify 30% higher CPM"
+          },
+          {
+            "test_name": "Bid Strategy: Manual CPA vs Target ROAS",
+            "hypothesis": "ROAS bidding better optimizes for revenue, not just conversions",
+            "priority": "Medium",
+            "potential_impact": "10-15% revenue increase",
+            "learning_value": "Medium - tactical optimization",
+            "timeline": "Week 5-8",
+            "budget": "$10K test budget",
+            "success_criteria": "ROAS bidding delivers 10%+ higher revenue at similar CPA"
+          }
+        ]
+      }
+    },
+    {
+      "id": "insight_005",
+      "type": "Strategic Insight - Opportunity Identification",
+      "difficulty": "Hard",
+      "question": "What are the top 3 untapped opportunities based on the last quarter's data? Quantify the potential impact of pursuing each opportunity.",
+      "sql_approach": "Identify underutilized channels, budget-constrained campaigns, high-potential segments",
+      "expected_insight_structure": {
+        "opportunities": [
+          {
+            "opportunity": "Scale Campaign X (currently budget-constrained)",
+            "evidence": "Campaign X has lowest CPA ($32 vs $45 average) and highest ROAS (5.2x vs 3.1x average) but only 8% of total budget",
+            "potential_impact": "Increasing budget from $12K to $35K could add 180-220 conversions/month at $32-38 CPA",
+            "confidence": "High - campaign has shown consistent performance for 4 months",
+            "next_steps": "Gradual scaling test: +50% budget week 1, monitor CPA, scale further if CPA stays below $40"
+          },
+          {
+            "opportunity": "Expand to LinkedIn Ads (untapped channel)",
+            "evidence": "B2B audience shows 3x higher LTV ($450 vs $150 average). LinkedIn CPL benchmarks suggest $80-120 CPL is achievable.",
+            "potential_impact": "Conservative: 50 conversions/month at $100 CPL = $5K spend, $22.5K revenue (4.5x ROAS). Optimistic: 120 conversions at $85 CPL.",
+            "confidence": "Medium - new channel risk, but audience fit is strong",
+            "next_steps": "$5K pilot test for 2 weeks, target $100 CPL, evaluate ROAS vs 3.0x threshold"
+          },
+          {
+            "opportunity": "Retarget cart abandoners (underutilized segment)",
+            "evidence": "Only 15% of cart abandoners are currently retargeted. Historical data shows 8-12% conversion rate on retargeting vs 2% on cold traffic.",
+            "potential_impact": "Expanding retargeting to 80% coverage could add 90-130 conversions/month at $25-30 CPA (vs $45 blended CPA)",
+            "confidence": "High - proven tactic with clear incrementality",
+            "next_steps": "Implement within 1 week: expand retargeting audiences, set up dynamic product ads, allocate $8K/month budget"
+          }
+        ]
+      }
+    }
+  ],
+  "insight_framework": {
+    "principles": [
+      "Go beyond surface-level observations",
+      "Connect multiple data points into coherent narratives",
+      "Identify 'so what' implications for business",
+      "Distinguish correlation from causation",
+      "Provide confidence levels for conclusions",
+      "Flag data limitations or caveats",
+      "Compare against benchmarks and expectations",
+      "Explain the 'why' behind patterns"
+    ],
+    "structure": {
+      "observation": "What did we see in the data?",
+      "analysis": "Why did this happen? (root causes)",
+      "implications": "So what? What does this mean for the business?",
+      "confidence": "How certain are we? What are the caveats?",
+      "next_steps": "What should we investigate further or act on?"
+    }
+  },
+  "recommendation_framework": {
+    "principles": [
+      "Be specific and actionable (not vague suggestions)",
+      "Quantify expected impact where possible",
+      "Consider implementation difficulty and timeline",
+      "Assess risks and trade-offs",
+      "Prioritize by potential business impact",
+      "Provide clear success metrics",
+      "Include contingency plans",
+      "Link back to insights that support the recommendation"
+    ],
+    "structure": {
+      "recommendation": "Clear, specific action to take",
+      "rationale": "Data-driven evidence from analysis",
+      "expected_impact": "Quantified outcomes (e.g., '15-20% CPA reduction', '+150 conversions')",
+      "implementation": "How to execute, timeline, resources needed",
+      "risks": "What could go wrong, mitigation strategies",
+      "success_metrics": "How to measure effectiveness (KPIs, targets)",
+      "priority": "High/Medium/Low based on impact and effort"
+    }
+  },
+  "agent_training_notes": {
+    "for_insights": [
+      "Tell a story, don't just list facts",
+      "Quantify the impact of each driver",
+      "Explain causation, not just correlation",
+      "Provide context (vs benchmarks, vs previous periods)",
+      "Acknowledge uncertainty and data limitations",
+      "Connect insights to business outcomes"
+    ],
+    "for_recommendations": [
+      "Be specific: 'Increase budget by $15K' not 'Increase budget'",
+      "Quantify impact: '+150 conversions' not 'more conversions'",
+      "Include timeline: 'Week 1-2' not 'soon'",
+      "Assess risk: 'May saturate at $X spend' not just upside",
+      "Define success: 'CPA < $45' not 'better performance'",
+      "Prioritize: Explain why this matters most"
+    ]
+  }
+}

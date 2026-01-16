@@ -1,0 +1,12 @@
+{
+  "test_file": {
+    "source_id": "test_file",
+    "source_type": "file",
+    "location": "C:\\Users\\asharm08\\AppData\\Local\\Temp\\tmpzduz4xt9.txt",
+    "last_hash": "f1f6dad130c6e42bac28c51fffb1954d3c5a62355b45769c42fda5b7745db53f",
+    "last_checked": "2025-12-01T18:54:47.101133",
+    "last_refreshed": "2025-12-01T18:54:47.102459",
+    "refresh_count": 1,
+    "error_count": 0
+  }
+}

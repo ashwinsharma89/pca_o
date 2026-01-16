@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "question": "What is the total spend across all campaigns?",
+    "category": "basic_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Spend) as total_spend FROM campaigns"
+  },
+  {
+    "id": 2,
+    "question": "Which job function has the highest conversion rate?",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Job_Function, (SUM(Conversions) * 100.0 / SUM(Clicks)) as avg_conv_rate FROM campaigns GROUP BY Job_Function ORDER BY avg_conv_rate DESC LIMIT 1"
+  },
+  {
+    "id": 3,
+    "question": "Show average CPC by seniority level",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Seniority, (SUM(Spend) / SUM(Clicks)) as avg_cpc FROM campaigns GROUP BY Seniority ORDER BY avg_cpc"
+  },
+  {
+    "id": 4,
+    "question": "Compare performance across industries by ROAS",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Industry, (SUM(Revenue) / SUM(Spend)) as avg_roas FROM campaigns GROUP BY Industry ORDER BY avg_roas DESC"
+  },
+  {
+    "id": 5,
+    "question": "Which campaign group generates the most leads?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Group, SUM(Leads) as total_leads FROM campaigns GROUP BY Campaign_Group ORDER BY total_leads DESC LIMIT 1"
+  },
+  {
+    "id": 6,
+    "question": "What is the lead form completion rate by ad format?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Format, (SUM(Leads) * 100.0 / SUM(Lead_Form_Opens)) as avg_completion_rate FROM campaigns GROUP BY Ad_Format ORDER BY avg_completion_rate DESC"
+  },
+  {
+    "id": 7,
+    "question": "Show top 5 campaigns by total revenue",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Revenue) as total_revenue FROM campaigns GROUP BY Campaign_Name ORDER BY total_revenue DESC LIMIT 5"
+  },
+  {
+    "id": 8,
+    "question": "Which company size segment has the best ROAS?",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Company_Size, (SUM(Revenue) / SUM(Spend)) as avg_roas FROM campaigns GROUP BY Company_Size ORDER BY avg_roas DESC LIMIT 1"
+  },
+  {
+    "id": 9,
+    "question": "What is the cost per lead by job function?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Job_Function, SUM(Spend) / SUM(Leads) as cost_per_lead FROM campaigns GROUP BY Job_Function ORDER BY cost_per_lead"
+  },
+  {
+    "id": 10,
+    "question": "Show daily leads trend for the last 30 days",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Date, SUM(Leads) as daily_leads FROM campaigns WHERE CAST(Date AS DATE) >= CURRENT_DATE - INTERVAL '30 days' GROUP BY Date ORDER BY Date"
+  },
+  {
+    "id": 11,
+    "question": "Compare Sponsored Content vs Video ads by CTR",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Format, (SUM(Clicks) * 100.0 / SUM(Impressions)) as avg_ctr FROM campaigns WHERE Ad_Format IN ('Sponsored_Content', 'Video') GROUP BY Ad_Format"
+  },
+  {
+    "id": 12,
+    "question": "Which seniority level has the highest engagement rate?",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Seniority, (SUM(Engagement) * 100.0 / SUM(Impressions)) as avg_engagement FROM campaigns GROUP BY Seniority ORDER BY avg_engagement DESC LIMIT 1"
+  },
+  {
+    "id": 13,
+    "question": "What is the total number of conversions by objective?",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Objective, SUM(Conversions) as total_conversions FROM campaigns GROUP BY Objective ORDER BY total_conversions DESC"
+  },
+  {
+    "id": 14,
+    "question": "Show campaigns with ROAS greater than 5",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT DISTINCT Campaign_Name FROM campaigns WHERE ROAS > 5"
+  },
+  {
+    "id": 15,
+    "question": "Compare mobile vs desktop performance by conversion rate",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, (SUM(Conversions) * 100.0 / SUM(Clicks)) as avg_conv_rate FROM campaigns GROUP BY Device ORDER BY avg_conv_rate DESC"
+  },
+  {
+    "id": 16,
+    "question": "Which ad format has the lowest cost per conversion?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Format, SUM(Spend) / SUM(Conversions) as cost_per_conv FROM campaigns GROUP BY Ad_Format ORDER BY cost_per_conv LIMIT 1"
+  },
+  {
+    "id": 17,
+    "question": "Show weekly spend trend",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as week, SUM(Spend) as weekly_spend FROM campaigns GROUP BY week ORDER BY week"
+  },
+  {
+    "id": 18,
+    "question": "What is the average CTR by industry?",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Industry, (SUM(Clicks) * 100.0 / SUM(Impressions)) as avg_ctr FROM campaigns GROUP BY Industry ORDER BY avg_ctr DESC"
+  },
+  {
+    "id": 19,
+    "question": "Which campaigns target C-Level executives?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT DISTINCT Campaign_Name FROM campaigns WHERE Seniority = 'C-Level'"
+  },
+  {
+    "id": 20,
+    "question": "Show total impressions by job function and seniority",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Job_Function, Seniority, SUM(Impressions) as total_impressions FROM campaigns GROUP BY Job_Function, Seniority ORDER BY total_impressions DESC"
+  },
+  {
+    "id": 21,
+    "question": "What is the lead generation efficiency by company size?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Company_Size, SUM(Leads) * 1.0 / SUM(Impressions) as lead_efficiency FROM campaigns GROUP BY Company_Size ORDER BY lead_efficiency DESC"
+  },
+  {
+    "id": 22,
+    "question": "Compare IT vs Marketing job functions by ROAS",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Job_Function, (SUM(Revenue) / SUM(Spend)) as avg_roas FROM campaigns WHERE Job_Function IN ('IT', 'Marketing') GROUP BY Job_Function"
+  },
+  {
+    "id": 23,
+    "question": "Which campaigns have CTR above 3%?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Clicks) * 100.0 / SUM(Impressions)) as avg_ctr FROM campaigns GROUP BY Campaign_Name HAVING (SUM(Clicks) * 100.0 / SUM(Impressions)) > 3 ORDER BY avg_ctr DESC"
+  },
+  {
+    "id": 24,
+    "question": "Show month-over-month revenue growth",
+    "category": "time_series",
+    "difficulty": "hard",
+    "expected_sql": "SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as month, SUM(Revenue) as monthly_revenue FROM campaigns GROUP BY month ORDER BY month"
+  },
+  {
+    "id": 25,
+    "question": "What is the average engagement rate by ad format?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Format, (SUM(Engagement) * 100.0 / SUM(Impressions)) as avg_engagement FROM campaigns GROUP BY Ad_Format ORDER BY avg_engagement DESC"
+  },
+  {
+    "id": 26,
+    "question": "Which objective drives the most conversions?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Objective, SUM(Conversions) as total_conversions FROM campaigns GROUP BY Objective ORDER BY total_conversions DESC LIMIT 1"
+  },
+  {
+    "id": 27,
+    "question": "Show campaigns targeting Technology industry with ROAS > 5",
+    "category": "performance_filtering",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Revenue) / SUM(Spend)) as avg_roas FROM campaigns WHERE Industry = 'Technology' GROUP BY Campaign_Name HAVING (SUM(Revenue) / SUM(Spend)) > 5"
+  },
+  {
+    "id": 28,
+    "question": "What is the total clicks by device?",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Device, SUM(Clicks) as total_clicks FROM campaigns GROUP BY Device ORDER BY total_clicks DESC"
+  },
+  {
+    "id": 29,
+    "question": "Compare Director vs VP level by conversion rate",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Seniority, (SUM(Conversions) * 100.0 / SUM(Clicks)) as avg_conv_rate FROM campaigns WHERE Seniority IN ('Director', 'VP') GROUP BY Seniority"
+  },
+  {
+    "id": 30,
+    "question": "Which campaigns have spend exceeding $30,000?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Spend) as total_spend FROM campaigns GROUP BY Campaign_Name HAVING SUM(Spend) > 30000 ORDER BY total_spend DESC"
+  }
+]

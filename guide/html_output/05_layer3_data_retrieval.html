@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Chapter 5: Layer 3 - Data Retrieval</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  
+  <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+      
+      :root {
+          --primary-color: #2563eb;
+          --text-color: #1f2937;
+          --bg-color: #ffffff;
+          --border-color: #e5e7eb;
+          --code-bg: #f3f4f6;
+          --heading-color: #111827;
+      }
+      
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+      
+      body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-size: 11pt;
+          line-height: 1.7;
+          color: var(--text-color);
+          background: var(--bg-color);
+          max-width: 8.5in;
+          margin: 0 auto;
+          padding: 0.75in;
+          counter-reset: page;
+      }
+      
+      /* Headers */
+      h1, h2, h3, h4, h5, h6 {
+          font-weight: 700;
+          color: var(--heading-color);
+          margin-top: 1.5em;
+          margin-bottom: 0.75em;
+          line-height: 1.3;
+      }
+      
+      h1 {
+          font-size: 28pt;
+          font-weight: 900;
+          border-bottom: 3px solid var(--primary-color);
+          padding-bottom: 0.3em;
+          margin-top: 0;
+          page-break-before: always;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+      }
+      
+      /* First h1 shouldn't have page break */
+      h1:first-of-type {
+          page-break-before: avoid;
+      }
+      
+      h2 {
+          font-size: 20pt;
+          font-weight: 700;
+          border-bottom: 2px solid var(--border-color);
+          padding-bottom: 0.3em;
+      }
+      
+      h3 {
+          font-size: 16pt;
+          font-weight: 700;
+          color: var(--primary-color);
+      }
+      
+      h4 {
+          font-size: 13pt;
+          font-weight: 600;
+      }
+      
+      /* Paragraphs */
+      p {
+          margin-bottom: 1em;
+          text-align: justify;
+      }
+      
+      /* Links */
+      a {
+          color: var(--primary-color);
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          transition: border-color 0.2s;
+      }
+      
+      a:hover {
+          border-bottom-color: var(--primary-color);
+      }
+      
+      /* Lists */
+      ul, ol {
+          margin-left: 1.5em;
+          margin-bottom: 1em;
+      }
+      
+      li {
+          margin-bottom: 0.5em;
+      }
+      
+      /* Tables */
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 1.5em 0;
+          font-size: 10pt;
+      }
+      
+      th {
+          background: var(--primary-color);
+          color: white;
+          padding: 12px;
+          text-align: left;
+          font-weight: 600;
+      }
+      
+      td {
+          padding: 10px 12px;
+          border-bottom: 1px solid var(--border-color);
+      }
+      
+      tr:hover {
+          background: #f9fafb;
+      }
+      
+      /* Code blocks */
+      code {
+          font-family: 'JetBrains Mono', 'Courier New', monospace;
+          background: var(--code-bg);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-size: 10pt;
+      }
+      
+      pre {
+          background: var(--code-bg);
+          padding: 1em;
+          border-radius: 6px;
+          overflow-x: auto;
+          margin: 1em 0;
+          border-left: 4px solid var(--primary-color);
+      }
+      
+      pre code {
+          background: none;
+          padding: 0;
+      }
+      
+      /* Blockquotes */
+      blockquote {
+          border-left: 4px solid var(--primary-color);
+          padding-left: 1em;
+          margin: 1em 0;
+          font-style: italic;
+          color: #4b5563;
+          background: #eff6ff;
+          padding: 1em;
+          border-radius: 4px;
+      }
+      
+      /* Horizontal rules */
+      hr {
+          border: none;
+          border-top: 2px solid var(--border-color);
+          margin: 2em 0;
+      }
+      
+      /* Navigation */
+      .navigation {
+          background: #f9fafb;
+          padding: 1em;
+          border-radius: 6px;
+          margin: 2em 0;
+          text-align: center;
+          border: 1px solid var(--border-color);
+      }
+      
+      .navigation a {
+          margin: 0 1em;
+          font-weight: 600;
+      }
+      
+      /* Table of Contents */
+      #TOC {
+          background: #f9fafb;
+          padding: 1.5em;
+          border-radius: 6px;
+          margin: 2em 0;
+          border: 1px solid var(--border-color);
+      }
+      
+      #TOC ul {
+          list-style: none;
+          margin-left: 0;
+      }
+      
+      #TOC li {
+          margin: 0.3em 0;
+      }
+      
+      #TOC a {
+          color: var(--text-color);
+      }
+      
+      #TOC > ul > li > a {
+          font-weight: 600;
+          font-size: 12pt;
+      }
+      
+      /* Terminology boxes */
+      .terminology {
+          background: #eff6ff;
+          border-left: 4px solid var(--primary-color);
+          padding: 1em;
+          margin: 1em 0;
+          border-radius: 4px;
+      }
+      
+      .terminology strong {
+          color: var(--primary-color);
+          font-size: 11pt;
+      }
+      
+      /* Mermaid diagrams */
+      .mermaid {
+          background: white;
+          padding: 1.5em;
+          margin: 1.5em 0;
+          border-radius: 6px;
+          border: 1px solid var(--border-color);
+          text-align: center;
+      }
+      
+      /* Print styles with page numbers */
+      @media print {
+          @page {
+              margin: 0.75in;
+              @bottom-right {
+                  content: "Page " counter(page);
+                  font-family: 'Inter', sans-serif;
+                  font-size: 9pt;
+                  color: #6b7280;
+              }
+              @bottom-left {
+                  content: "PCA Agent Documentation";
+                  font-family: 'Inter', sans-serif;
+                  font-size: 9pt;
+                  color: #6b7280;
+              }
+          }
+          
+          body {
+              max-width: none;
+              padding: 0;
+              counter-increment: page;
+          }
+          
+          .navigation {
+              display: none;
+          }
+          
+          a {
+              color: var(--text-color);
+              border-bottom: none;
+          }
+          
+          a[href^="http"]:after {
+              content: " (" attr(href) ")";
+              font-size: 8pt;
+              color: #6b7280;
+          }
+          
+          h1, h2, h3 {
+              page-break-after: avoid;
+          }
+          
+          h1 {
+              page-break-before: always;
+          }
+          
+          h1:first-of-type {
+              page-break-before: avoid;
+          }
+          
+          pre, table, .terminology, .mermaid {
+              page-break-inside: avoid;
+          }
+          
+          /* Page numbers in TOC */
+          #TOC a::after {
+              content: leader('.') target-counter(attr(href), page);
+              float: right;
+          }
+      }
+  </style>
+
+  <!-- Mermaid.js for diagram rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#2563eb',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#1e40af',
+        lineColor: '#6b7280',
+        secondaryColor: '#f3f4f6',
+        tertiaryColor: '#eff6ff'
+      }
+    });
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Chapter 5: Layer 3 - Data Retrieval</h1>
+<p class="date">January 2026</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#overview">5.1 Overview</a></li>
+<li><a href="#the-two-sql-generation-paths">5.2 The Two SQL Generation Paths</a>
+<ul>
+<li><a href="#path-1-template-based-sql-fast">Path 1: Template-Based SQL (Fast)</a></li>
+<li><a href="#path-2-llm-generated-sql-flexible">Path 2: LLM-Generated SQL (Flexible)</a></li>
+</ul></li>
+<li><a href="#sql-validation-safety">5.3 SQL Validation &amp; Safety</a></li>
+<li><a href="#database-technology-duckdb">5.4 Database Technology: DuckDB</a></li>
+<li><a href="#data-format-parquet-files">5.5 Data Format: Parquet Files</a></li>
+<li><a href="#query-execution-flow">5.6 Query Execution Flow</a>
+<ul>
+<li><a href="#step-1-receive-query-analysis">Step 1: Receive Query Analysis</a></li>
+<li><a href="#step-2-select-sql-generation-method">Step 2: Select SQL Generation Method</a></li>
+<li><a href="#step-3-generate-sql">Step 3: Generate SQL</a></li>
+<li><a href="#step-4-validate-sql">Step 4: Validate SQL</a></li>
+<li><a href="#step-5-execute-query">Step 5: Execute Query</a></li>
+<li><a href="#step-6-return-dataframe">Step 6: Return DataFrame</a></li>
+</ul></li>
+<li><a href="#common-sql-templates">5.7 Common SQL Templates</a>
+<ul>
+<li><a href="#template-1-time-series-aggregation">Template 1: Time Series Aggregation</a></li>
+<li><a href="#template-2-top-n-by-metric">Template 2: Top N by Metric</a></li>
+<li><a href="#template-3-comparison-this-vs-last-period">Template 3: Comparison (This vs Last Period)</a></li>
+</ul></li>
+<li><a href="#performance-optimization">5.8 Performance Optimization</a></li>
+<li><a href="#error-handling">5.9 Error Handling</a></li>
+<li><a href="#real-example-walkthrough">5.10 Real Example Walkthrough</a></li>
+<li><a href="#key-takeaways">5.11 Key Takeaways</a></li>
+</ul>
+</nav>
+<p><strong>CHAPTER 5</strong></p>
+<p><strong>LAYER 3: DATA RETRIEVAL &amp; SQL GENERATION</strong></p>
+<hr />
+<p><strong>Navigation:</strong> <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/04_layer2_query_understanding.md">← Chapter 4</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/INDEX.md">Index</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/06_layer4_analysis.md">Next: Chapter 6 →</a></p>
+<hr />
+<h2 id="overview">5.1 Overview</h2>
+<p>Layer 3 is responsible for converting the query analysis from Layer 2 into actual SQL queries, executing them against the database, and returning structured data.</p>
+<blockquote>
+<p><strong>Office Analogy - The Records Department:</strong></p>
+<p>Imagine you need information from your company’s records department. You submit a request: “I need all expense reports from last quarter.”</p>
+<p>The records clerk: 1. <strong>Understands your request</strong> (already done by Layer 2) 2. <strong>Knows which filing cabinet</strong> to open (table selection) 3. <strong>Knows which folders</strong> to pull (column selection) 4. <strong>Knows how to filter</strong> the documents (WHERE clause) 5. <strong>Organizes the results</strong> (ORDER BY, GROUP BY) 6. <strong>Hands you the documents</strong> (returns DataFrame)</p>
+<p>That’s exactly what Layer 3 does - it’s your data records clerk!</p>
+</blockquote>
+<p><strong>Time:</strong> ~50-200ms<br />
+<strong>Input:</strong> Query analysis from Layer 2<br />
+<strong>Output:</strong> Pandas/Polars DataFrame with results</p>
+<hr />
+<h2 id="the-two-sql-generation-paths">5.2 The Two SQL Generation Paths</h2>
+<p>Just like Layer 2 has two paths, Layer 3 also has two approaches:</p>
+<h3 id="path-1-template-based-sql-fast">Path 1: Template-Based SQL (Fast)</h3>
+<blockquote>
+<p><strong>Office Analogy - Pre-Printed Forms:</strong></p>
+<p>Your company has pre-printed expense report forms for common requests: - “Weekly expense summary” → Form A - “Department comparison” → Form B - “Top 10 spenders” → Form C</p>
+<p>The clerk just fills in the blanks (dates, department names) and hands you the completed form. Fast and reliable!</p>
+</blockquote>
+<p><strong>When used:</strong> For Bulletproof queries (80% of requests)<br />
+<strong>Speed:</strong> ~50ms<br />
+<strong>How it works:</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Template example</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>WEEKLY_SUMMARY_TEMPLATE <span class="op">=</span> <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">    DATE_TRUNC(&#39;week&#39;, date) as week,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">    SUM(spend) as total_spend,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SUM(conversions) as total_conversions,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">    ROUND(SUM(spend) / NULLIF(SUM(conversions), 0), 2) as cpa</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">FROM campaigns</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE date &gt;= &#39;</span><span class="sc">{start_date}</span><span class="st">&#39; AND date &lt;= &#39;</span><span class="sc">{end_date}</span><span class="st">&#39;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY week</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY week DESC</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Fill in the template</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>sql <span class="op">=</span> WEEKLY_SUMMARY_TEMPLATE.<span class="bu">format</span>(</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    start_date<span class="op">=</span><span class="st">&#39;2024-01-01&#39;</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    end_date<span class="op">=</span><span class="st">&#39;2024-01-07&#39;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<h3 id="path-2-llm-generated-sql-flexible">Path 2: LLM-Generated SQL (Flexible)</h3>
+<blockquote>
+<p><strong>Office Analogy - Custom Research:</strong></p>
+<p>Sometimes you ask for something unusual: “Show me all expenses over $500 that were submitted on Fridays in Q3, grouped by manager approval time.”</p>
+<p>The clerk can’t use a pre-printed form. They need to: 1. Think about which files to check 2. Figure out the right filters 3. Decide how to organize the results 4. Create a custom report</p>
+<p>This takes longer but handles any request!</p>
+</blockquote>
+<p><strong>When used:</strong> For complex LLM queries (20% of requests)<br />
+<strong>Speed:</strong> ~200ms<br />
+<strong>How it works:</strong></p>
+<p>The LLM receives: - Database schema - Available tables and columns - Example queries - User’s natural language question</p>
+<p>And generates:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    manager_name,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> approval_count,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">AVG</span>(<span class="fu">EXTRACT</span>(EPOCH <span class="kw">FROM</span> (approved_at <span class="op">-</span> submitted_at))<span class="op">/</span><span class="dv">3600</span>) <span class="kw">as</span> avg_hours_to_approve</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> expenses</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> amount <span class="op">&gt;</span> <span class="dv">500</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> <span class="fu">EXTRACT</span>(DOW <span class="kw">FROM</span> submitted_at) <span class="op">=</span> <span class="dv">5</span>  <span class="co">-- Friday</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> submitted_at <span class="op">&gt;=</span> <span class="st">&#39;2024-07-01&#39;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">AND</span> submitted_at <span class="op">&lt;</span> <span class="st">&#39;2024-10-01&#39;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> manager_name</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> avg_hours_to_approve <span class="kw">DESC</span></span></code></pre></div>
+<hr />
+<h2 id="sql-validation-safety">5.3 SQL Validation &amp; Safety</h2>
+<blockquote>
+<p><strong>Office Analogy - The Safety Checklist:</strong></p>
+<p>Before the records clerk executes your request, they check: - ✓ Are you asking for data you’re allowed to see? - ✓ Is the request reasonable? (Not asking for 10 million records) - ✓ Will this request crash the system? - ✓ Are you trying to delete or modify data? (Not allowed!)</p>
+<p>If anything looks suspicious, they reject the request!</p>
+</blockquote>
+<p><strong>Safety Checks:</strong></p>
+<ol type="1">
+<li><strong>Read-Only Validation</strong>
+<ul>
+<li>Only SELECT statements allowed</li>
+<li>No INSERT, UPDATE, DELETE, DROP</li>
+</ul></li>
+<li><strong>Table Whitelist</strong>
+<ul>
+<li>Only approved tables can be queried</li>
+<li>Prevents access to sensitive system tables</li>
+</ul></li>
+<li><strong>Row Limit Enforcement</strong>
+<ul>
+<li>Maximum 10,000 rows per query</li>
+<li>Prevents memory overflow</li>
+</ul></li>
+<li><strong>Timeout Protection</strong>
+<ul>
+<li>Queries must complete within 30 seconds</li>
+<li>Prevents infinite loops</li>
+</ul></li>
+</ol>
+<p><strong>Code Example:</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_sql(sql: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Validate SQL query for safety&quot;&quot;&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check 1: Only SELECT allowed</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> sql.strip().upper().startswith(<span class="st">&#39;SELECT&#39;</span>):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;Only SELECT queries allowed&quot;</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check 2: No dangerous keywords</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    dangerous <span class="op">=</span> [<span class="st">&#39;DROP&#39;</span>, <span class="st">&#39;DELETE&#39;</span>, <span class="st">&#39;UPDATE&#39;</span>, <span class="st">&#39;INSERT&#39;</span>, <span class="st">&#39;ALTER&#39;</span>, <span class="st">&#39;TRUNCATE&#39;</span>]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">any</span>(keyword <span class="kw">in</span> sql.upper() <span class="cf">for</span> keyword <span class="kw">in</span> dangerous):</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;Dangerous SQL operation detected&quot;</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check 3: Table whitelist</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    allowed_tables <span class="op">=</span> [<span class="st">&#39;campaigns&#39;</span>, <span class="st">&#39;ads&#39;</span>, <span class="st">&#39;keywords&#39;</span>, <span class="st">&#39;conversions&#39;</span>]</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... validation logic</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">True</span></span></code></pre></div>
+<hr />
+<h2 id="database-technology-duckdb">5.4 Database Technology: DuckDB</h2>
+<blockquote>
+<p><strong>Technical Term - DuckDB:</strong></p>
+<p><strong>What it is:</strong> An in-memory analytical database (like SQLite but for analytics)</p>
+<p><strong>Office Analogy:</strong> - <strong>Traditional database (PostgreSQL):</strong> A large filing room in the basement. You submit requests and wait for someone to go down, find the files, and bring them back up. - <strong>DuckDB:</strong> A filing cabinet right at your desk. Everything is in memory, so you can grab files instantly!</p>
+<p><strong>Why it’s fast:</strong> - All data loaded in RAM (no disk access) - Columnar storage (reads only needed columns) - Vectorized execution (processes thousands of rows at once)</p>
+</blockquote>
+<p><strong>Performance Comparison:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Database</th>
+<th>Query Time</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PostgreSQL</td>
+<td>2-5 seconds</td>
+<td>Large datasets, concurrent users</td>
+</tr>
+<tr class="even">
+<td>DuckDB</td>
+<td>50-200ms</td>
+<td>Analytics, single user, in-memory</td>
+</tr>
+<tr class="odd">
+<td>SQLite</td>
+<td>500ms-2s</td>
+<td>Small datasets, embedded</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="data-format-parquet-files">5.5 Data Format: Parquet Files</h2>
+<blockquote>
+<p><strong>Technical Term - Parquet:</strong></p>
+<p><strong>What it is:</strong> A columnar file format for storing data efficiently</p>
+<p><strong>Office Analogy - Filing System:</strong></p>
+<p><strong>Row-based storage (CSV):</strong></p>
+<pre><code>File 1: John, Sales, $50k, 2024
+File 2: Mary, Marketing, $60k, 2024
+File 3: Bob, Sales, $55k, 2024</code></pre>
+<p>To find all Sales employees, you must read ALL files!</p>
+<p><strong>Column-based storage (Parquet):</strong></p>
+<pre><code>Names file: John, Mary, Bob
+Department file: Sales, Marketing, Sales
+Salary file: $50k, $60k, $55k
+Year file: 2024, 2024, 2024</code></pre>
+<p>To find all Sales employees, you only read the Department file!</p>
+<p><strong>Result:</strong> 10-100x faster for analytics!</p>
+</blockquote>
+<p><strong>Parquet Benefits:</strong></p>
+<ol type="1">
+<li><strong>Compression:</strong> 5-10x smaller than CSV</li>
+<li><strong>Speed:</strong> Only read columns you need</li>
+<li><strong>Type Safety:</strong> Stores data types (no parsing needed)</li>
+<li><strong>Metadata:</strong> Built-in statistics for query optimization</li>
+</ol>
+<hr />
+<h2 id="query-execution-flow">5.6 Query Execution Flow</h2>
+<figure>
+<img src="diagrams/sql_generation_flow.png" alt="SQL Generation Flow" /><figcaption aria-hidden="true">SQL Generation Flow</figcaption>
+</figure>
+<p><strong>Step-by-Step Process:</strong></p>
+<h3 id="step-1-receive-query-analysis">Step 1: Receive Query Analysis</h3>
+<p><strong>Input from Layer 2:</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;intent&quot;</span>: <span class="st">&quot;COMPARISON&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;metrics&quot;</span>: [<span class="st">&quot;spend&quot;</span>, <span class="st">&quot;conversions&quot;</span>, <span class="st">&quot;cpa&quot;</span>],</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;dimensions&quot;</span>: [<span class="st">&quot;week&quot;</span>],</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;time_range&quot;</span>: {</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;start&quot;</span>: <span class="st">&quot;2024-01-01&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;end&quot;</span>: <span class="st">&quot;2024-01-14&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;template&quot;</span>: <span class="st">&quot;week_over_week&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="step-2-select-sql-generation-method">Step 2: Select SQL Generation Method</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> query_analysis.get(<span class="st">&quot;template&quot;</span>):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Use template-based generation (fast)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    sql <span class="op">=</span> generate_from_template(query_analysis)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Use LLM-based generation (flexible)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    sql <span class="op">=</span> generate_with_llm(query_analysis)</span></code></pre></div>
+<h3 id="step-3-generate-sql">Step 3: Generate SQL</h3>
+<p><strong>Template-based:</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_from_template(analysis):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    template <span class="op">=</span> SQL_TEMPLATES[analysis[<span class="st">&quot;template&quot;</span>]]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> template.<span class="bu">format</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        metrics<span class="op">=</span><span class="st">&quot;, &quot;</span>.join(analysis[<span class="st">&quot;metrics&quot;</span>]),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        start_date<span class="op">=</span>analysis[<span class="st">&quot;time_range&quot;</span>][<span class="st">&quot;start&quot;</span>],</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        end_date<span class="op">=</span>analysis[<span class="st">&quot;time_range&quot;</span>][<span class="st">&quot;end&quot;</span>]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<p><strong>LLM-based:</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_with_llm(analysis):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> <span class="ss">f&quot;&quot;&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ss">    Generate SQL for DuckDB to answer this question:</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ss">    </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ss">    Intent: </span><span class="sc">{</span>analysis[<span class="st">&quot;intent&quot;</span>]<span class="sc">}</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ss">    Metrics: </span><span class="sc">{</span>analysis[<span class="st">&quot;metrics&quot;</span>]<span class="sc">}</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ss">    Dimensions: </span><span class="sc">{</span>analysis[<span class="st">&quot;dimensions&quot;</span>]<span class="sc">}</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ss">    Time Range: </span><span class="sc">{</span>analysis[<span class="st">&quot;time_range&quot;</span>]<span class="sc">}</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="ss">    </span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ss">    Available tables:</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="ss">    - campaigns (date, campaign_name, spend, conversions, clicks, impressions)</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="ss">    </span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="ss">    Return only the SQL query.</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="ss">    &quot;&quot;&quot;</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    sql <span class="op">=</span> llm.generate(prompt)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sql</span></code></pre></div>
+<h3 id="step-4-validate-sql">Step 4: Validate SQL</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>validate_sql(sql)  <span class="co"># Throws exception if unsafe</span></span></code></pre></div>
+<h3 id="step-5-execute-query">Step 5: Execute Query</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Connect to database</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>conn <span class="op">=</span> duckdb.<span class="ex">connect</span>(<span class="st">&#39;data/campaigns.duckdb&#39;</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute query</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> conn.execute(sql).fetchdf()  <span class="co"># Returns Pandas DataFrame</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Close connection</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>conn.close()</span></code></pre></div>
+<h3 id="step-6-return-dataframe">Step 6: Return DataFrame</h3>
+<p><strong>Output to Layer 4:</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;data&quot;</span>: result,  <span class="co"># Pandas DataFrame</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;sql&quot;</span>: sql,      <span class="co"># The executed SQL</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;rows&quot;</span>: <span class="bu">len</span>(result),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;execution_time_ms&quot;</span>: <span class="dv">87</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<hr />
+<h2 id="common-sql-templates">5.7 Common SQL Templates</h2>
+<h3 id="template-1-time-series-aggregation">Template 1: Time Series Aggregation</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    DATE_TRUNC(<span class="st">&#39;{granularity}&#39;</span>, <span class="dt">date</span>) <span class="kw">as</span> period,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(spend) <span class="kw">as</span> total_spend,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(conversions) <span class="kw">as</span> total_conversions,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ROUND</span>(<span class="fu">SUM</span>(spend) <span class="op">/</span> <span class="fu">NULLIF</span>(<span class="fu">SUM</span>(conversions), <span class="dv">0</span>), <span class="dv">2</span>) <span class="kw">as</span> cpa</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campaigns</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="dt">date</span> <span class="op">&gt;=</span> <span class="st">&#39;{start_date}&#39;</span> <span class="kw">AND</span> <span class="dt">date</span> <span class="op">&lt;=</span> <span class="st">&#39;{end_date}&#39;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> period</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> period</span></code></pre></div>
+<h3 id="template-2-top-n-by-metric">Template 2: Top N by Metric</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    {<span class="kw">dimension</span>} <span class="kw">as</span> name,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>({metric}) <span class="kw">as</span> total</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campaigns</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="dt">date</span> <span class="op">&gt;=</span> <span class="st">&#39;{start_date}&#39;</span> <span class="kw">AND</span> <span class="dt">date</span> <span class="op">&lt;=</span> <span class="st">&#39;{end_date}&#39;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> {<span class="kw">dimension</span>}</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> total <span class="kw">DESC</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> {<span class="kw">limit</span>}</span></code></pre></div>
+<h3 id="template-3-comparison-this-vs-last-period">Template 3: Comparison (This vs Last Period)</h3>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> current_period <span class="kw">AS</span> (</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="fu">SUM</span>({metric}) <span class="kw">as</span> current_value</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> campaigns</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> <span class="dt">date</span> <span class="op">&gt;=</span> <span class="st">&#39;{current_start}&#39;</span> <span class="kw">AND</span> <span class="dt">date</span> <span class="op">&lt;=</span> <span class="st">&#39;{current_end}&#39;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>previous_period <span class="kw">AS</span> (</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> <span class="fu">SUM</span>({metric}) <span class="kw">as</span> previous_value</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> campaigns</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">WHERE</span> <span class="dt">date</span> <span class="op">&gt;=</span> <span class="st">&#39;{previous_start}&#39;</span> <span class="kw">AND</span> <span class="dt">date</span> <span class="op">&lt;=</span> <span class="st">&#39;{previous_end}&#39;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    current_value,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    previous_value,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ROUND</span>((current_value <span class="op">-</span> previous_value) <span class="op">/</span> <span class="fu">NULLIF</span>(previous_value, <span class="dv">0</span>) <span class="op">*</span> <span class="dv">100</span>, <span class="dv">2</span>) <span class="kw">as</span> percent_change</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> current_period, previous_period</span></code></pre></div>
+<hr />
+<h2 id="performance-optimization">5.8 Performance Optimization</h2>
+<blockquote>
+<p><strong>Office Analogy - Efficiency Tips:</strong></p>
+<p>A smart records clerk knows tricks to work faster: - <strong>Index cards</strong> (database indexes) - find files instantly - <strong>Summary sheets</strong> (pre-aggregated data) - don’t recalculate every time - <strong>Recent requests folder</strong> (query cache) - common requests already prepared - <strong>Batch processing</strong> (query optimization) - handle multiple requests together</p>
+</blockquote>
+<p><strong>Optimization Techniques:</strong></p>
+<ol type="1">
+<li><p><strong>Indexes on Common Columns</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_date <span class="kw">ON</span> campaigns(<span class="dt">date</span>);</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_campaign <span class="kw">ON</span> campaigns(campaign_name);</span></code></pre></div></li>
+<li><p><strong>Materialized Views for Common Aggregations</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> daily_summary <span class="kw">AS</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">date</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(spend) <span class="kw">as</span> daily_spend,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">SUM</span>(conversions) <span class="kw">as</span> daily_conversions</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campaigns</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dt">date</span>;</span></code></pre></div></li>
+<li><p><strong>Query Result Caching</strong></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cache results for 5 minutes</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="at">@cache</span>(ttl<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> execute_query(sql: <span class="bu">str</span>):</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> conn.execute(sql).fetchdf()</span></code></pre></div></li>
+<li><p><strong>Partition Pruning</strong></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Only scan relevant date partitions</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="dt">date</span> <span class="op">&gt;=</span> <span class="st">&#39;2024-01-01&#39;</span>  <span class="co">-- Skips older partitions</span></span></code></pre></div></li>
+</ol>
+<hr />
+<h2 id="error-handling">5.9 Error Handling</h2>
+<p><strong>Common Errors and Solutions:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Error</th>
+<th>Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Table not found</code></td>
+<td>Typo in table name</td>
+<td>Use table whitelist</td>
+</tr>
+<tr class="even">
+<td><code>Column not found</code></td>
+<td>Invalid column reference</td>
+<td>Validate against schema</td>
+</tr>
+<tr class="odd">
+<td><code>Query timeout</code></td>
+<td>Query too complex</td>
+<td>Add LIMIT clause</td>
+</tr>
+<tr class="even">
+<td><code>Out of memory</code></td>
+<td>Too many rows</td>
+<td>Enforce row limits</td>
+</tr>
+<tr class="odd">
+<td><code>Division by zero</code></td>
+<td>NULL values</td>
+<td>Use NULLIF()</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Error Response Example:</strong></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;success&quot;</span>: <span class="va">False</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;error&quot;</span>: <span class="st">&quot;Query timeout after 30 seconds&quot;</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;suggestion&quot;</span>: <span class="st">&quot;Try adding a date filter to reduce data volume&quot;</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;fallback_sql&quot;</span>: <span class="st">&quot;SELECT * FROM campaigns LIMIT 100&quot;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<hr />
+<h2 id="real-example-walkthrough">5.10 Real Example Walkthrough</h2>
+<p><strong>User Question:</strong> “Show me top 5 campaigns by ROAS last week”</p>
+<p><strong>Step 1: Input from Layer 2</strong></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;intent&quot;</span>: <span class="st">&quot;TOP_N&quot;</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;metric&quot;</span>: <span class="st">&quot;roas&quot;</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;dimension&quot;</span>: <span class="st">&quot;campaign_name&quot;</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;limit&quot;</span>: <span class="dv">5</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;time_range&quot;</span>: {<span class="st">&quot;start&quot;</span>: <span class="st">&quot;2024-01-01&quot;</span>, <span class="st">&quot;end&quot;</span>: <span class="st">&quot;2024-01-07&quot;</span>},</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;template&quot;</span>: <span class="st">&quot;top_n_by_metric&quot;</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><strong>Step 2: Generate SQL from Template</strong></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    campaign_name,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ROUND</span>(<span class="fu">SUM</span>(revenue) <span class="op">/</span> <span class="fu">NULLIF</span>(<span class="fu">SUM</span>(spend), <span class="dv">0</span>), <span class="dv">2</span>) <span class="kw">as</span> roas</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campaigns</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="dt">date</span> <span class="op">&gt;=</span> <span class="st">&#39;2024-01-01&#39;</span> <span class="kw">AND</span> <span class="dt">date</span> <span class="op">&lt;=</span> <span class="st">&#39;2024-01-07&#39;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> campaign_name</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> roas <span class="kw">DESC</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span></span></code></pre></div>
+<p><strong>Step 3: Execute in DuckDB</strong></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> conn.execute(sql).fetchdf()</span></code></pre></div>
+<p><strong>Step 4: Output DataFrame</strong></p>
+<pre><code>   campaign_name  roas
+0  Brand Search   4.50
+1  Retargeting    3.20
+2  Display Ads    2.10
+3  Social Media   1.80
+4  Email Campaign 1.50</code></pre>
+<p><strong>Execution Time:</strong> 87ms</p>
+<hr />
+<h2 id="key-takeaways">5.11 Key Takeaways</h2>
+<p>✅ <strong>Layer 3 is the data retrieval specialist</strong><br />
+✅ <strong>Two paths:</strong> Templates (fast) vs LLM (flexible)<br />
+✅ <strong>DuckDB:</strong> In-memory analytics database for speed<br />
+✅ <strong>Parquet:</strong> Columnar storage for efficiency<br />
+✅ <strong>Safety first:</strong> Validation prevents dangerous queries<br />
+✅ <strong>Performance:</strong> 50-200ms typical query time</p>
+<blockquote>
+<p><strong>Remember:</strong> Layer 3 is like your company’s records clerk - they know where everything is stored, how to find it quickly, and how to organize it for you. They’re fast, reliable, and always follow safety protocols!</p>
+</blockquote>
+<hr />
+<p><strong>Navigation:</strong> <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/04_layer2_query_understanding.md">← Chapter 4</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/INDEX.md">Index</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/06_layer4_analysis.md">Next: Chapter 6 →</a></p>
+</body>
+</html>

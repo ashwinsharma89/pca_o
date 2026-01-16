@@ -1,0 +1,14 @@
+# PCA Agent Cron Jobs
+# Add to crontab with: crontab -e
+
+# Daily backup at 2 AM
+0 2 * * * cd /opt/pca_agent && /usr/bin/python3 scripts/backup_scheduler.py >> /var/log/pca_agent/backup.log 2>&1
+
+# Upload to S3 at 3 AM (after backup completes)
+0 3 * * * cd /opt/pca_agent && /usr/bin/python3 scripts/s3_backup.py upload --file /var/backups/pca_agent/$(ls -t /var/backups/pca_agent/*.gz | head -1) >> /var/log/pca_agent/s3_upload.log 2>&1
+
+# Cleanup old S3 backups weekly (Sunday at 4 AM)
+0 4 * * 0 cd /opt/pca_agent && /usr/bin/python3 scripts/s3_backup.py cleanup --retention-days 90 >> /var/log/pca_agent/s3_cleanup.log 2>&1
+
+# Health check every 5 minutes
+*/5 * * * * curl -f http://localhost:8000/health || echo "Health check failed" | mail -s "PCA Agent Health Alert" admin@example.com

@@ -1,0 +1,136 @@
+{
+  "dashboard": {
+    "title": "PCA Agent - Production Dashboard",
+    "tags": ["pca-agent", "production"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "API Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(pca_agent_api_requests_total[5m])",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 2,
+        "title": "API Response Time (P95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(pca_agent_api_response_time_bucket[5m]))",
+            "legendFormat": "P95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(pca_agent_api_response_time_bucket[5m]))",
+            "legendFormat": "P99"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 3,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(pca_agent_errors_total[5m])",
+            "legendFormat": "{{error_type}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "id": 4,
+        "title": "Cache Hit Rate",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "(rate(pca_agent_cache_hits_total[5m]) / (rate(pca_agent_cache_hits_total[5m]) + rate(pca_agent_cache_misses_total[5m]))) * 100"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 8, "w": 6, "h": 8}
+      },
+      {
+        "id": 5,
+        "title": "Active Users",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "pca_agent_users_active"
+          }
+        ],
+        "gridPos": {"x": 18, "y": 8, "w": 6, "h": 8}
+      },
+      {
+        "id": 6,
+        "title": "Database Query Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(pca_agent_database_query_duration_sum[5m]) / rate(pca_agent_database_query_duration_count[5m])",
+            "legendFormat": "{{query_type}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "id": 7,
+        "title": "LLM API Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(pca_agent_llm_latency_sum[5m]) / rate(pca_agent_llm_latency_count[5m])",
+            "legendFormat": "{{provider}} - {{model}}"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "id": 8,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100",
+            "legendFormat": "Memory Usage %"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8}
+      },
+      {
+        "id": 9,
+        "title": "CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+            "legendFormat": "CPU Usage %"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8}
+      },
+      {
+        "id": 10,
+        "title": "Top Errors",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, sum by(error_type) (rate(pca_agent_errors_total[5m])))",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 32, "w": 24, "h": 8}
+      }
+    ],
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}

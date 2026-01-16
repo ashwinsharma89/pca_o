@@ -1,0 +1,23 @@
+# Bandit Security Scanner Configuration
+# https://bandit.readthedocs.io/en/latest/config.html
+
+# Skip specific tests with documented justifications
+skips:
+  # B104: Binding to all interfaces - intentional for containerized deployment
+  - B104
+  # B110: try_except_pass - used in graceful fallback patterns
+  - B110  
+  # B311: Standard pseudo-random generators - not used for security
+  - B311
+
+# Exclude test directories  
+exclude_dirs:
+  - tests
+  - test
+  - .venv
+  - venv
+  - node_modules
+  - frontend
+  - alembic/versions
+  - __pycache__
+  - .git

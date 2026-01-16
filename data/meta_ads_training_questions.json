@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "question": "What is the total spend across all campaigns?",
+    "category": "basic_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Spend) as total_spend FROM campaigns"
+  },
+  {
+    "id": 2,
+    "question": "Which campaign has the highest ROAS?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, MAX(ROAS) as highest_roas FROM campaigns GROUP BY Campaign_Name ORDER BY highest_roas DESC LIMIT 1"
+  },
+  {
+    "id": 3,
+    "question": "Show average CTR by placement",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Placement, (SUM(Clicks) * 100.0 / SUM(Impressions)) as avg_ctr FROM campaigns GROUP BY Placement ORDER BY avg_ctr DESC"
+  },
+  {
+    "id": 4,
+    "question": "What is the total revenue from Instagram placements?",
+    "category": "filtered_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Revenue) as total_revenue FROM campaigns WHERE Placement LIKE '%Instagram%'"
+  },
+  {
+    "id": 5,
+    "question": "Compare engagement rate between Mobile and Desktop",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, SUM(Engagement) * 100.0 / SUM(Impressions) as engagement_rate FROM campaigns GROUP BY Device"
+  },
+  {
+    "id": 6,
+    "question": "Which ad set has the best conversion rate?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Ad_Set_Name, SUM(Conversions) * 100.0 / SUM(Clicks) as conv_rate FROM campaigns GROUP BY Ad_Set_Name ORDER BY conv_rate DESC LIMIT 1"
+  },
+  {
+    "id": 7,
+    "question": "Show daily spend trend for the last 30 days",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Date, SUM(Spend) as daily_spend FROM campaigns WHERE CAST(Date AS DATE) >= CURRENT_DATE - INTERVAL '30 days' GROUP BY Date ORDER BY Date"
+  },
+  {
+    "id": 8,
+    "question": "What is the average video completion rate for Stories vs Reels?",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, AVG(Video_Avg_Watch_Time) as avg_watch_time FROM campaigns WHERE Placement IN ('Instagram_Stories', 'Instagram_Reels') GROUP BY Placement"
+  },
+  {
+    "id": 9,
+    "question": "Which age group has the highest conversion rate?",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Age, SUM(Conversions) * 100.0 / SUM(Clicks) as conv_rate FROM campaigns GROUP BY Age ORDER BY conv_rate DESC LIMIT 1"
+  },
+  {
+    "id": 10,
+    "question": "Show top 5 campaigns by total revenue",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Revenue) as total_revenue FROM campaigns GROUP BY Campaign_Name ORDER BY total_revenue DESC LIMIT 5"
+  },
+  {
+    "id": 11,
+    "question": "What is the cost per conversion by objective?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Objective, SUM(Spend) / SUM(Conversions) as cost_per_conv FROM campaigns GROUP BY Objective ORDER BY cost_per_conv"
+  },
+  {
+    "id": 12,
+    "question": "Compare male vs female performance by ROAS",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Gender, (SUM(Revenue) / SUM(Spend)) as avg_roas FROM campaigns GROUP BY Gender ORDER BY avg_roas DESC"
+  },
+  {
+    "id": 13,
+    "question": "Which placement has the highest engagement per impression?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, SUM(Engagement) * 1.0 / SUM(Impressions) as engagement_per_impression FROM campaigns GROUP BY Placement ORDER BY engagement_per_impression DESC LIMIT 1"
+  },
+  {
+    "id": 14,
+    "question": "Show weekly spend trend",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as week, SUM(Spend) as weekly_spend FROM campaigns GROUP BY week ORDER BY week"
+  },
+  {
+    "id": 15,
+    "question": "What is the average frequency by campaign?",
+    "category": "reach_frequency",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Impressions) * 1.0 / SUM(Reach)) as avg_frequency FROM campaigns GROUP BY Campaign_Name ORDER BY avg_frequency DESC"
+  },
+  {
+    "id": 16,
+    "question": "Which campaigns have ROAS greater than 5?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT DISTINCT Campaign_Name FROM campaigns WHERE ROAS > 5"
+  },
+  {
+    "id": 17,
+    "question": "Show total impressions and reach by device",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Device, SUM(Impressions) as total_impressions, SUM(Reach) as total_reach FROM campaigns GROUP BY Device"
+  },
+  {
+    "id": 18,
+    "question": "What is the link click rate by placement?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, SUM(Link_Clicks) * 100.0 / SUM(Clicks) as link_click_rate FROM campaigns GROUP BY Placement ORDER BY link_click_rate DESC"
+  },
+  {
+    "id": 19,
+    "question": "Compare video views between age groups for video placements",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Age, SUM(Video_Views) as total_video_views FROM campaigns WHERE Video_Views > 0 GROUP BY Age ORDER BY total_video_views DESC"
+  },
+  {
+    "id": 20,
+    "question": "What is the total number of post reactions by campaign?",
+    "category": "engagement_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Post_Reactions) as total_reactions FROM campaigns GROUP BY Campaign_Name ORDER BY total_reactions DESC"
+  },
+  {
+    "id": 21,
+    "question": "Show campaigns with CTR above 2.5%",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Clicks) * 100.0 / SUM(Impressions)) as avg_ctr FROM campaigns GROUP BY Campaign_Name HAVING (SUM(Clicks) * 100.0 / SUM(Impressions)) > 2.5 ORDER BY avg_ctr DESC"
+  },
+  {
+    "id": 22,
+    "question": "What is the cost per thousand impressions (CPM) by placement?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, (SUM(Spend) / SUM(Impressions)) * 1000 as cpm FROM campaigns GROUP BY Placement ORDER BY cpm"
+  },
+  {
+    "id": 23,
+    "question": "Which objective generates the most conversions?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Objective, SUM(Conversions) as total_conversions FROM campaigns GROUP BY Objective ORDER BY total_conversions DESC LIMIT 1"
+  },
+  {
+    "id": 24,
+    "question": "Show month-over-month revenue growth",
+    "category": "time_series",
+    "difficulty": "hard",
+    "expected_sql": "SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as month, SUM(Revenue) as monthly_revenue FROM campaigns GROUP BY month ORDER BY month"
+  },
+  {
+    "id": 25,
+    "question": "What is the average AOV by age group?",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Age, (SUM(Revenue) / SUM(Conversions)) as avg_aov FROM campaigns GROUP BY Age ORDER BY avg_aov DESC"
+  },
+  {
+    "id": 26,
+    "question": "Compare engagement metrics (reactions, comments, shares) by placement",
+    "category": "engagement_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement, SUM(Post_Reactions) as reactions, SUM(Post_Comments) as comments, SUM(Post_Shares) as shares FROM campaigns GROUP BY Placement"
+  },
+  {
+    "id": 27,
+    "question": "Which campaigns have the lowest CPC?",
+    "category": "efficiency_metrics",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Spend) / SUM(Clicks)) as avg_cpc FROM campaigns GROUP BY Campaign_Name ORDER BY avg_cpc LIMIT 5"
+  },
+  {
+    "id": 28,
+    "question": "Show total reach by gender and age",
+    "category": "demographic_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Gender, Age, SUM(Reach) as total_reach FROM campaigns GROUP BY Gender, Age ORDER BY total_reach DESC"
+  },
+  {
+    "id": 29,
+    "question": "What is the video view rate by device?",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, SUM(Video_Views) * 100.0 / SUM(Impressions) as video_view_rate FROM campaigns WHERE Video_Views > 0 GROUP BY Device"
+  },
+  {
+    "id": 30,
+    "question": "Show campaigns where spend exceeds $50,000",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Spend) as total_spend FROM campaigns GROUP BY Campaign_Name HAVING SUM(Spend) > 50000 ORDER BY total_spend DESC"
+  }
+]

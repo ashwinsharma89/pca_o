@@ -1,0 +1,137 @@
+# Docker Compose for PCA Agent with Infrastructure
+# Optimized for low traffic and free infrastructure
+
+version: '3.8'
+
+services:
+  # Redis - Message broker and result backend for Celery
+  redis:
+    image: redis:7-alpine
+    container_name: pca-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  # Jaeger - Distributed tracing (all-in-one for development)
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: pca-jaeger
+    ports:
+      - "6831:6831/udp" # Jaeger agent (thrift compact)
+      - "16686:16686" # Jaeger UI
+      - "14268:14268" # Jaeger collector HTTP
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:14269/" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  # Main API
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pca-api
+    ports:
+      - "8000:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
+    volumes:
+      - ..:/app
+      - ../data:/app/data
+      - ../reports:/app/reports
+    depends_on:
+      redis:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pca-celery-worker
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - ..:/app
+      - ../data:/app/data
+      - ../reports:/app/reports
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery -A src.tasks.celery_app worker --loglevel=info --concurrency=2
+    healthcheck:
+      test: [ "CMD", "celery", "-A", "src.tasks.celery_app", "inspect", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Celery Beat (Scheduler)
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pca-celery-beat
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - ..:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery -A src.tasks.celery_app beat --loglevel=info
+    restart: unless-stopped
+
+  # Flower - Celery monitoring (optional, lightweight)
+  flower:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pca-flower
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes:
+      - ..:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery -A src.tasks.celery_app flower --port=5555
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  default:
+    name: pca-network

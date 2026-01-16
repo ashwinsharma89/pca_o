@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Chapter 2: The Six-Layer Architecture</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  
+  <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+      
+      :root {
+          --primary-color: #2563eb;
+          --text-color: #1f2937;
+          --bg-color: #ffffff;
+          --border-color: #e5e7eb;
+          --code-bg: #f3f4f6;
+          --heading-color: #111827;
+      }
+      
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+      
+      body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-size: 11pt;
+          line-height: 1.7;
+          color: var(--text-color);
+          background: var(--bg-color);
+          max-width: 8.5in;
+          margin: 0 auto;
+          padding: 0.75in;
+          counter-reset: page;
+      }
+      
+      /* Headers */
+      h1, h2, h3, h4, h5, h6 {
+          font-weight: 700;
+          color: var(--heading-color);
+          margin-top: 1.5em;
+          margin-bottom: 0.75em;
+          line-height: 1.3;
+      }
+      
+      h1 {
+          font-size: 28pt;
+          font-weight: 900;
+          border-bottom: 3px solid var(--primary-color);
+          padding-bottom: 0.3em;
+          margin-top: 0;
+          page-break-before: always;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+      }
+      
+      /* First h1 shouldn't have page break */
+      h1:first-of-type {
+          page-break-before: avoid;
+      }
+      
+      h2 {
+          font-size: 20pt;
+          font-weight: 700;
+          border-bottom: 2px solid var(--border-color);
+          padding-bottom: 0.3em;
+      }
+      
+      h3 {
+          font-size: 16pt;
+          font-weight: 700;
+          color: var(--primary-color);
+      }
+      
+      h4 {
+          font-size: 13pt;
+          font-weight: 600;
+      }
+      
+      /* Paragraphs */
+      p {
+          margin-bottom: 1em;
+          text-align: justify;
+      }
+      
+      /* Links */
+      a {
+          color: var(--primary-color);
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          transition: border-color 0.2s;
+      }
+      
+      a:hover {
+          border-bottom-color: var(--primary-color);
+      }
+      
+      /* Lists */
+      ul, ol {
+          margin-left: 1.5em;
+          margin-bottom: 1em;
+      }
+      
+      li {
+          margin-bottom: 0.5em;
+      }
+      
+      /* Tables */
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 1.5em 0;
+          font-size: 10pt;
+      }
+      
+      th {
+          background: var(--primary-color);
+          color: white;
+          padding: 12px;
+          text-align: left;
+          font-weight: 600;
+      }
+      
+      td {
+          padding: 10px 12px;
+          border-bottom: 1px solid var(--border-color);
+      }
+      
+      tr:hover {
+          background: #f9fafb;
+      }
+      
+      /* Code blocks */
+      code {
+          font-family: 'JetBrains Mono', 'Courier New', monospace;
+          background: var(--code-bg);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-size: 10pt;
+      }
+      
+      pre {
+          background: var(--code-bg);
+          padding: 1em;
+          border-radius: 6px;
+          overflow-x: auto;
+          margin: 1em 0;
+          border-left: 4px solid var(--primary-color);
+      }
+      
+      pre code {
+          background: none;
+          padding: 0;
+      }
+      
+      /* Blockquotes */
+      blockquote {
+          border-left: 4px solid var(--primary-color);
+          padding-left: 1em;
+          margin: 1em 0;
+          font-style: italic;
+          color: #4b5563;
+          background: #eff6ff;
+          padding: 1em;
+          border-radius: 4px;
+      }
+      
+      /* Horizontal rules */
+      hr {
+          border: none;
+          border-top: 2px solid var(--border-color);
+          margin: 2em 0;
+      }
+      
+      /* Navigation */
+      .navigation {
+          background: #f9fafb;
+          padding: 1em;
+          border-radius: 6px;
+          margin: 2em 0;
+          text-align: center;
+          border: 1px solid var(--border-color);
+      }
+      
+      .navigation a {
+          margin: 0 1em;
+          font-weight: 600;
+      }
+      
+      /* Table of Contents */
+      #TOC {
+          background: #f9fafb;
+          padding: 1.5em;
+          border-radius: 6px;
+          margin: 2em 0;
+          border: 1px solid var(--border-color);
+      }
+      
+      #TOC ul {
+          list-style: none;
+          margin-left: 0;
+      }
+      
+      #TOC li {
+          margin: 0.3em 0;
+      }
+      
+      #TOC a {
+          color: var(--text-color);
+      }
+      
+      #TOC > ul > li > a {
+          font-weight: 600;
+          font-size: 12pt;
+      }
+      
+      /* Terminology boxes */
+      .terminology {
+          background: #eff6ff;
+          border-left: 4px solid var(--primary-color);
+          padding: 1em;
+          margin: 1em 0;
+          border-radius: 4px;
+      }
+      
+      .terminology strong {
+          color: var(--primary-color);
+          font-size: 11pt;
+      }
+      
+      /* Mermaid diagrams */
+      .mermaid {
+          background: white;
+          padding: 1.5em;
+          margin: 1.5em 0;
+          border-radius: 6px;
+          border: 1px solid var(--border-color);
+          text-align: center;
+      }
+      
+      /* Print styles with page numbers */
+      @media print {
+          @page {
+              margin: 0.75in;
+              @bottom-right {
+                  content: "Page " counter(page);
+                  font-family: 'Inter', sans-serif;
+                  font-size: 9pt;
+                  color: #6b7280;
+              }
+              @bottom-left {
+                  content: "PCA Agent Documentation";
+                  font-family: 'Inter', sans-serif;
+                  font-size: 9pt;
+                  color: #6b7280;
+              }
+          }
+          
+          body {
+              max-width: none;
+              padding: 0;
+              counter-increment: page;
+          }
+          
+          .navigation {
+              display: none;
+          }
+          
+          a {
+              color: var(--text-color);
+              border-bottom: none;
+          }
+          
+          a[href^="http"]:after {
+              content: " (" attr(href) ")";
+              font-size: 8pt;
+              color: #6b7280;
+          }
+          
+          h1, h2, h3 {
+              page-break-after: avoid;
+          }
+          
+          h1 {
+              page-break-before: always;
+          }
+          
+          h1:first-of-type {
+              page-break-before: avoid;
+          }
+          
+          pre, table, .terminology, .mermaid {
+              page-break-inside: avoid;
+          }
+          
+          /* Page numbers in TOC */
+          #TOC a::after {
+              content: leader('.') target-counter(attr(href), page);
+              float: right;
+          }
+      }
+  </style>
+
+  <!-- Mermaid.js for diagram rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#2563eb',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#1e40af',
+        lineColor: '#6b7280',
+        secondaryColor: '#f3f4f6',
+        tertiaryColor: '#eff6ff'
+      }
+    });
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Chapter 2: The Six-Layer Architecture</h1>
+<p class="date">January 2026</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#overview-of-all-layers">2.1 Overview of All Layers</a></li>
+<li><a href="#the-six-layers">2.2 The Six Layers</a></li>
+<li><a href="#layer-by-layer-breakdown">2.3 Layer-by-Layer Breakdown</a>
+<ul>
+<li><a href="#layer-1-api-gateway-request-routing">Layer 1: API Gateway &amp; Request Routing</a></li>
+<li><a href="#layer-2-query-understanding-intent-detection">Layer 2: Query Understanding &amp; Intent Detection</a></li>
+<li><a href="#layer-3-data-retrieval-sql-generation">Layer 3: Data Retrieval &amp; SQL Generation</a></li>
+<li><a href="#layer-4-analysis-intelligence">Layer 4: Analysis &amp; Intelligence</a></li>
+<li><a href="#layer-5-visualization-presentation">Layer 5: Visualization &amp; Presentation</a></li>
+<li><a href="#layer-6-response-formatting-delivery">Layer 6: Response Formatting &amp; Delivery</a></li>
+<li><a href="#layer-2-query-understanding-intent-detection-1">Layer 2: Query Understanding &amp; Intent Detection</a></li>
+<li><a href="#layer-3-data-retrieval-sql-generation-1">Layer 3: Data Retrieval &amp; SQL Generation</a></li>
+<li><a href="#layer-4-analysis-intelligence-1">Layer 4: Analysis &amp; Intelligence</a></li>
+<li><a href="#layer-5-visualization-presentation-1">Layer 5: Visualization &amp; Presentation</a></li>
+<li><a href="#layer-6-response-formatting-delivery-1">Layer 6: Response Formatting &amp; Delivery</a></li>
+</ul></li>
+<li><a href="#how-layers-communicate">2.4 How Layers Communicate</a></li>
+<li><a href="#complete-data-flow-example">2.5 Complete Data Flow Example</a></li>
+<li><a href="#performance-characteristics">2.6 Performance Characteristics</a></li>
+<li><a href="#why-this-architecture">2.7 Why This Architecture?</a>
+<ul>
+<li><a href="#separation-of-concerns">2.7.1 Separation of Concerns</a></li>
+<li><a href="#testability">2.7.2 Testability</a></li>
+<li><a href="#scalability">2.7.3 Scalability</a></li>
+<li><a href="#maintainability">2.7.4 Maintainability</a></li>
+</ul></li>
+<li><a href="#error-handling-flow">2.8 Error Handling Flow</a></li>
+<li><a href="#whats-next">2.9 What’s Next?</a></li>
+</ul>
+</nav>
+<p><strong>CHAPTER 2</strong></p>
+<p><strong>THE SIX-LAYER ARCHITECTURE</strong></p>
+<hr />
+<p><strong>Navigation:</strong> <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/01_introduction.md">← Chapter 1</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/INDEX.md">Index</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/03_layer1_api_gateway.md">Next: Chapter 3 →</a></p>
+<hr />
+<h2 id="overview-of-all-layers">2.1 Overview of All Layers</h2>
+<p>The PCA Agent is built using a <strong>layered architecture</strong> where each layer has a single, well-defined responsibility.</p>
+<blockquote>
+<p><strong>Office Analogy - The Assembly Line:</strong></p>
+<p>Think of a car manufacturing plant. Each station on the assembly line has ONE job: - Station 1: Install the engine - Station 2: Attach the wheels - Station 3: Paint the body - Station 4: Install the interior - Station 5: Quality inspection - Station 6: Final detailing</p>
+<p>Each station is an expert at their one task. If there’s a problem with painting, you only fix Station 3 - you don’t need to touch the engine installation. That’s exactly how the PCA Agent’s layers work!</p>
+</blockquote>
+<p>This design makes the system: - ✅ <strong>Easier to understand</strong> - Each layer is simple on its own - ✅ <strong>Easier to test</strong> - Test each layer independently - ✅ <strong>Easier to maintain</strong> - Fix bugs in one layer without affecting others - ✅ <strong>Easier to scale</strong> - Optimize slow layers without touching fast ones</p>
+<hr />
+<h2 id="the-six-layers">2.2 The Six Layers</h2>
+<blockquote>
+<p><strong>Complete Office Analogy - Processing a Purchase Order:</strong></p>
+<p>Imagine you submit a purchase order at your company. Here’s the journey:</p>
+<ol type="1">
+<li><strong>Security Desk (Layer 1):</strong> Checks your employee badge and verifies you’re authorized to make purchases</li>
+<li><strong>Mail Room (Layer 2):</strong> Reads your request and determines what department should handle it (IT equipment? Office supplies? Travel?)</li>
+<li><strong>Records Department (Layer 3):</strong> Pulls up your budget, past purchases, and available funds</li>
+<li><strong>Analysis Team (Layer 4):</strong> Reviews if this purchase makes sense, compares prices, checks if it’s within policy</li>
+<li><strong>Graphics Department (Layer 5):</strong> Creates an approval form with charts showing budget impact</li>
+<li><strong>Executive Assistant (Layer 6):</strong> Packages everything into a nice email and sends it to you</li>
+</ol>
+<p><strong>Total time:</strong> A few seconds instead of days!</p>
+</blockquote>
+<figure>
+<img src="diagrams/six_layer_architecture.png" alt="Six-Layer Architecture" /><figcaption aria-hidden="true">Six-Layer Architecture</figcaption>
+</figure>
+<p><strong>Layer Timing:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Layer</th>
+<th>Function</th>
+<th>Time</th>
+<th>Office Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Layer 1</td>
+<td>API Gateway</td>
+<td>~5ms</td>
+<td>Security checkpoint</td>
+</tr>
+<tr class="even">
+<td>Layer 2</td>
+<td>Query Understanding</td>
+<td>~5-800ms</td>
+<td>Mail room sorting</td>
+</tr>
+<tr class="odd">
+<td>Layer 3</td>
+<td>Data Retrieval</td>
+<td>~50-200ms</td>
+<td>Records lookup</td>
+</tr>
+<tr class="even">
+<td>Layer 4</td>
+<td>Analysis</td>
+<td>~500-2000ms</td>
+<td>Analysis team review</td>
+</tr>
+<tr class="odd">
+<td>Layer 5</td>
+<td>Visualization</td>
+<td>~100-300ms</td>
+<td>Graphics creation</td>
+</tr>
+<tr class="even">
+<td>Layer 6</td>
+<td>Response Formatting</td>
+<td>~10ms</td>
+<td>Final packaging</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td><strong>Complete Response</strong></td>
+<td><strong>0.7-3.5s</strong></td>
+<td><strong>Instant approval!</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="layer-by-layer-breakdown">2.3 Layer-by-Layer Breakdown</h2>
+<h3 id="layer-1-api-gateway-request-routing">Layer 1: API Gateway &amp; Request Routing</h3>
+<p><strong>Time:</strong> ~5ms<br />
+<strong>Purpose:</strong> Security checkpoint and traffic director</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The security desk at your office building. They: - Check your ID badge (authentication) - Make sure you’re not entering/exiting too frequently (rate limiting) - Verify you’re not a security threat (CSRF protection) - Direct you to the right floor/department (routing)</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Validates your identity (JWT token) 2. Checks if you’re making too many requests (rate limiting) 3. Protects against attacks (CSRF validation) 4. Routes your request to the right handler</p>
+<p><strong>Output:</strong> Validated request ready for processing</p>
+<p><strong><a href="#chapter-3-layer-1-api-gateway--request-routing">Read Full Chapter: Layer 1 - API Gateway →</a></strong></p>
+<hr />
+<h3 id="layer-2-query-understanding-intent-detection">Layer 2: Query Understanding &amp; Intent Detection</h3>
+<p><strong>Time:</strong> ~5-800ms (depends on path)<br />
+<strong>Purpose:</strong> Figure out what you’re really asking</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The mail room that sorts incoming requests. When you submit a vague request like “I need help with computers,” they figure out: - Do you need a new laptop? (hardware request) - Is your software broken? (IT support ticket) - Do you need training? (HR training request)</p>
+<p>They classify your intent and route it to the right department. The PCA Agent does the same with your questions!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Checks if your question matches a known pattern (fast path - like a pre-printed form) 2. If not, uses an LLM to analyze your question (slow path - like having someone read and interpret your request) 3. Extracts key information: metrics, dimensions, time ranges 4. Classifies the intent: comparison, trend, aggregation, etc.</p>
+<p><strong>Output:</strong> Structured query analysis</p>
+<blockquote>
+<p><strong>Technical Term - Intent Classification:</strong></p>
+<p><strong>What it means:</strong> Figuring out what type of question you’re asking</p>
+<p><strong>Office Example:</strong> - “How much did we spend?” → AGGREGATION (add up totals) - “Compare this month to last month” → COMPARISON (side-by-side analysis) - “Show me the trend” → TREND (changes over time)</p>
+<p>Just like how the mail room knows the difference between a complaint, a request, and a question!</p>
+</blockquote>
+<p><strong><a href="#chapter-4-layer-2-query-understanding--intent-detection">Read Full Chapter: Layer 2 - Query Understanding →</a></strong></p>
+<hr />
+<h3 id="layer-3-data-retrieval-sql-generation">Layer 3: Data Retrieval &amp; SQL Generation</h3>
+<p><strong>Time:</strong> ~50-200ms<br />
+<strong>Purpose:</strong> Get the data from the database</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The records department with filing cabinets full of information. You ask “What was our revenue last quarter?” and they: 1. Know exactly which filing cabinet to open (SQL generation) 2. Check that you’re allowed to see that information (SQL validation) 3. Pull out the files (query execution) 4. Hand you the documents (return results)</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Generates SQL query (from template or LLM) 2. Validates the SQL for safety 3. Executes the query in DuckDB 4. Returns raw data results</p>
+<blockquote>
+<p><strong>Technical Term - SQL (Structured Query Language):</strong></p>
+<p><strong>What it is:</strong> The language databases understand</p>
+<p><strong>Office Analogy:</strong> Like asking the records clerk in their language instead of yours: - <strong>Your language:</strong> “Can you get me all the expense reports from last month?” - <strong>SQL language:</strong> “SELECT * FROM expenses WHERE month = ‘January’”</p>
+<p>The database only understands SQL, so the system translates your natural language into SQL!</p>
+</blockquote>
+<p><strong>Output:</strong> Pandas/Polars DataFrame with query results</p>
+<blockquote>
+<p><strong>Technical Term - DataFrame:</strong></p>
+<p><strong>What it is:</strong> A table of data (rows and columns)</p>
+<p><strong>Office Analogy:</strong> Like an Excel spreadsheet. Each row is a record (one campaign, one day, one transaction) and each column is a piece of information (date, spend, conversions).</p>
+</blockquote>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/05_layer3_data_retrieval.md">Read Full Chapter: Layer 3 - SQL Generation →</a></strong></p>
+<hr />
+<h3 id="layer-4-analysis-intelligence">Layer 4: Analysis &amp; Intelligence</h3>
+<p><strong>Time:</strong> ~500-2000ms<br />
+<strong>Purpose:</strong> Find patterns and generate insights</p>
+<blockquote>
+<p><strong>Office Analogy - The Analysis Team Meeting:</strong></p>
+<p>Imagine you have a team of specialists analyzing your data: - <strong>Data Analyst (Reasoning Agent):</strong> Looks at the numbers and finds patterns. “Your spend increased 20% but conversions only increased 5% - that’s concerning!” - <strong>Industry Expert (B2B Specialist):</strong> Adds context. “That’s actually normal for Q4 in the B2B software industry. Lead quality matters more than quantity.” - <strong>Project Manager (Orchestrator):</strong> Coordinates the team, makes sure everyone contributes, and compiles the final report.</p>
+<p>All three work together, each bringing their expertise. That’s Layer 4!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Orchestrates multiple AI agents 2. Reasoning Agent finds patterns in the data 3. B2B Specialist adds industry context 4. Generates actionable recommendations</p>
+<blockquote>
+<p><strong>Technical Term - Agent Orchestration:</strong></p>
+<p><strong>What it is:</strong> Coordinating multiple AI agents to work together</p>
+<p><strong>Office Analogy:</strong> Like a project manager coordinating a team. Instead of one person doing everything, you have specialists: - One person analyzes the data - Another person adds industry knowledge - A third person creates visualizations - The project manager (orchestrator) makes sure they all work together and don’t duplicate effort</p>
+<p>The orchestrator is like the person who takes a file to different departments, collects information from each, and brings it all back together!</p>
+</blockquote>
+<p><strong>Output:</strong> List of insights with priorities and recommendations</p>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/06_layer4_analysis.md">Read Full Chapter: Layer 4 - Analysis →</a></strong></p>
+<hr />
+<h3 id="layer-5-visualization-presentation">Layer 5: Visualization &amp; Presentation</h3>
+<p><strong>Time:</strong> ~100-300ms<br />
+<strong>Purpose:</strong> Create charts that tell the story</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The graphics department that takes boring spreadsheets and turns them into beautiful presentations. They know: - Use a pie chart for market share (parts of a whole) - Use a line chart for trends over time (changes) - Use a bar chart for comparisons (side-by-side) - Use a gauge for progress toward a goal (how close are we?)</p>
+<p>They make the data visual and easy to understand at a glance!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Determines the best chart type for each insight 2. Generates interactive Plotly charts 3. Applies marketing-specific color schemes 4. Adds benchmarks and annotations</p>
+<blockquote>
+<p><strong>Technical Term - Chart Type Selection:</strong></p>
+<p><strong>What it is:</strong> Choosing the right visual representation for your data</p>
+<p><strong>Office Analogy:</strong> Like choosing the right format for a presentation: - <strong>Budget breakdown?</strong> → Pie chart (like slicing a pizza to show where money goes) - <strong>Sales over time?</strong> → Line chart (like a temperature graph showing ups and downs) - <strong>This year vs last year?</strong> → Bar chart (like standing two people side-by-side to compare heights) - <strong>Progress to goal?</strong> → Gauge chart (like a car’s speedometer showing how close you are)</p>
+</blockquote>
+<p><strong>Output:</strong> Interactive charts ready for display</p>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/07_layer5_visualization.md">Read Full Chapter: Layer 5 - Visualization →</a></strong></p>
+<hr />
+<h3 id="layer-6-response-formatting-delivery">Layer 6: Response Formatting &amp; Delivery</h3>
+<p><strong>Time:</strong> ~10ms<br />
+<strong>Purpose:</strong> Package everything into a clean response</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The executive assistant who takes all the analysis, charts, and data and packages it into a beautiful executive summary email. They: - Write a clear summary in plain English - Format numbers nicely ($1.2M instead of 1234567) - Organize everything logically - Send it to you in a format you can easily read</p>
+<p>They’re the final touch that makes everything professional and polished!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Generates a natural language summary 2. Assembles charts, insights, and data into JSON 3. Formats numbers and percentages correctly 4. Sends the response back to the user</p>
+<blockquote>
+<p><strong>Technical Term - JSON (JavaScript Object Notation):</strong></p>
+<p><strong>What it is:</strong> A standardized format for packaging data</p>
+<p><strong>Office Analogy:</strong> Like using a standard memo template. Instead of everyone writing emails differently, JSON is a agreed-upon format that both the backend and frontend understand:</p>
+<pre><code>{
+  &quot;answer&quot;: &quot;Your CPA is $12.50&quot;,
+  &quot;chart&quot;: {chart data},
+  &quot;insights&quot;: [&quot;Spend increased 20%&quot;, &quot;Conversions up 15%&quot;]
+}</code></pre>
+<p>It’s like a form with labeled boxes - everyone knows where to find each piece of information!</p>
+</blockquote>
+<p><strong>Output:</strong> Final JSON response to the frontend</p>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/08_layer6_response.md">Read Full Chapter: Layer 6 - Response Formatting →</a></strong></p>
+<hr />
+<h3 id="layer-2-query-understanding-intent-detection-1">Layer 2: Query Understanding &amp; Intent Detection</h3>
+<p><strong>Time:</strong> ~5-800ms (depends on path)<br />
+<strong>Purpose:</strong> Figure out what you’re really asking</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The mail room that sorts incoming requests. When you submit a vague request like “I need help with computers,” they figure out: - Do you need a new laptop? (hardware request) - Is your software broken? (IT support ticket) - Do you need training? (HR training request)</p>
+<p>They classify your intent and route it to the right department. The PCA Agent does the same with your questions!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Checks if your question matches a known pattern (fast path - like a pre-printed form) 2. If not, uses an LLM to analyze your question (slow path - like having someone read and interpret your request) 3. Extracts key information: metrics, dimensions, time ranges 4. Classifies the intent: comparison, trend, aggregation, etc.</p>
+<p><strong>Output:</strong> Structured query analysis</p>
+<blockquote>
+<p><strong>Technical Term - Intent Classification:</strong></p>
+<p><strong>What it means:</strong> Figuring out what type of question you’re asking</p>
+<p><strong>Office Example:</strong> - “How much did we spend?” → AGGREGATION (add up totals) - “Compare this month to last month” → COMPARISON (side-by-side analysis) - “Show me the trend” → TREND (changes over time)</p>
+<p>Just like how the mail room knows the difference between a complaint, a request, and a question!</p>
+</blockquote>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/04_layer2_query_understanding.md">Read Full Chapter →</a></strong></p>
+<hr />
+<h3 id="layer-3-data-retrieval-sql-generation-1">Layer 3: Data Retrieval &amp; SQL Generation</h3>
+<p><strong>Time:</strong> ~50-200ms<br />
+<strong>Purpose:</strong> Get the data from the database</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The records department with filing cabinets full of information. You ask “What was our revenue last quarter?” and they: 1. Know exactly which filing cabinet to open (SQL generation) 2. Check that you’re allowed to see that information (SQL validation) 3. Pull out the files (query execution) 4. Hand you the documents (return results)</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Generates SQL query (from template or LLM) 2. Validates the SQL for safety 3. Executes the query in DuckDB 4. Returns raw data results</p>
+<blockquote>
+<p><strong>Technical Term - SQL (Structured Query Language):</strong></p>
+<p><strong>What it is:</strong> The language databases understand</p>
+<p><strong>Office Analogy:</strong> Like asking the records clerk in their language instead of yours: - <strong>Your language:</strong> “Can you get me all the expense reports from last month?” - <strong>SQL language:</strong> “SELECT * FROM expenses WHERE month = ‘January’”</p>
+<p>The database only understands SQL, so the system translates your natural language into SQL!</p>
+</blockquote>
+<p><strong>Output:</strong> Pandas/Polars DataFrame with query results</p>
+<blockquote>
+<p><strong>Technical Term - DataFrame:</strong></p>
+<p><strong>What it is:</strong> A table of data (rows and columns)</p>
+<p><strong>Office Analogy:</strong> Like an Excel spreadsheet. Each row is a record (one campaign, one day, one transaction) and each column is a piece of information (date, spend, conversions).</p>
+</blockquote>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/05_layer3_sql_generation.md">Read Full Chapter →</a></strong></p>
+<hr />
+<h3 id="layer-4-analysis-intelligence-1">Layer 4: Analysis &amp; Intelligence</h3>
+<p><strong>Time:</strong> ~500-2000ms<br />
+<strong>Purpose:</strong> Find patterns and generate insights</p>
+<blockquote>
+<p><strong>Office Analogy - The Analysis Team Meeting:</strong></p>
+<p>Imagine you have a team of specialists analyzing your data: - <strong>Data Analyst (Reasoning Agent):</strong> Looks at the numbers and finds patterns. “Your spend increased 20% but conversions only increased 5% - that’s concerning!” - <strong>Industry Expert (B2B Specialist):</strong> Adds context. “That’s actually normal for Q4 in the B2B software industry. Lead quality matters more than quantity.” - <strong>Project Manager (Orchestrator):</strong> Coordinates the team, makes sure everyone contributes, and compiles the final report.</p>
+<p>All three work together, each bringing their expertise. That’s Layer 4!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Orchestrates multiple AI agents 2. Reasoning Agent finds patterns in the data 3. B2B Specialist adds industry context 4. Generates actionable recommendations</p>
+<blockquote>
+<p><strong>Technical Term - Agent Orchestration:</strong></p>
+<p><strong>What it is:</strong> Coordinating multiple AI agents to work together</p>
+<p><strong>Office Analogy:</strong> Like a project manager coordinating a team. Instead of one person doing everything, you have specialists: - One person analyzes the data - Another person adds industry knowledge - A third person creates visualizations - The project manager (orchestrator) makes sure they all work together and don’t duplicate effort</p>
+<p>The orchestrator is like the person who takes a file to different departments, collects information from each, and brings it all back together!</p>
+</blockquote>
+<p><strong>Output:</strong> List of insights with priorities and recommendations</p>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/06_layer4_analysis.md">Read Full Chapter →</a></strong></p>
+<hr />
+<h3 id="layer-5-visualization-presentation-1">Layer 5: Visualization &amp; Presentation</h3>
+<p><strong>Time:</strong> ~100-300ms<br />
+<strong>Purpose:</strong> Create charts that tell the story</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The graphics department that takes boring spreadsheets and turns them into beautiful presentations. They know: - Use a pie chart for market share (parts of a whole) - Use a line chart for trends over time (changes) - Use a bar chart for comparisons (side-by-side) - Use a gauge for progress toward a goal (how close are we?)</p>
+<p>They make the data visual and easy to understand at a glance!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Determines the best chart type for each insight 2. Generates interactive Plotly charts 3. Applies marketing-specific color schemes 4. Adds benchmarks and annotations</p>
+<blockquote>
+<p><strong>Technical Term - Chart Type Selection:</strong></p>
+<p><strong>What it is:</strong> Choosing the right visual representation for your data</p>
+<p><strong>Office Analogy:</strong> Like choosing the right format for a presentation: - <strong>Budget breakdown?</strong> → Pie chart (like slicing a pizza to show where money goes) - <strong>Sales over time?</strong> → Line chart (like a temperature graph showing ups and downs) - <strong>This year vs last year?</strong> → Bar chart (like standing two people side-by-side to compare heights) - <strong>Progress to goal?</strong> → Gauge chart (like a car’s speedometer showing how close you are)</p>
+</blockquote>
+<p><strong>Output:</strong> Interactive charts ready for display</p>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/07_layer5_visualization.md">Read Full Chapter →</a></strong></p>
+<hr />
+<h3 id="layer-6-response-formatting-delivery-1">Layer 6: Response Formatting &amp; Delivery</h3>
+<p><strong>Time:</strong> ~10ms<br />
+<strong>Purpose:</strong> Package everything into a clean response</p>
+<blockquote>
+<p><strong>Office Analogy:</strong> The executive assistant who takes all the analysis, charts, and data and packages it into a beautiful executive summary email. They: - Write a clear summary in plain English - Format numbers nicely ($1.2M instead of 1234567) - Organize everything logically - Send it to you in a format you can easily read</p>
+<p>They’re the final touch that makes everything professional and polished!</p>
+</blockquote>
+<p><strong>What it does:</strong> 1. Generates a natural language summary 2. Assembles charts, insights, and data into JSON 3. Formats numbers and percentages correctly 4. Sends the response back to the user</p>
+<blockquote>
+<p><strong>Technical Term - JSON (JavaScript Object Notation):</strong></p>
+<p><strong>What it is:</strong> A standardized format for packaging data</p>
+<p><strong>Office Analogy:</strong> Like using a standard memo template. Instead of everyone writing emails differently, JSON is a agreed-upon format that both the backend and frontend understand:</p>
+<pre><code>{
+  &quot;answer&quot;: &quot;Your CPA is $12.50&quot;,
+  &quot;chart&quot;: {chart data},
+  &quot;insights&quot;: [&quot;Spend increased 20%&quot;, &quot;Conversions up 15%&quot;]
+}</code></pre>
+<p>It’s like a form with labeled boxes - everyone knows where to find each piece of information!</p>
+</blockquote>
+<p><strong>Output:</strong> Final JSON response to the frontend</p>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/08_layer6_response_formatting.md">Read Full Chapter →</a></strong></p>
+<hr />
+<h2 id="how-layers-communicate">2.4 How Layers Communicate</h2>
+<p>Each layer has a clear <strong>input</strong> and <strong>output</strong> contract:</p>
+<figure>
+<img src="diagrams/layer_communication.png" alt="Layer Communication" /><figcaption aria-hidden="true">Layer Communication</figcaption>
+</figure>
+<blockquote>
+<p><strong>Office Analogy - The Document Chain:</strong></p>
+<p>Think of an expense report moving through departments: 1. <strong>Security</strong> gives you a stamped form → <strong>Mail Room</strong> 2. <strong>Mail Room</strong> adds a routing slip → <strong>Records</strong> 3. <strong>Records</strong> attaches your budget info → <strong>Analysis</strong> 4. <strong>Analysis</strong> adds their recommendation → <strong>Graphics</strong> 5. <strong>Graphics</strong> creates a visual summary → <strong>Executive Assistant</strong> 6. <strong>Executive Assistant</strong> sends final email → <strong>You</strong></p>
+<p>Each department only talks to the department before and after them. Graphics doesn’t need to know what Security did - they just receive what Analysis sends them!</p>
+</blockquote>
+<p><strong>Key Principle:</strong> Each layer only knows about its immediate neighbors. Layer 3 doesn’t know about Layer 5, and that’s intentional.</p>
+<blockquote>
+<p><strong>Why this matters:</strong> If you change how Graphics creates charts (Layer 5), you don’t need to change how Security works (Layer 1). They’re completely independent!</p>
+</blockquote>
+<hr />
+<h2 id="complete-data-flow-example">2.5 Complete Data Flow Example</h2>
+<p>Let’s trace a real question through all layers:</p>
+<p><strong>Question:</strong> <em>“Compare last 2 weeks performance”</em></p>
+<figure>
+<img src="diagrams/request_flow.png" alt="Complete Request Flow" /><figcaption aria-hidden="true">Complete Request Flow</figcaption>
+</figure>
+<blockquote>
+<p><strong>Office Analogy - Following the Purchase Order:</strong></p>
+<p>You submit: “I need to compare our office supply costs from the last 2 weeks”</p>
+<ol type="1">
+<li><strong>Security (5ms):</strong> Checks your badge, lets you in</li>
+<li><strong>Mail Room (5ms):</strong> “This is a COMPARISON request for office supplies”</li>
+<li><strong>Records (100ms):</strong> Pulls up Week 1 costs ($500) and Week 2 costs ($650)</li>
+<li><strong>Analysis (1000ms):</strong> “Costs increased 30%. Main driver: printer paper went from $100 to $250”</li>
+<li><strong>Graphics (200ms):</strong> Creates a side-by-side bar chart showing the increase</li>
+<li><strong>Executive Assistant (10ms):</strong> Writes: “Office supply costs increased 30% ($500 → $650), primarily due to printer paper”</li>
+</ol>
+<p><strong>Total time:</strong> 1.3 seconds instead of 2 days!</p>
+</blockquote>
+<p><strong>Processing Flow:</strong></p>
+<ol type="1">
+<li><strong>Layer 1 (5ms):</strong> Validates token, checks rate limit, routes to handler</li>
+<li><strong>Layer 2 (5ms):</strong> Pattern match: “last 2 weeks” → Intent: COMPARISON</li>
+<li><strong>Layer 3 (100ms):</strong> Generates SQL, executes query, returns DataFrame[current_week, previous_week]</li>
+<li><strong>Layer 4 (1000ms):</strong> Reasoning Agent analyzes changes, finds patterns</li>
+<li><strong>Layer 5 (200ms):</strong> Selects comparison bar chart, generates visualization</li>
+<li><strong>Layer 6 (10ms):</strong> Formats summary, assembles JSON response</li>
+</ol>
+<p><strong>Total Time:</strong> 1.32 seconds</p>
+<hr />
+<h2 id="performance-characteristics">2.6 Performance Characteristics</h2>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Layer</th>
+<th style="text-align: center;">Avg Time</th>
+<th style="text-align: center;">Can Be Cached?</th>
+<th style="text-align: center;">Parallelizable?</th>
+<th style="text-align: left;">Office Analogy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Layer 1</td>
+<td style="text-align: center;">5ms</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">N/A</td>
+<td style="text-align: left;">Badge scan is instant</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="diagrams/performance_comparison.png" alt="Performance Comparison" /><figcaption aria-hidden="true">Performance Comparison</figcaption>
+</figure>
+<div class="line-block">Layer 2 | 5-800ms | Yes | No | Mail sorting (can remember common requests) |<br />
+Layer 3 | 50-200ms | Yes | No | File retrieval (can keep recent files handy) |<br />
+Layer 4 | 500-2000ms | Partial | Yes | Team analysis (multiple analysts work in parallel) |<br />
+Layer 5 | 100-300ms | Yes | Yes | Multiple designers work simultaneously |<br />
+Layer 6 | 10ms | No | N/A | Email formatting is instant |<br />
+<strong>Total</strong> | <strong>0.7-3.5s</strong> | - | - | <strong>Much faster than days!</strong> |</div>
+<p><strong>Optimization Strategies:</strong></p>
+<blockquote>
+<p><strong>Office Analogies for Optimization:</strong></p>
+</blockquote>
+<ul>
+<li><p>⚡ <strong>Semantic Caching in Layer 2 (saves 800ms):</strong> &gt; Like the mail room keeping a “Frequently Asked Questions” binder. If someone asks “What’s my vacation balance?” and someone else asks “How many vacation days do I have?”, they recognize it’s the same question and give the cached answer instantly.</p></li>
+<li><p>⚡ <strong>Query Result Caching in Layer 3 (saves 200ms):</strong> &gt; Like the records department keeping today’s most-requested files on their desk instead of walking to the filing cabinet every time.</p></li>
+<li><p>⚡ <strong>Parallel Agent Execution in Layer 4 (saves 500-1000ms):</strong> &gt; Like having 3 analysts work on different parts of the report simultaneously instead of one person doing everything sequentially.</p></li>
+</ul>
+<hr />
+<h2 id="why-this-architecture">2.7 Why This Architecture?</h2>
+<h3 id="separation-of-concerns">2.7.1 Separation of Concerns</h3>
+<blockquote>
+<p><strong>Office Analogy:</strong> In a well-run company, the security guard doesn’t do accounting, and the accountant doesn’t handle security. Each person has ONE clear job. If there’s a security issue, you talk to security. If there’s a budget issue, you talk to accounting.</p>
+<p>Same with the PCA Agent - security issues are in Layer 1, data issues are in Layer 3. No confusion!</p>
+</blockquote>
+<p>Each layer does ONE thing well: - Security is separate from data retrieval - Analysis is separate from visualization - Easy to reason about and debug</p>
+<h3 id="testability">2.7.2 Testability</h3>
+<blockquote>
+<p><strong>Office Analogy:</strong> You can test if the mail room is sorting requests correctly without needing the entire company to be operational. Just give them sample requests and see if they route them to the right department.</p>
+<p>Same with the PCA Agent - you can test Layer 2 (query understanding) without needing a database or charts!</p>
+</blockquote>
+<p>You can test each layer in isolation:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test Layer 2 without needing a database</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_query_understanding():</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>[Caching Strategy](..<span class="op">/</span>diagrams<span class="op">/</span>caching_strategy.png)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> analyze_question(<span class="st">&quot;What is my CPA?&quot;</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> result[<span class="st">&#39;intent&#39;</span>] <span class="op">==</span> QueryIntent.AGGREGATION</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="st">&#39;CPA&#39;</span> <span class="kw">in</span> result[<span class="st">&#39;entities&#39;</span>][<span class="st">&#39;metrics&#39;</span>]</span></code></pre></div>
+<h3 id="scalability">2.7.3 Scalability</h3>
+<blockquote>
+<p><strong>Office Analogy:</strong> If the analysis team is slow (they’re overwhelmed with work), you can: - Hire more analysts - Give them better tools - Cache common analyses</p>
+<p>You don’t need to change how security works or how the mail room operates!</p>
+</blockquote>
+<p>Slow layers can be optimized independently: - Layer 4 (Analysis) is slow? → Add caching or use faster LLM - Layer 3 (SQL) is slow? → Optimize queries or add indexes - Don’t need to touch other layers</p>
+<h3 id="maintainability">2.7.4 Maintainability</h3>
+<blockquote>
+<p><strong>Office Analogy:</strong> If there’s a problem with how charts are created, you only need to talk to the graphics department. You don’t need to involve security, mail room, records, or anyone else. The problem is isolated!</p>
+</blockquote>
+<p>Bug in visualization? Only look at Layer 5.<br />
+Security issue? Only look at Layer 1.</p>
+<hr />
+<h2 id="error-handling-flow">2.8 Error Handling Flow</h2>
+<figure>
+<img src="diagrams/error_handling.png" alt="Error Handling Flow" /><figcaption aria-hidden="true">Error Handling Flow</figcaption>
+</figure>
+<p>What happens if something goes wrong?</p>
+<blockquote>
+<p><strong>Office Analogy - The Rejection Path:</strong></p>
+<p><strong>Scenario 1:</strong> You try to enter the building without a badge - <strong>Security:</strong> “Sorry, no badge = no entry” (401 Unauthorized) - You never even get to the mail room!</p>
+<p><strong>Scenario 2:</strong> You submit a request that’s too vague - <strong>Mail Room:</strong> “I don’t understand this request. Can you clarify?” (Ask for clarification) - They send it back to you instead of passing it forward</p>
+<p><strong>Scenario 3:</strong> Records can’t find the information - <strong>Records:</strong> Tries the main filing cabinet (primary LLM) - <strong>Records:</strong> Tries the backup filing cabinet (secondary LLM) - <strong>Records:</strong> Tries the archive (tertiary LLM) - <strong>Records:</strong> “Sorry, we don’t have that data. Did you mean X instead?” (Helpful error)</p>
+</blockquote>
+<p><strong>Key Principle:</strong> Fail gracefully and provide helpful error messages.</p>
+<hr />
+<h2 id="whats-next">2.9 What’s Next?</h2>
+<p>Now that you understand the overall architecture, let’s dive deep into each layer:</p>
+<p><strong><a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/03_layer1_api_gateway.md">Chapter 3: Layer 1 - API Gateway →</a></strong></p>
+<p>In the next chapter, you’ll learn exactly how the “Security Desk” works - how it checks your identity, prevents abuse, and routes your request to the right place!</p>
+<hr />
+<p><strong>Navigation:</strong> <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/01_introduction.md">← Chapter 1</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/INDEX.md">Index</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/03_layer1_api_gateway.md">Next: Chapter 3 →</a></p>
+</body>
+</html>

@@ -1,0 +1,198 @@
+{
+  "description": "Comprehensive training questions for PCA Agent Q&A system covering temporal comparisons, funnel analysis, channel performance, and strategic insights",
+  "version": "2.0",
+  "last_updated": "2024-11-17",
+  "training_questions": [
+    {
+      "id": "temporal_001",
+      "category": "Temporal Comparison",
+      "difficulty": "Medium",
+      "question": "Compare campaign performance between the last 2 weeks vs. the previous 2 weeks. What's the percentage change in impressions, clicks, and conversions?",
+      "expected_sql": "WITH last_2_weeks AS (SELECT SUM(Impressions) as imp, SUM(Clicks) as clk, SUM(Conversions) as conv FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 14 DAY), prev_2_weeks AS (SELECT SUM(Impressions) as imp, SUM(Clicks) as clk, SUM(Conversions) as conv FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 28 DAY AND Date < CURRENT_DATE - INTERVAL 14 DAY) SELECT ...",
+      "aggregation_rules": ["Never AVG pre-calculated rates", "Compute from SUM aggregates"],
+      "temporal_logic": "last 2 weeks = -14 days, previous 2 weeks = -28 to -14 days"
+    },
+    {
+      "id": "temporal_002",
+      "category": "Temporal Comparison",
+      "difficulty": "Medium",
+      "question": "Show me the trend for cost per click (CPC) over the last 2 months on a week-by-week basis. Calculate CPC for each week separately.",
+      "expected_sql": "SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as Week, ROUND(SUM(Spend) / NULLIF(SUM(Clicks), 0), 2) as CPC FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 60 DAY GROUP BY Week ORDER BY Week",
+      "aggregation_rules": ["CPC = SUM(Spend) / SUM(Clicks) per week", "NOT AVG(CPC)"],
+      "temporal_logic": "last 2 months = -60 days, week-by-week = DATE_TRUNC('week')"
+    },
+    {
+      "id": "temporal_003",
+      "category": "Temporal Comparison",
+      "difficulty": "Hard",
+      "question": "How did our click-through rate (CTR) in the last month compare to the month before? Remember to recalculate CTR from total clicks/total impressions for each period.",
+      "expected_sql": "WITH last_month AS (SELECT SUM(Clicks) as clicks, SUM(Impressions) as imps FROM campaigns WHERE Date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL 1 MONTH)), prev_month AS (...) SELECT (last_month.clicks / last_month.imps) * 100 as Last_Month_CTR, (prev_month.clicks / prev_month.imps) * 100 as Prev_Month_CTR",
+      "aggregation_rules": ["CTR = (SUM(Clicks) / SUM(Impressions)) * 100", "Calculate per period, not AVG"],
+      "temporal_logic": "last month = DATE_TRUNC('month', -1 month), month before = -2 months"
+    },
+    {
+      "id": "temporal_004",
+      "category": "Temporal Comparison",
+      "difficulty": "Medium",
+      "question": "What's the month-over-month growth in leads for the past 6 months? Show both absolute numbers and growth percentages.",
+      "expected_sql": "SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as Month, SUM(Conversions) as Leads, LAG(SUM(Conversions)) OVER (ORDER BY Month) as Prev_Month_Leads, ROUND(((SUM(Conversions) - LAG(SUM(Conversions)) OVER (ORDER BY Month)) / NULLIF(LAG(SUM(Conversions)) OVER (ORDER BY Month), 0)) * 100, 2) as Growth_Pct FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 180 DAY GROUP BY Month ORDER BY Month",
+      "aggregation_rules": ["Use window functions for MoM comparison"],
+      "temporal_logic": "past 6 months = -180 days, month-over-month = LAG function"
+    },
+    {
+      "id": "temporal_005",
+      "category": "Temporal Comparison",
+      "difficulty": "Hard",
+      "question": "Compare Q3 2024 vs Q2 2024 performance. For metrics like ROAS, CPM, and CTR, recalculate them from aggregate spend, revenue, impressions, and clicks - don't average the daily/weekly rates.",
+      "expected_sql": "WITH q3 AS (SELECT SUM(Spend) as spend, SUM(Revenue) as rev, SUM(Impressions) as imps, SUM(Clicks) as clks FROM campaigns WHERE QUARTER(CAST(Date AS DATE)) = 3 AND YEAR(CAST(Date AS DATE)) = 2024), q2 AS (...) SELECT (q3.rev / q3.spend) as Q3_ROAS, (q2.rev / q2.spend) as Q2_ROAS, (q3.spend / q3.imps * 1000) as Q3_CPM, (q3.clks / q3.imps * 100) as Q3_CTR ...",
+      "aggregation_rules": ["ROAS = SUM(Revenue) / SUM(Spend)", "CPM = (SUM(Spend) / SUM(Impressions)) * 1000", "CTR = (SUM(Clicks) / SUM(Impressions)) * 100"],
+      "temporal_logic": "Q3 = QUARTER(Date) = 3, Q2 = QUARTER(Date) = 2"
+    },
+    {
+      "id": "channel_001",
+      "category": "Channel Analysis",
+      "difficulty": "Medium",
+      "question": "Which marketing channel (email, social media, paid ads, etc.) generated the highest ROI, and what was the contribution of each channel to total conversions?",
+      "expected_sql": "SELECT Platform, SUM(Revenue) - SUM(Spend) as Profit, ROUND((SUM(Revenue) - SUM(Spend)) / NULLIF(SUM(Spend), 0) * 100, 2) as ROI_Pct, SUM(Conversions) as Total_Conversions, ROUND(SUM(Conversions) * 100.0 / SUM(SUM(Conversions)) OVER (), 2) as Conversion_Contribution_Pct FROM campaigns GROUP BY Platform ORDER BY ROI_Pct DESC",
+      "aggregation_rules": ["ROI = (Revenue - Spend) / Spend * 100", "Use window function for contribution %"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "channel_002",
+      "category": "Channel Analysis",
+      "difficulty": "Medium",
+      "question": "Compare the cost per acquisition (CPA) across different channels used in this campaign. Which channel was most cost-effective?",
+      "expected_sql": "SELECT Platform, SUM(Spend) as Total_Spend, SUM(Conversions) as Total_Conversions, ROUND(SUM(Spend) / NULLIF(SUM(Conversions), 0), 2) as CPA FROM campaigns GROUP BY Platform ORDER BY CPA ASC",
+      "aggregation_rules": ["CPA = SUM(Spend) / SUM(Conversions)", "NOT AVG(CPA)"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "funnel_001",
+      "category": "Funnel Analysis",
+      "difficulty": "Hard",
+      "question": "What was the conversion rate at each stage of the funnel, and where did we see the highest drop-off?",
+      "expected_sql": "SELECT SUM(Impressions) as Awareness, SUM(Clicks) as Consideration, SUM(Conversions) as Conversion, ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as Awareness_to_Consideration_Rate, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Consideration_to_Conversion_Rate, ROUND((SUM(Impressions) - SUM(Clicks)) / NULLIF(SUM(Impressions), 0) * 100, 2) as Awareness_Dropoff_Pct, ROUND((SUM(Clicks) - SUM(Conversions)) / NULLIF(SUM(Clicks), 0) * 100, 2) as Consideration_Dropoff_Pct FROM campaigns",
+      "aggregation_rules": ["Conversion rates from aggregates", "Drop-off = (stage1 - stage2) / stage1 * 100"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "funnel_002",
+      "category": "Funnel Analysis",
+      "difficulty": "Medium",
+      "question": "Calculate the click-through rate and conversion rate for each platform",
+      "expected_sql": "SELECT Platform, ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as CTR, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Conversion_Rate FROM campaigns GROUP BY Platform ORDER BY CTR DESC",
+      "aggregation_rules": ["CTR = (SUM(Clicks) / SUM(Impressions)) * 100", "Conversion_Rate = (SUM(Conversions) / SUM(Clicks)) * 100"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "budget_001",
+      "category": "Budget & ROI",
+      "difficulty": "Medium",
+      "question": "Calculate the return on ad spend (ROAS) for this campaign. Did we achieve the target ROAS of 3.0?",
+      "expected_sql": "SELECT SUM(Revenue) as Total_Revenue, SUM(Spend) as Total_Spend, ROUND(SUM(Revenue) / NULLIF(SUM(Spend), 0), 2) as ROAS, CASE WHEN (SUM(Revenue) / NULLIF(SUM(Spend), 0)) >= 3.0 THEN 'Target Achieved' ELSE 'Below Target' END as Target_Status FROM campaigns",
+      "aggregation_rules": ["ROAS = SUM(Revenue) / SUM(Spend)", "NOT AVG(ROAS)"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "budget_002",
+      "category": "Budget & ROI",
+      "difficulty": "Hard",
+      "question": "If we had an additional 20% budget, which channel should we invest in based on this campaign's performance data?",
+      "expected_sql": "SELECT Platform, SUM(Spend) as Current_Spend, ROUND(SUM(Revenue) / NULLIF(SUM(Spend), 0), 2) as ROAS, ROUND(SUM(Spend) / NULLIF(SUM(Conversions), 0), 2) as CPA, ROUND(SUM(Spend) * 1.2, 2) as Recommended_Spend_20pct_Increase FROM campaigns GROUP BY Platform ORDER BY ROAS DESC LIMIT 1",
+      "aggregation_rules": ["Recommend channel with highest ROAS", "Calculate from aggregates"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "audience_001",
+      "category": "Audience Analysis",
+      "difficulty": "Medium",
+      "question": "How did different audience segments perform in terms of engagement rate and conversion rate?",
+      "expected_sql": "SELECT Audience_Segment, ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as Engagement_Rate, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Conversion_Rate FROM campaigns GROUP BY Audience_Segment ORDER BY Conversion_Rate DESC",
+      "aggregation_rules": ["Engagement = CTR", "Conversion Rate from aggregates"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "audience_002",
+      "category": "Audience Analysis",
+      "difficulty": "Medium",
+      "question": "Compare the performance of new vs. returning customers in this campaign. Which group had better conversion metrics?",
+      "expected_sql": "SELECT Customer_Type, SUM(Conversions) as Total_Conversions, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Conversion_Rate, ROUND(SUM(Spend) / NULLIF(SUM(Conversions), 0), 2) as CPA FROM campaigns WHERE Customer_Type IN ('New', 'Returning') GROUP BY Customer_Type ORDER BY Conversion_Rate DESC",
+      "aggregation_rules": ["Calculate metrics per customer type from aggregates"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "creative_001",
+      "category": "Creative Performance",
+      "difficulty": "Medium",
+      "question": "Which creative variant (subject lines, ad copy, images) performed best in terms of click-through rate and conversions?",
+      "expected_sql": "SELECT Creative_Variant, ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as CTR, SUM(Conversions) as Total_Conversions, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Conversion_Rate FROM campaigns GROUP BY Creative_Variant ORDER BY CTR DESC, Total_Conversions DESC",
+      "aggregation_rules": ["CTR and Conversion Rate from aggregates per variant"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "timing_001",
+      "category": "Timing Optimization",
+      "difficulty": "Medium",
+      "question": "What were the best performing days and times for campaign engagement? Should we adjust our sending schedule?",
+      "expected_sql": "SELECT DAYNAME(CAST(Date AS DATE)) as Day_of_Week, HOUR(CAST(Date AS TIMESTAMP)) as Hour, SUM(Clicks) as Total_Clicks, ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as CTR FROM campaigns GROUP BY Day_of_Week, Hour ORDER BY Total_Clicks DESC LIMIT 10",
+      "aggregation_rules": ["CTR from aggregates per day/hour"],
+      "temporal_logic": "Use DAYNAME and HOUR functions"
+    },
+    {
+      "id": "comparative_001",
+      "category": "Comparative Analysis",
+      "difficulty": "Hard",
+      "question": "How did our campaign performance compare to previous campaigns with similar objectives and budgets?",
+      "expected_sql": "WITH current_campaign AS (SELECT SUM(Spend) as spend, SUM(Conversions) as conv, SUM(Revenue) as rev FROM campaigns WHERE Campaign_Name = 'Current_Campaign'), similar_campaigns AS (SELECT AVG(SUM(Spend)) as avg_spend, AVG(SUM(Conversions)) as avg_conv, AVG(SUM(Revenue)) as avg_rev FROM campaigns WHERE Campaign_Type = 'Similar' GROUP BY Campaign_Name) SELECT ...",
+      "aggregation_rules": ["Compare aggregated metrics", "Use CTEs for clarity"],
+      "temporal_logic": "N/A"
+    },
+    {
+      "id": "aggregation_rule_001",
+      "category": "Aggregation Rules Test",
+      "difficulty": "Easy",
+      "question": "Calculate average CTR for the last month",
+      "expected_sql": "SELECT ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as CTR FROM campaigns WHERE Date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL 1 MONTH)",
+      "aggregation_rules": ["CTR = (Total Clicks / Total Impressions) * 100", "NOT AVG(CTR)"],
+      "temporal_logic": "last month = DATE_TRUNC('month', -1 month)"
+    },
+    {
+      "id": "aggregation_rule_002",
+      "category": "Aggregation Rules Test",
+      "difficulty": "Easy",
+      "question": "Show me CPM comparison between last week and this week",
+      "expected_sql": "WITH this_week AS (SELECT SUM(Spend) as spend, SUM(Impressions) as imps FROM campaigns WHERE Date >= DATE_TRUNC('week', CURRENT_DATE)), last_week AS (SELECT SUM(Spend) as spend, SUM(Impressions) as imps FROM campaigns WHERE Date >= DATE_TRUNC('week', CURRENT_DATE - INTERVAL 7 DAY) AND Date < DATE_TRUNC('week', CURRENT_DATE)) SELECT ROUND((this_week.spend / this_week.imps) * 1000, 2) as This_Week_CPM, ROUND((last_week.spend / last_week.imps) * 1000, 2) as Last_Week_CPM FROM this_week, last_week",
+      "aggregation_rules": ["CPM = (SUM(Spend) / SUM(Impressions)) * 1000 per week", "NOT AVG(CPM)"],
+      "temporal_logic": "this week = DATE_TRUNC('week', CURRENT_DATE), last week = -7 days"
+    },
+    {
+      "id": "insights_001",
+      "category": "Strategic Insights",
+      "difficulty": "Hard",
+      "question": "Based on all the campaign data, what are the top 3 channels by ROAS and their contribution to total revenue?",
+      "expected_sql": "SELECT Platform, ROUND(SUM(Revenue) / NULLIF(SUM(Spend), 0), 2) as ROAS, SUM(Revenue) as Total_Revenue, ROUND(SUM(Revenue) * 100.0 / SUM(SUM(Revenue)) OVER (), 2) as Revenue_Contribution_Pct FROM campaigns GROUP BY Platform ORDER BY ROAS DESC LIMIT 3",
+      "aggregation_rules": ["ROAS from aggregates", "Use window function for contribution %"],
+      "temporal_logic": "N/A"
+    }
+  ],
+  "notes": {
+    "critical_rules": [
+      "NEVER use AVG() on pre-calculated rate metrics (CTR, CPC, CPM, CPA, ROAS, Conversion Rate)",
+      "ALWAYS compute rate metrics from SUM(numerator) / SUM(denominator)",
+      "Use NULLIF to prevent division by zero",
+      "Cast Date columns properly: CAST(Date AS DATE)",
+      "Use DATE_TRUNC for period grouping",
+      "Use CTEs for complex temporal comparisons"
+    ],
+    "temporal_patterns": {
+      "last_2_weeks": "Date >= CURRENT_DATE - INTERVAL 14 DAY",
+      "previous_2_weeks": "Date >= CURRENT_DATE - INTERVAL 28 DAY AND Date < CURRENT_DATE - INTERVAL 14 DAY",
+      "last_month": "Date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL 1 MONTH)",
+      "last_6_months": "Date >= CURRENT_DATE - INTERVAL 180 DAY",
+      "week_over_week": "GROUP BY DATE_TRUNC('week', Date)",
+      "month_over_month": "GROUP BY DATE_TRUNC('month', Date)",
+      "quarter_comparison": "QUARTER(Date) or DATE_TRUNC('quarter', Date)",
+      "year_over_year": "Compare same period using YEAR(Date)"
+    }
+  }
+}

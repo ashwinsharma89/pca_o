@@ -1,0 +1,14 @@
+# Additional requirements for Smart Performance Diagnostics
+# Install with: pip install -r requirements_diagnostics.txt
+
+# ML and SHAP for driver analysis
+xgboost>=2.0.0
+shap>=0.43.0
+scikit-learn>=1.3.0
+
+# Statistical analysis
+scipy>=1.11.0
+
+# Already in main requirements but listed for completeness
+pandas>=2.0.0
+numpy>=1.24.0

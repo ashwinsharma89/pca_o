@@ -1,0 +1,38 @@
+@startuml
+!theme plain
+title Chart D: Layer Latency Topology
+
+robust "User Perception" as L1
+robust "Gateway Processing" as L2
+robust "Orchestration" as L3
+robust "Deep Reasoning" as L4
+robust "Data Fetch" as L5
+
+@0
+L1 is Active
+
+@+100
+L1 is Idle
+L2 is Active
+
+@+50
+L2 is Idle
+L3 is Active
+
+@+200
+L3 is Idle
+L4 is Active
+
+@+1000
+L4 is Waiting
+L5 is Active
+
+@+500
+L5 is Idle
+L4 is Active
+
+@+5000
+L4 is Idle
+L1 is Active
+
+@enduml

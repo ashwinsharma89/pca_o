@@ -1,0 +1,28 @@
+[Unit]
+Description=PCA Agent API Server
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=pca-agent
+WorkingDirectory=/opt/pca_agent
+Environment="JWT_SECRET_KEY=CHANGE_THIS_IN_PRODUCTION"
+Environment="DATABASE_URL=postgresql://user:pass@localhost:5432/pca_agent"
+Environment="OPENTELEMETRY_ENABLED=true"
+Environment="JAEGER_HOST=localhost"
+Environment="CORS_ORIGINS=https://yourdomain.com"
+ExecStart=/usr/bin/python3 -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pca-agent
+
+[Install]
+WantedBy=multi-user.target

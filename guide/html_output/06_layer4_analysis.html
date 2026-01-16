@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Chapter 6: Layer 4 - Analysis</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  
+  <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+      
+      :root {
+          --primary-color: #2563eb;
+          --text-color: #1f2937;
+          --bg-color: #ffffff;
+          --border-color: #e5e7eb;
+          --code-bg: #f3f4f6;
+          --heading-color: #111827;
+      }
+      
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+      
+      body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-size: 11pt;
+          line-height: 1.7;
+          color: var(--text-color);
+          background: var(--bg-color);
+          max-width: 8.5in;
+          margin: 0 auto;
+          padding: 0.75in;
+          counter-reset: page;
+      }
+      
+      /* Headers */
+      h1, h2, h3, h4, h5, h6 {
+          font-weight: 700;
+          color: var(--heading-color);
+          margin-top: 1.5em;
+          margin-bottom: 0.75em;
+          line-height: 1.3;
+      }
+      
+      h1 {
+          font-size: 28pt;
+          font-weight: 900;
+          border-bottom: 3px solid var(--primary-color);
+          padding-bottom: 0.3em;
+          margin-top: 0;
+          page-break-before: always;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+      }
+      
+      /* First h1 shouldn't have page break */
+      h1:first-of-type {
+          page-break-before: avoid;
+      }
+      
+      h2 {
+          font-size: 20pt;
+          font-weight: 700;
+          border-bottom: 2px solid var(--border-color);
+          padding-bottom: 0.3em;
+      }
+      
+      h3 {
+          font-size: 16pt;
+          font-weight: 700;
+          color: var(--primary-color);
+      }
+      
+      h4 {
+          font-size: 13pt;
+          font-weight: 600;
+      }
+      
+      /* Paragraphs */
+      p {
+          margin-bottom: 1em;
+          text-align: justify;
+      }
+      
+      /* Links */
+      a {
+          color: var(--primary-color);
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          transition: border-color 0.2s;
+      }
+      
+      a:hover {
+          border-bottom-color: var(--primary-color);
+      }
+      
+      /* Lists */
+      ul, ol {
+          margin-left: 1.5em;
+          margin-bottom: 1em;
+      }
+      
+      li {
+          margin-bottom: 0.5em;
+      }
+      
+      /* Tables */
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 1.5em 0;
+          font-size: 10pt;
+      }
+      
+      th {
+          background: var(--primary-color);
+          color: white;
+          padding: 12px;
+          text-align: left;
+          font-weight: 600;
+      }
+      
+      td {
+          padding: 10px 12px;
+          border-bottom: 1px solid var(--border-color);
+      }
+      
+      tr:hover {
+          background: #f9fafb;
+      }
+      
+      /* Code blocks */
+      code {
+          font-family: 'JetBrains Mono', 'Courier New', monospace;
+          background: var(--code-bg);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-size: 10pt;
+      }
+      
+      pre {
+          background: var(--code-bg);
+          padding: 1em;
+          border-radius: 6px;
+          overflow-x: auto;
+          margin: 1em 0;
+          border-left: 4px solid var(--primary-color);
+      }
+      
+      pre code {
+          background: none;
+          padding: 0;
+      }
+      
+      /* Blockquotes */
+      blockquote {
+          border-left: 4px solid var(--primary-color);
+          padding-left: 1em;
+          margin: 1em 0;
+          font-style: italic;
+          color: #4b5563;
+          background: #eff6ff;
+          padding: 1em;
+          border-radius: 4px;
+      }
+      
+      /* Horizontal rules */
+      hr {
+          border: none;
+          border-top: 2px solid var(--border-color);
+          margin: 2em 0;
+      }
+      
+      /* Navigation */
+      .navigation {
+          background: #f9fafb;
+          padding: 1em;
+          border-radius: 6px;
+          margin: 2em 0;
+          text-align: center;
+          border: 1px solid var(--border-color);
+      }
+      
+      .navigation a {
+          margin: 0 1em;
+          font-weight: 600;
+      }
+      
+      /* Table of Contents */
+      #TOC {
+          background: #f9fafb;
+          padding: 1.5em;
+          border-radius: 6px;
+          margin: 2em 0;
+          border: 1px solid var(--border-color);
+      }
+      
+      #TOC ul {
+          list-style: none;
+          margin-left: 0;
+      }
+      
+      #TOC li {
+          margin: 0.3em 0;
+      }
+      
+      #TOC a {
+          color: var(--text-color);
+      }
+      
+      #TOC > ul > li > a {
+          font-weight: 600;
+          font-size: 12pt;
+      }
+      
+      /* Terminology boxes */
+      .terminology {
+          background: #eff6ff;
+          border-left: 4px solid var(--primary-color);
+          padding: 1em;
+          margin: 1em 0;
+          border-radius: 4px;
+      }
+      
+      .terminology strong {
+          color: var(--primary-color);
+          font-size: 11pt;
+      }
+      
+      /* Mermaid diagrams */
+      .mermaid {
+          background: white;
+          padding: 1.5em;
+          margin: 1.5em 0;
+          border-radius: 6px;
+          border: 1px solid var(--border-color);
+          text-align: center;
+      }
+      
+      /* Print styles with page numbers */
+      @media print {
+          @page {
+              margin: 0.75in;
+              @bottom-right {
+                  content: "Page " counter(page);
+                  font-family: 'Inter', sans-serif;
+                  font-size: 9pt;
+                  color: #6b7280;
+              }
+              @bottom-left {
+                  content: "PCA Agent Documentation";
+                  font-family: 'Inter', sans-serif;
+                  font-size: 9pt;
+                  color: #6b7280;
+              }
+          }
+          
+          body {
+              max-width: none;
+              padding: 0;
+              counter-increment: page;
+          }
+          
+          .navigation {
+              display: none;
+          }
+          
+          a {
+              color: var(--text-color);
+              border-bottom: none;
+          }
+          
+          a[href^="http"]:after {
+              content: " (" attr(href) ")";
+              font-size: 8pt;
+              color: #6b7280;
+          }
+          
+          h1, h2, h3 {
+              page-break-after: avoid;
+          }
+          
+          h1 {
+              page-break-before: always;
+          }
+          
+          h1:first-of-type {
+              page-break-before: avoid;
+          }
+          
+          pre, table, .terminology, .mermaid {
+              page-break-inside: avoid;
+          }
+          
+          /* Page numbers in TOC */
+          #TOC a::after {
+              content: leader('.') target-counter(attr(href), page);
+              float: right;
+          }
+      }
+  </style>
+
+  <!-- Mermaid.js for diagram rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#2563eb',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#1e40af',
+        lineColor: '#6b7280',
+        secondaryColor: '#f3f4f6',
+        tertiaryColor: '#eff6ff'
+      }
+    });
+  </script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Chapter 6: Layer 4 - Analysis</h1>
+<p class="date">January 2026</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#overview">6.1 Overview</a></li>
+<li><a href="#multi-agent-architecture">6.2 Multi-Agent Architecture</a>
+<ul>
+<li><a href="#the-orchestrator-pattern">The Orchestrator Pattern</a></li>
+</ul></li>
+<li><a href="#agent-1-reasoning-agent">6.3 Agent 1: Reasoning Agent</a>
+<ul>
+<li><a href="#capabilities">Capabilities</a></li>
+<li><a href="#how-it-works">How It Works</a></li>
+</ul></li>
+<li><a href="#agent-2-b2b-specialist">6.4 Agent 2: B2B Specialist</a>
+<ul>
+<li><a href="#industry-knowledge">Industry Knowledge</a></li>
+<li><a href="#capabilities-1">Capabilities</a></li>
+</ul></li>
+<li><a href="#agent-3-trend-analyzer">6.5 Agent 3: Trend Analyzer</a>
+<ul>
+<li><a href="#forecasting-methods">Forecasting Methods</a></li>
+<li><a href="#example-insights">Example Insights</a></li>
+</ul></li>
+<li><a href="#agent-4-anomaly-detector">6.6 Agent 4: Anomaly Detector</a>
+<ul>
+<li><a href="#anomaly-types">Anomaly Types</a></li>
+<li><a href="#detection-methods">Detection Methods</a></li>
+</ul></li>
+<li><a href="#the-orchestrator">6.7 The Orchestrator</a>
+<ul>
+<li><a href="#orchestration-flow">Orchestration Flow</a></li>
+</ul></li>
+<li><a href="#insight-prioritization">6.8 Insight Prioritization</a>
+<ul>
+<li><a href="#priority-levels">Priority Levels</a></li>
+<li><a href="#confidence-scores">Confidence Scores</a></li>
+</ul></li>
+<li><a href="#real-example-walkthrough">6.9 Real Example Walkthrough</a></li>
+<li><a href="#performance-optimization">6.10 Performance Optimization</a>
+<ul>
+<li><a href="#parallel-processing">Parallel Processing</a></li>
+<li><a href="#caching">Caching</a></li>
+<li><a href="#smart-agent-selection">Smart Agent Selection</a></li>
+</ul></li>
+<li><a href="#key-takeaways">6.11 Key Takeaways</a></li>
+</ul>
+</nav>
+<p><strong>CHAPTER 6</strong></p>
+<p><strong>LAYER 4: ANALYSIS &amp; INTELLIGENCE</strong></p>
+<hr />
+<p><strong>Navigation:</strong> <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/05_layer3_data_retrieval.md">← Chapter 5</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/INDEX.md">Index</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/07_layer5_visualization.md">Next: Chapter 7 →</a></p>
+<hr />
+<h2 id="overview">6.1 Overview</h2>
+<p>Layer 4 is the intelligence core of the PCA Agent. This is where raw data transforms into actionable insights through multi-agent AI orchestration.</p>
+<blockquote>
+<p><strong>Office Analogy - The Analysis Team:</strong></p>
+<p>Imagine you have a team of expert consultants analyzing your marketing data: - <strong>Senior Analyst (Reasoning Agent):</strong> Finds patterns and trends in the numbers - <strong>Industry Expert (B2B Specialist):</strong> Adds context about your specific industry - <strong>Trend Forecaster:</strong> Predicts what will happen next - <strong>Auditor (Anomaly Detector):</strong> Spots unusual patterns that need attention - <strong>Project Manager (Orchestrator):</strong> Coordinates everyone and compiles the final report</p>
+<p>That’s exactly what Layer 4 does - it’s like having a team of AI consultants!</p>
+</blockquote>
+<p><strong>Time:</strong> ~500-2000ms<br />
+<strong>Input:</strong> DataFrame from Layer 3<br />
+<strong>Output:</strong> List of insights with priorities and recommendations</p>
+<figure>
+<img src="diagrams/agent_orchestration.png" alt="Agent Orchestration" /><figcaption aria-hidden="true">Agent Orchestration</figcaption>
+</figure>
+<hr />
+<h2 id="multi-agent-architecture">6.2 Multi-Agent Architecture</h2>
+<h3 id="the-orchestrator-pattern">The Orchestrator Pattern</h3>
+<blockquote>
+<p><strong>Office Analogy - The Project Manager:</strong></p>
+<p>Think of a project manager coordinating a team: 1. <strong>Receives the task</strong> (analyze this data) 2. <strong>Breaks it down</strong> into subtasks 3. <strong>Assigns work</strong> to specialists 4. <strong>Collects results</strong> from each person 5. <strong>Combines everything</strong> into a final report 6. <strong>Prioritizes</strong> the most important findings</p>
+<p>The Orchestrator does exactly this with AI agents!</p>
+</blockquote>
+<p><strong>Why Multiple Agents?</strong></p>
+<p>Instead of one giant AI trying to do everything, we have specialized agents:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Agent</th>
+<th>Specialty</th>
+<th>Office Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Reasoning Agent</strong></td>
+<td>Pattern detection</td>
+<td>Data Analyst</td>
+</tr>
+<tr class="even">
+<td><strong>B2B Specialist</strong></td>
+<td>Industry context</td>
+<td>Industry Consultant</td>
+</tr>
+<tr class="odd">
+<td><strong>Trend Analyzer</strong></td>
+<td>Time series forecasting</td>
+<td>Market Researcher</td>
+</tr>
+<tr class="even">
+<td><strong>Anomaly Detector</strong></td>
+<td>Outlier identification</td>
+<td>Quality Auditor</td>
+</tr>
+<tr class="odd">
+<td><strong>Orchestrator</strong></td>
+<td>Coordination</td>
+<td>Project Manager</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Benefits:</strong> - <strong>Specialization:</strong> Each agent is expert in one thing - <strong>Parallel Processing:</strong> Multiple agents work simultaneously - <strong>Modularity:</strong> Easy to add/remove agents - <strong>Cost Efficiency:</strong> Use cheaper models for simple tasks</p>
+<hr />
+<h2 id="agent-1-reasoning-agent">6.3 Agent 1: Reasoning Agent</h2>
+<blockquote>
+<p><strong>What it does:</strong> Analyzes data to find patterns, trends, and correlations</p>
+</blockquote>
+<blockquote>
+<p><strong>Office Analogy:</strong> The senior data analyst who looks at spreadsheets and says “Aha! I notice that whenever we increase Facebook spend, our CPA goes down, but only on weekends!”</p>
+</blockquote>
+<h3 id="capabilities">Capabilities</h3>
+<p><strong>1. Trend Detection</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Spend has increased 23% week-over-week for the past 3 weeks, </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">indicating an aggressive scaling strategy&quot;</span></span></code></pre></div>
+<p><strong>2. Correlation Analysis</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Strong negative correlation (-0.85) between ad frequency and CTR, </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">suggesting ad fatigue&quot;</span></span></code></pre></div>
+<p><strong>3. Comparative Analysis</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Google Search campaigns outperform Facebook by 45% on ROAS, </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">but Facebook has 3x higher volume&quot;</span></span></code></pre></div>
+<p><strong>4. Threshold Violations</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;CPA exceeded target threshold ($15) on 12 out of 14 days, </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">requiring immediate optimization&quot;</span></span></code></pre></div>
+<h3 id="how-it-works">How It Works</h3>
+<p><strong>Input:</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;data&quot;</span>: DataFrame[date, campaign, spend, conversions, roas],</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;question&quot;</span>: <span class="st">&quot;How are my campaigns performing?&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;context&quot;</span>: <span class="st">&quot;User wants overall performance assessment&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><strong>Process:</strong> 1. Calculate key metrics (averages, totals, growth rates) 2. Identify trends (increasing, decreasing, stable) 3. Find correlations between metrics 4. Compare against benchmarks 5. Generate natural language insights</p>
+<p><strong>Output:</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;insight&quot;</span>: <span class="st">&quot;Total spend increased 23% WoW&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;priority&quot;</span>: <span class="st">&quot;high&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;category&quot;</span>: <span class="st">&quot;trend&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;confidence&quot;</span>: <span class="fl">0.95</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;insight&quot;</span>: <span class="st">&quot;ROAS declined 8</span><span class="sc">% d</span><span class="st">espite increased spend&quot;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;priority&quot;</span>: <span class="st">&quot;critical&quot;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;category&quot;</span>: <span class="st">&quot;performance&quot;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;confidence&quot;</span>: <span class="fl">0.92</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<hr />
+<h2 id="agent-2-b2b-specialist">6.4 Agent 2: B2B Specialist</h2>
+<blockquote>
+<p><strong>What it does:</strong> Adds industry-specific context and best practices</p>
+</blockquote>
+<blockquote>
+<p><strong>Office Analogy:</strong> The industry consultant who says “In the SaaS industry, a $50 CPA is actually excellent because the lifetime value is typically $2,000+”</p>
+</blockquote>
+<h3 id="industry-knowledge">Industry Knowledge</h3>
+<p>The B2B Specialist has deep knowledge of: - <strong>SaaS:</strong> Long sales cycles, high LTV, focus on MQL quality - <strong>E-commerce:</strong> Short sales cycles, focus on ROAS and AOV - <strong>B2B Services:</strong> Relationship-based, focus on lead quality - <strong>Financial Services:</strong> Compliance-heavy, focus on qualified leads</p>
+<h3 id="capabilities-1">Capabilities</h3>
+<p><strong>1. Benchmark Comparison</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Your $45 CPA is 23% below the SaaS industry average of $58, </span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">indicating efficient acquisition&quot;</span></span></code></pre></div>
+<p><strong>2. Best Practice Recommendations</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;For B2B SaaS, consider increasing spend on LinkedIn where </span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">decision-makers are more active than Facebook&quot;</span></span></code></pre></div>
+<p><strong>3. Seasonality Context</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Q4 typically sees 30-40% higher CPAs in B2B due to budget </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">exhaustion and holiday slowdowns&quot;</span></span></code></pre></div>
+<p><strong>4. Channel-Specific Advice</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example insight</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Google Search works well for high-intent SaaS buyers, </span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">while Display is better for brand awareness&quot;</span></span></code></pre></div>
+<hr />
+<h2 id="agent-3-trend-analyzer">6.5 Agent 3: Trend Analyzer</h2>
+<blockquote>
+<p><strong>What it does:</strong> Forecasts future performance based on historical patterns</p>
+</blockquote>
+<blockquote>
+<p><strong>Office Analogy:</strong> The market researcher who looks at past sales data and predicts “Based on the last 6 months, I expect sales to increase 15% next quarter”</p>
+</blockquote>
+<h3 id="forecasting-methods">Forecasting Methods</h3>
+<p><strong>1. Linear Trend</strong> - Simple growth/decline patterns - Good for stable metrics</p>
+<p><strong>2. Moving Average</strong> - Smooths out short-term fluctuations - Good for noisy data</p>
+<p><strong>3. Seasonal Decomposition</strong> - Identifies weekly/monthly patterns - Good for recurring cycles</p>
+<p><strong>4. Prophet (Facebook’s Algorithm)</strong> - Advanced time series forecasting - Handles holidays and seasonality</p>
+<h3 id="example-insights">Example Insights</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Trend projection</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;At current growth rate (5% WoW), spend will reach $100k/week </span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">by end of quarter&quot;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Seasonality detection</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Conversions consistently peak on Tuesdays and Wednesdays, </span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">dropping 30% on weekends&quot;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast with confidence</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Predicted ROAS for next week: 3.2 (±0.4) based on 8-week trend&quot;</span></span></code></pre></div>
+<hr />
+<h2 id="agent-4-anomaly-detector">6.6 Agent 4: Anomaly Detector</h2>
+<blockquote>
+<p><strong>What it does:</strong> Identifies unusual patterns that need immediate attention</p>
+</blockquote>
+<blockquote>
+<p><strong>Office Analogy:</strong> The quality auditor who reviews reports and flags “Wait, this number doesn’t make sense - we’ve never spent $50k in one day before!”</p>
+</blockquote>
+<h3 id="anomaly-types">Anomaly Types</h3>
+<p><strong>1. Statistical Outliers</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;Spend on 2024-01-15 was $45k, 4.2 standard deviations above </span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">the 30-day average of $12k&quot;</span></span></code></pre></div>
+<p><strong>2. Sudden Changes</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;CPA jumped from $15 to $67 overnight - possible tracking issue </span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">or campaign misconfiguration&quot;</span></span></code></pre></div>
+<p><strong>3. Missing Data</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;No conversion data recorded for 2024-01-10, but spend continued - </span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">check tracking pixel&quot;</span></span></code></pre></div>
+<p><strong>4. Impossible Values</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;ROAS of 0.02 detected - this means $1 spent generated $0.02 revenue, </span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">likely a data error&quot;</span></span></code></pre></div>
+<h3 id="detection-methods">Detection Methods</h3>
+<ul>
+<li><strong>Z-Score:</strong> Measures how many standard deviations from mean</li>
+<li><strong>IQR (Interquartile Range):</strong> Identifies values outside normal range</li>
+<li><strong>Moving Average Deviation:</strong> Compares to recent trends</li>
+<li><strong>Domain Rules:</strong> Business logic (e.g., CPA can’t be negative)</li>
+</ul>
+<hr />
+<h2 id="the-orchestrator">6.7 The Orchestrator</h2>
+<blockquote>
+<p><strong>What it does:</strong> Coordinates all agents and combines their outputs</p>
+</blockquote>
+<blockquote>
+<p><strong>Office Analogy:</strong> The project manager who collects reports from all team members, removes duplicates, prioritizes findings, and creates the executive summary</p>
+</blockquote>
+<h3 id="orchestration-flow">Orchestration Flow</h3>
+<p><strong>Step 1: Task Distribution</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Orchestrator sends data to all agents in parallel</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>tasks <span class="op">=</span> [</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    reasoning_agent.analyze(data),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    b2b_specialist.contextualize(data, industry<span class="op">=</span><span class="st">&quot;SaaS&quot;</span>),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    trend_analyzer.forecast(data),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    anomaly_detector.scan(data)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Wait for all to complete</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span></code></pre></div>
+<p><strong>Step 2: Deduplication</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove duplicate insights</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Example: Both Reasoning and Anomaly might flag the same spike</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>unique_insights <span class="op">=</span> deduplicate(results)</span></code></pre></div>
+<p><strong>Step 3: Prioritization</strong></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rank by importance</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>priorities <span class="op">=</span> {</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;critical&quot;</span>: [<span class="st">&quot;data_error&quot;</span>, <span class="st">&quot;budget_overrun&quot;</span>, <span class="st">&quot;zero_conversions&quot;</span>],</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;high&quot;</span>: [<span class="st">&quot;significant_trend&quot;</span>, <span class="st">&quot;threshold_violation&quot;</span>],</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;medium&quot;</span>: [<span class="st">&quot;minor_trend&quot;</span>, <span class="st">&quot;benchmark_comparison&quot;</span>],</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;low&quot;</span>: [<span class="st">&quot;general_observation&quot;</span>]</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><strong>Step 4: Synthesis</strong></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine related insights</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Example: &quot;Spend increased 20%&quot; + &quot;ROAS decreased 10%&quot; </span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># → &quot;Efficiency declining despite scale&quot;</span></span></code></pre></div>
+<p><strong>Step 5: Recommendation Generation</strong></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Based on all insights, suggest actions</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>recommendations <span class="op">=</span> [</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Reduce spend on underperforming campaigns&quot;</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Increase budget for high-ROAS channels&quot;</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Investigate tracking issue on Campaign X&quot;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<hr />
+<h2 id="insight-prioritization">6.8 Insight Prioritization</h2>
+<h3 id="priority-levels">Priority Levels</h3>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 36%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Priority</th>
+<th>Criteria</th>
+<th>Action Required</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>CRITICAL</strong></td>
+<td>Data errors, budget overruns</td>
+<td>Immediate</td>
+<td>“No conversions tracked for 3 days”</td>
+</tr>
+<tr class="even">
+<td><strong>HIGH</strong></td>
+<td>Significant trends, threshold violations</td>
+<td>Within 24h</td>
+<td>“CPA 50% above target”</td>
+</tr>
+<tr class="odd">
+<td><strong>MEDIUM</strong></td>
+<td>Notable patterns, opportunities</td>
+<td>This week</td>
+<td>“Google outperforming Facebook”</td>
+</tr>
+<tr class="even">
+<td><strong>LOW</strong></td>
+<td>General observations</td>
+<td>FYI only</td>
+<td>“Spend consistent with last week”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="confidence-scores">Confidence Scores</h3>
+<p>Each insight includes a confidence score:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;insight&quot;</span>: <span class="st">&quot;ROAS declining&quot;</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;confidence&quot;</span>: <span class="fl">0.95</span>,  <span class="co"># 95% confident</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;evidence&quot;</span>: <span class="st">&quot;8-week consistent downward trend, p-value &lt; 0.01&quot;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><strong>Confidence Factors:</strong> - <strong>Data quality:</strong> More data = higher confidence - <strong>Statistical significance:</strong> p-value &lt; 0.05 - <strong>Consistency:</strong> Multiple agents agree - <strong>Historical accuracy:</strong> Past predictions were correct</p>
+<hr />
+<h2 id="real-example-walkthrough">6.9 Real Example Walkthrough</h2>
+<p><strong>User Question:</strong> “How are my campaigns performing?”</p>
+<p><strong>Input Data:</strong></p>
+<pre><code>   date        campaign      spend  conversions  roas
+0  2024-01-01  Google Search  $5k    45          3.2
+1  2024-01-01  Facebook       $3k    20          2.1
+...</code></pre>
+<p><strong>Agent Outputs:</strong></p>
+<p><strong>Reasoning Agent:</strong></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Total spend: $127k (↑15% vs last week)&quot;</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Total conversions: 1,234 (↑8% vs last week)&quot;</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Average ROAS: 2.8 (↓5% vs last week)&quot;</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Google Search is top performer with 3.5 ROAS&quot;</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<p><strong>B2B Specialist:</strong></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Your $42 CPA is excellent for B2B SaaS (industry avg: $65)&quot;</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;LinkedIn typically outperforms Facebook for B2B - consider testing&quot;</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Q1 is strong season for SaaS - good time to scale&quot;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<p><strong>Trend Analyzer:</strong></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Spend growing 15% WoW for 4 consecutive weeks&quot;</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;ROAS declining 3-5% WoW - efficiency decreasing&quot;</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Forecast: If trend continues, ROAS will hit 2.5 in 2 weeks&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<p><strong>Anomaly Detector:</strong></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;⚠️ Facebook CPA spiked to $89 on Jan 15 (normal: $45)&quot;</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;✓ No data quality issues detected&quot;</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;✓ All campaigns within budget limits&quot;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<p><strong>Orchestrator Output:</strong></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;summary&quot;</span>: <span class="st">&quot;Campaigns are scaling well (+15</span><span class="sc">% s</span><span class="st">pend) but efficiency </span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="st">                is declining (-5% ROAS). Google Search is your best </span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="st">                performer. Facebook had an anomaly on Jan 15.&quot;</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;insights&quot;</span>: [</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;text&quot;</span>: <span class="st">&quot;Facebook CPA spiked to $89 on Jan 15&quot;</span>,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;priority&quot;</span>: <span class="st">&quot;high&quot;</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;category&quot;</span>: <span class="st">&quot;anomaly&quot;</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;confidence&quot;</span>: <span class="fl">0.98</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;text&quot;</span>: <span class="st">&quot;ROAS declining 5% WoW despite 15</span><span class="sc">% s</span><span class="st">pend increase&quot;</span>,</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;priority&quot;</span>: <span class="st">&quot;high&quot;</span>,</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;category&quot;</span>: <span class="st">&quot;trend&quot;</span>,</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;confidence&quot;</span>: <span class="fl">0.92</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;text&quot;</span>: <span class="st">&quot;Google Search outperforming with 3.5 ROAS&quot;</span>,</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;priority&quot;</span>: <span class="st">&quot;medium&quot;</span>,</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;category&quot;</span>: <span class="st">&quot;performance&quot;</span>,</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;confidence&quot;</span>: <span class="fl">0.95</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;recommendations&quot;</span>: [</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Investigate Facebook spike on Jan 15 - possible ad set issue&quot;</span>,</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Consider reducing Facebook spend and reallocating to Google&quot;</span>,</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Monitor ROAS trend - may need optimization if decline continues&quot;</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<hr />
+<h2 id="performance-optimization">6.10 Performance Optimization</h2>
+<h3 id="parallel-processing">Parallel Processing</h3>
+<p>All agents run simultaneously:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sequential (slow): 2000ms total</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>result1 <span class="op">=</span> reasoning_agent.analyze()      <span class="co"># 500ms</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>result2 <span class="op">=</span> b2b_specialist.contextualize() <span class="co"># 500ms</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>result3 <span class="op">=</span> trend_analyzer.forecast()      <span class="co"># 500ms</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>result4 <span class="op">=</span> anomaly_detector.scan()        <span class="co"># 500ms</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Parallel (fast): 500ms total</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    reasoning_agent.analyze(),</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    b2b_specialist.contextualize(),</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    trend_analyzer.forecast(),</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    anomaly_detector.scan()</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p><strong>Speedup:</strong> 4x faster with parallel execution!</p>
+<h3 id="caching">Caching</h3>
+<p>Expensive computations are cached:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="at">@cache</span>(ttl<span class="op">=</span><span class="dv">300</span>)  <span class="co"># Cache for 5 minutes</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_trends(data):</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Expensive statistical analysis</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> trends</span></code></pre></div>
+<h3 id="smart-agent-selection">Smart Agent Selection</h3>
+<p>Not all agents run for every query:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> query_type <span class="op">==</span> <span class="st">&quot;simple_metric&quot;</span>:</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Only use Reasoning Agent</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    agents <span class="op">=</span> [reasoning_agent]</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> query_type <span class="op">==</span> <span class="st">&quot;trend_analysis&quot;</span>:</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Use Reasoning + Trend Analyzer</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    agents <span class="op">=</span> [reasoning_agent, trend_analyzer]</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Use all agents</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    agents <span class="op">=</span> [reasoning_agent, b2b_specialist, trend_analyzer, anomaly_detector]</span></code></pre></div>
+<hr />
+<h2 id="key-takeaways">6.11 Key Takeaways</h2>
+<p>✅ <strong>Layer 4 is the intelligence core</strong> - transforms data into insights<br />
+✅ <strong>Multi-agent architecture</strong> - specialized AI agents working together<br />
+✅ <strong>Orchestrator coordinates</strong> - manages all agents and combines outputs<br />
+✅ <strong>Parallel processing</strong> - all agents run simultaneously for speed<br />
+✅ <strong>Prioritized insights</strong> - critical issues flagged first<br />
+✅ <strong>Actionable recommendations</strong> - not just analysis, but what to do</p>
+<blockquote>
+<p><strong>Remember:</strong> Layer 4 is like having a team of expert consultants analyzing your data 24/7. Each consultant (agent) has their specialty, and the project manager (orchestrator) makes sure you get a comprehensive, prioritized report!</p>
+</blockquote>
+<hr />
+<p><strong>Navigation:</strong> <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/05_layer3_data_retrieval.md">← Chapter 5</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/INDEX.md">Index</a> | <a href="file:///Users/ashwin/Desktop/pca_agent%20copy/guide/chapters/07_layer5_visualization.md">Next: Chapter 7 →</a></p>
+</body>
+</html>

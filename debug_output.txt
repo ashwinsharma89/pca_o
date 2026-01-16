@@ -1,0 +1,67 @@
+2026-01-11 20:53:48.879 | INFO     | src.core.database.duckdb_manager:get_connection:83 - Persistent DB not found at data/analytics.duckdb. Using IN-MEMORY mode with Parquet source.
+2026-01-11 20:53:48.883 | INFO     | src.core.database.duckdb_manager:get_connection:115 - Creating View from Parquet: data/campaigns/**/*.parquet
+INFO:src.kg_rag.client.connection:Connected to Neo4j at bolt://127.0.0.1:7687
+WARNING:neo4j.notifications:Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the property names in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing property name is: spend)", position=<SummaryInputPosition line=3, column=49, offset=68>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 49, 'offset': 68, 'line': 3}}> for query: '\n        MATCH (c:Campaign)\n        RETURN count(c) as count, sum(c.spend) as total_spend\n        '
+WARNING:neo4j.notifications:Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the labels in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing label name is: Campaign)", position=<SummaryInputPosition line=2, column=10, offset=18>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 10, 'offset': 18, 'line': 2}}> for query: '\n        MATCH (c:Campaign)\n        RETURN count(c) as count, sum(c.spend) as total_spend\n        '
+
+--- Checking DuckDB Totals ---
+Total Rows: 100000
+Columns: ['Date', 'Channel', 'Placement', 'Funnel', 'Ad Type', 'Total Spent', 'Site Visit', 'Impressions', 'Clicks', 'Platform', 'Campaign_Name_Full', 'Placement_Name_Full', 'Creative_Name_Full', 'Audience_Segment', 'Device_Type', 'Geographic_Region', 'Age_Group', 'Campaign_Objective', 'Targeting_Type', 'Creative_Format', 'Creative_Elements', 'Creative_ID', 'Budget_Type', 'Bid_Strategy', 'Landing_Page_Type', 'Attribution_Window', 'Frequency_Cap', 'Dayparting_Schedule', 'Gender_Targeting', 'Language_Targeting', 'Customer_Lifecycle_Stage', 'Seasonality_Factor', 'Competitive_Strategy', 'Conversions', 'Revenue_2024', 'Revenue_2025', 'Reach_2024', 'Reach_2025', 'Video_Plays_2024', 'Video_Plays_2025', 'Video_Completes_2024', 'Video_Completes_2025', 'Spend', 'Campaign', 'Revenue', 'ROI', 'id', 'month', 'year']
+
+Row Counts by Platform:
+Platform
+LinkedIn                      5812
+Facebook                      5660
+Instagram                     5483
+Pinterest                     5481
+Snapchat                      5458
+Twitter                       5396
+TikTok                        5311
+YouTube                       4605
+Roku                          3704
+Teads                         2820
+Google Display Network        2642
+Taboola                       2627
+Fox News                      2616
+ESPN                          2585
+The Trade Desk                2569
+Outbrain                      2560
+CNN                           2475
+Amazon DSP                    2449
+SendGrid                      2103
+Google Ads                    2100
+Target Roundel                2100
+Amazon Ads                    2070
+Amazon Fire TV                2060
+Hulu                          1987
+Digital Billboards            1967
+Salesforce Marketing Cloud    1962
+Transit Ads                   1961
+Bing Ads                      1957
+Walmart Connect               1956
+Street Furniture              1942
+Samsung TV Plus               1874
+DuckDuckGo                    1859
+Mailchimp                     1793
+HubSpot                         41
+Meta Ads                        11
+Meta                             2
+Google                           2
+Name: count, dtype: int64
+
+Date Range: 2024-01-01 00:00:00 to 2024-12-31 00:00:00
+Null Dates:  0
+
+Sample Rows:
+        Date                Platform  Spend
+0 2024-01-01                Snapchat    NaN
+1 2024-01-01                Outbrain    NaN
+2 2024-01-01                     CNN    NaN
+3 2024-01-01  Google Display Network    NaN
+4 2024-01-01               Instagram    NaN
+
+Total Spend (raw sum): 1966339.07
+
+--- Checking Neo4j Totals ---
+Total Campaigns: 0
+Total Spend: 0

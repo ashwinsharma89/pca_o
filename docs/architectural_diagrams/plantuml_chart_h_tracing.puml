@@ -1,0 +1,55 @@
+@startuml
+!theme plain
+title Chart H: Distributed Trace Lifecycle (The Journey of X-Request-ID)
+
+actor User
+participant "API Gateway" as API
+participant "Auth (Middleware)" as Auth
+participant "Orchestrator" as Orch
+participant "Agent (Worker)" as Agent
+participant "LLM (OpenAI)" as LLM
+database "Knowledge Graph" as KG
+
+== Request-Scoped Trace (Span Root) ==
+
+User -> API : POST /query (Starts Trace)
+activate API
+
+    API -> Auth : Validate Token
+    activate Auth
+        note right of Auth: Span: auth_validation\nTags: {user_id: 124, role: admin}
+    Auth --> API : OK
+    deactivate Auth
+
+    API -> Orch : Route Query
+    activate Orch
+        note right of Orch: Span: query_routing\nX-Request-ID Propagated
+
+        == Async Sub-Trace (Child Spans) ==
+
+        Orch -> Agent : Invoke Strategy Agent
+        activate Agent
+            note right of Agent: Span: agent_execution\nTool: Strategy Analysis
+
+            Agent -> KG : Fetch Context
+            activate KG
+                note right of KG: Span: db_query\nCypher: MATCH (c:Campaign)...
+            KG --> Agent : Nodes
+            deactivate KG
+
+            Agent -> LLM : Generate Reasoning
+            activate LLM
+                note right of LLM: Span: llm_generation\nTokens: 450\nModel: gpt-4
+            LLM --> Agent : Response
+            deactivate LLM
+            
+        Agent --> Orch : Result
+        deactivate Agent
+        
+    Orch --> API : Final Response
+    deactivate Orch
+    
+API --> User : 200 OK
+deactivate API
+
+@enduml

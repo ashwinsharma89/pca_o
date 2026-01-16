@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "question": "What is the total media cost across all campaigns?",
+    "category": "basic_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Media_Cost_Adv_Currency) as total_media_cost FROM campaigns"
+  },
+  {
+    "id": 2,
+    "question": "Which insertion order has the highest ROAS?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Insertion_Order, (SUM(Revenue_Adv_Currency) / SUM(Media_Cost_Adv_Currency)) as roas FROM campaigns GROUP BY Insertion_Order ORDER BY roas DESC LIMIT 1"
+  },
+  {
+    "id": 3,
+    "question": "Show average CTR by environment",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Environment, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Environment ORDER BY ctr DESC"
+  },
+  {
+    "id": 4,
+    "question": "What is the total conversions from video environment?",
+    "category": "filtered_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Conversions) as total_conversions FROM campaigns WHERE Environment = 'Video'"
+  },
+  {
+    "id": 5,
+    "question": "Compare post-click vs post-view conversions",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT SUM(Post_Click_Conv) as post_click, SUM(Post_View_Conv) as post_view FROM campaigns"
+  },
+  {
+    "id": 6,
+    "question": "Which line item has the best conversion rate?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Line_Item, (SUM(Conversions) * 100.0 / SUM(Clicks)) as conv_rate FROM campaigns GROUP BY Line_Item ORDER BY conv_rate DESC LIMIT 1"
+  },
+  {
+    "id": 7,
+    "question": "Show daily revenue trend for the last 30 days",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Date, SUM(Revenue_Adv_Currency) as daily_revenue FROM campaigns WHERE CAST(Date AS DATE) >= CURRENT_DATE - INTERVAL '30 days' GROUP BY Date ORDER BY Date"
+  },
+  {
+    "id": 8,
+    "question": "What is the viewability percentage by device?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, AVG(Viewability_Percent) as avg_viewability FROM campaigns GROUP BY Device ORDER BY avg_viewability DESC"
+  },
+  {
+    "id": 9,
+    "question": "Which exchange has the highest CTR?",
+    "category": "performance_ranking",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Exchange, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Exchange ORDER BY ctr DESC LIMIT 1"
+  },
+  {
+    "id": 10,
+    "question": "Show top 5 insertion orders by total revenue",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Insertion_Order, SUM(Revenue_Adv_Currency) as total_revenue FROM campaigns GROUP BY Insertion_Order ORDER BY total_revenue DESC LIMIT 5"
+  },
+  {
+    "id": 11,
+    "question": "What is the CPA by inventory type?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Inventory_Type, (SUM(Media_Cost_Adv_Currency) / SUM(Conversions)) as cpa FROM campaigns GROUP BY Inventory_Type ORDER BY cpa"
+  },
+  {
+    "id": 12,
+    "question": "Compare Connected TV vs Mobile performance by ROAS",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, (SUM(Revenue_Adv_Currency) / SUM(Media_Cost_Adv_Currency)) as roas FROM campaigns WHERE Device IN ('Connected_TV', 'Mobile') GROUP BY Device"
+  },
+  {
+    "id": 13,
+    "question": "Which environment has the highest video completion rate?",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, AVG(Video_Completion_Rate) as avg_completion FROM campaigns WHERE Video_Completions > 0 GROUP BY Environment ORDER BY avg_completion DESC LIMIT 1"
+  },
+  {
+    "id": 14,
+    "question": "Show weekly media cost trend",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as week, SUM(Media_Cost_Adv_Currency) as weekly_cost FROM campaigns GROUP BY week ORDER BY week"
+  },
+  {
+    "id": 15,
+    "question": "What is the video quartile 3 completion rate by device?",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, (SUM(Video_Quartile_3) * 100.0 / SUM(Impressions)) as q3_rate FROM campaigns WHERE Environment = 'Video' GROUP BY Device ORDER BY q3_rate DESC"
+  },
+  {
+    "id": 16,
+    "question": "Which campaigns have viewability above 85%?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT DISTINCT Insertion_Order FROM campaigns WHERE Viewability_Percent > 85"
+  },
+  {
+    "id": 17,
+    "question": "Show total impressions by environment and device",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, Device, SUM(Impressions) as total_impressions FROM campaigns GROUP BY Environment, Device ORDER BY total_impressions DESC"
+  },
+  {
+    "id": 18,
+    "question": "What is the CPM by exchange?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Exchange, (SUM(Media_Cost_Adv_Currency) / SUM(Impressions) * 1000) as cpm FROM campaigns GROUP BY Exchange ORDER BY cpm"
+  },
+  {
+    "id": 19,
+    "question": "Compare display vs video by conversion rate",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, (SUM(Conversions) * 100.0 / SUM(Clicks)) as conv_rate FROM campaigns GROUP BY Environment"
+  },
+  {
+    "id": 20,
+    "question": "What is the post-view conversion rate by inventory type?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Inventory_Type, (SUM(Post_View_Conv) * 100.0 / SUM(Impressions)) as pv_conv_rate FROM campaigns GROUP BY Inventory_Type ORDER BY pv_conv_rate DESC"
+  },
+  {
+    "id": 21,
+    "question": "Show line items with CTR above 2%",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Line_Item, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Line_Item HAVING (SUM(Clicks) * 100.0 / SUM(Impressions)) > 2"
+  },
+  {
+    "id": 22,
+    "question": "What is the CPC by device?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, (SUM(Media_Cost_Adv_Currency) / SUM(Clicks)) as cpc FROM campaigns GROUP BY Device ORDER BY cpc"
+  },
+  {
+    "id": 23,
+    "question": "Which inventory type generates the most conversions?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Inventory_Type, SUM(Conversions) as total_conversions FROM campaigns GROUP BY Inventory_Type ORDER BY total_conversions DESC LIMIT 1"
+  },
+  {
+    "id": 24,
+    "question": "Show month-over-month video completions trend",
+    "category": "time_series",
+    "difficulty": "hard",
+    "expected_sql": "SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as month, SUM(Video_Completions) as monthly_completions FROM campaigns WHERE Video_Completions > 0 GROUP BY month ORDER BY month"
+  },
+  {
+    "id": 25,
+    "question": "What is the viewable impression rate by exchange?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Exchange, (SUM(Viewable_Impressions) * 100.0 / SUM(Measurable_Impressions)) as viewable_rate FROM campaigns GROUP BY Exchange ORDER BY viewable_rate DESC"
+  },
+  {
+    "id": 26,
+    "question": "Compare video quartile completion rates by device",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, (SUM(Video_Quartile_1) * 100.0 / SUM(Impressions)) as q1, (SUM(Video_Quartile_2) * 100.0 / SUM(Impressions)) as q2, (SUM(Video_Quartile_3) * 100.0 / SUM(Impressions)) as q3 FROM campaigns WHERE Environment = 'Video' GROUP BY Device"
+  },
+  {
+    "id": 27,
+    "question": "Which exchanges have the lowest CPA?",
+    "category": "efficiency_metrics",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Exchange, (SUM(Media_Cost_Adv_Currency) / SUM(Conversions)) as cpa FROM campaigns GROUP BY Exchange ORDER BY cpa LIMIT 5"
+  },
+  {
+    "id": 28,
+    "question": "Show total revenue by advertiser",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Advertiser, SUM(Revenue_Adv_Currency) as total_revenue FROM campaigns GROUP BY Advertiser ORDER BY total_revenue DESC"
+  },
+  {
+    "id": 29,
+    "question": "What is the active view viewable impression rate?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT (SUM(Active_View_Viewable_Impressions) * 100.0 / SUM(Active_View_Measurable_Impressions)) as viewable_rate FROM campaigns"
+  },
+  {
+    "id": 30,
+    "question": "Show insertion orders where media cost exceeds $60,000",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Insertion_Order, SUM(Media_Cost_Adv_Currency) as total_cost FROM campaigns GROUP BY Insertion_Order HAVING SUM(Media_Cost_Adv_Currency) > 60000 ORDER BY total_cost DESC"
+  }
+]

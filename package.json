@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "markmap-lib": "^0.18.12",
+    "markmap-render": "^0.18.12"
+  }
+}

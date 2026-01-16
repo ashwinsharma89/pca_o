@@ -1,0 +1,210 @@
+{
+  "description": "Advanced strategic analysis questions for PCA Agent - anomaly detection, cohort analysis, forecasting, and strategic insights",
+  "version": "1.0",
+  "last_updated": "2024-11-17",
+  "categories": [
+    "Performance Anomaly & Pattern Detection",
+    "Cohort & Segmentation Analysis",
+    "Trend Forecasting & Predictive Analysis",
+    "Efficiency & Optimization Insights",
+    "Cross-Channel & Attribution Analysis",
+    "Competitive & Market Context",
+    "Creative & Messaging Insights",
+    "Audience & Targeting Insights",
+    "Budget & Resource Allocation",
+    "Conversion Quality & Value Analysis",
+    "Funnel & User Journey Analysis",
+    "Testing & Experimentation Insights",
+    "Risk & Volatility Analysis",
+    "Strategic Recommendations"
+  ],
+  "strategic_questions": [
+    {
+      "id": "anomaly_001",
+      "category": "Performance Anomaly & Pattern Detection",
+      "difficulty": "Hard",
+      "question": "Identify any unusual spikes or drops in performance over the last 2 months. What days/weeks had anomalies based on statistical outliers (>2 standard deviations from mean)?",
+      "expected_sql_pattern": "WITH daily_metrics AS (SELECT Date, SUM(Conversions) as conversions, SUM(Spend) as spend FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 60 DAY GROUP BY Date), stats AS (SELECT AVG(conversions) as avg_conv, STDDEV(conversions) as stddev_conv FROM daily_metrics) SELECT d.Date, d.conversions, d.spend, s.avg_conv, s.stddev_conv, CASE WHEN d.conversions > s.avg_conv + 2*s.stddev_conv THEN 'Positive Spike' WHEN d.conversions < s.avg_conv - 2*s.stddev_conv THEN 'Negative Drop' ELSE 'Normal' END as Anomaly_Type FROM daily_metrics d, stats s WHERE d.conversions > s.avg_conv + 2*s.stddev_conv OR d.conversions < s.avg_conv - 2*s.stddev_conv",
+      "analysis_type": "Statistical anomaly detection",
+      "business_context": "Identify unusual performance days to investigate causes (campaigns, events, issues)"
+    },
+    {
+      "id": "anomaly_002",
+      "category": "Performance Anomaly & Pattern Detection",
+      "difficulty": "Hard",
+      "question": "Analyze the correlation between ad spend increases and conversion rates over the last quarter. Is there a point of diminishing returns?",
+      "expected_sql_pattern": "WITH weekly_data AS (SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as Week, SUM(Spend) as Total_Spend, SUM(Clicks) as Total_Clicks, SUM(Conversions) as Total_Conversions, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Conversion_Rate FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY GROUP BY Week) SELECT Week, Total_Spend, Conversion_Rate, LAG(Total_Spend) OVER (ORDER BY Week) as Prev_Spend, LAG(Conversion_Rate) OVER (ORDER BY Week) as Prev_Conv_Rate, ROUND(((Total_Spend - LAG(Total_Spend) OVER (ORDER BY Week)) / NULLIF(LAG(Total_Spend) OVER (ORDER BY Week), 0)) * 100, 2) as Spend_Change_Pct, ROUND(Conversion_Rate - LAG(Conversion_Rate) OVER (ORDER BY Week), 2) as Conv_Rate_Change FROM weekly_data ORDER BY Week",
+      "analysis_type": "Correlation and diminishing returns analysis",
+      "business_context": "Identify optimal spend levels before efficiency drops"
+    },
+    {
+      "id": "anomaly_003",
+      "category": "Performance Anomaly & Pattern Detection",
+      "difficulty": "Medium",
+      "question": "Which time periods showed the best efficiency (lowest CPA with highest conversion volume) over the last quarter?",
+      "expected_sql_pattern": "WITH weekly_performance AS (SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as Week, SUM(Spend) as Total_Spend, SUM(Conversions) as Total_Conversions, ROUND(SUM(Spend) / NULLIF(SUM(Conversions), 0), 2) as CPA FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY GROUP BY Week), efficiency_score AS (SELECT Week, Total_Conversions, CPA, PERCENT_RANK() OVER (ORDER BY CPA ASC) as CPA_Rank, PERCENT_RANK() OVER (ORDER BY Total_Conversions DESC) as Volume_Rank, (PERCENT_RANK() OVER (ORDER BY CPA ASC) + PERCENT_RANK() OVER (ORDER BY Total_Conversions DESC)) / 2 as Efficiency_Score FROM weekly_performance) SELECT Week, Total_Conversions, CPA, ROUND(Efficiency_Score, 3) as Efficiency_Score FROM efficiency_score ORDER BY Efficiency_Score DESC LIMIT 5",
+      "analysis_type": "Multi-criteria efficiency ranking",
+      "business_context": "Identify sweet spots for optimal performance"
+    },
+    {
+      "id": "anomaly_004",
+      "category": "Performance Anomaly & Pattern Detection",
+      "difficulty": "Medium",
+      "question": "Detect seasonality patterns in the last 6 months. Do certain days of the week consistently perform better?",
+      "expected_sql_pattern": "SELECT DAYNAME(CAST(Date AS DATE)) as Day_of_Week, DAYOFWEEK(CAST(Date AS DATE)) as Day_Number, COUNT(*) as Days_Count, AVG(daily_conversions) as Avg_Conversions, AVG(daily_ctr) as Avg_CTR, AVG(daily_cpa) as Avg_CPA FROM (SELECT Date, SUM(Conversions) as daily_conversions, (SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100 as daily_ctr, SUM(Spend) / NULLIF(SUM(Conversions), 0) as daily_cpa FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 180 DAY GROUP BY Date) daily_metrics GROUP BY Day_of_Week, Day_Number ORDER BY Day_Number",
+      "analysis_type": "Seasonality and day-of-week analysis",
+      "business_context": "Optimize scheduling and budget allocation by day"
+    },
+    {
+      "id": "cohort_001",
+      "category": "Cohort & Segmentation Analysis",
+      "difficulty": "Hard",
+      "question": "Compare the average order value (AOV) of customers acquired in the last 3 months vs. those acquired 6 months ago. Are recent strategies bringing higher-value customers?",
+      "expected_sql_pattern": "WITH recent_cohort AS (SELECT AVG(Order_Value) as AOV, COUNT(DISTINCT Customer_ID) as Customer_Count, SUM(Order_Value) as Total_Revenue FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY), older_cohort AS (SELECT AVG(Order_Value) as AOV, COUNT(DISTINCT Customer_ID) as Customer_Count, SUM(Order_Value) as Total_Revenue FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 180 DAY AND Date < CURRENT_DATE - INTERVAL 90 DAY) SELECT 'Last 3 Months' as Cohort, r.AOV, r.Customer_Count, r.Total_Revenue FROM recent_cohort r UNION ALL SELECT 'Previous 3 Months (4-6 months ago)' as Cohort, o.AOV, o.Customer_Count, o.Total_Revenue FROM older_cohort o",
+      "analysis_type": "Cohort comparison for customer value",
+      "business_context": "Assess if acquisition quality is improving over time"
+    },
+    {
+      "id": "cohort_002",
+      "category": "Cohort & Segmentation Analysis",
+      "difficulty": "Hard",
+      "question": "Segment the audience by engagement level (high, medium, low) based on CTR over the last 2 months. Which segment has the best conversion rate and lowest CPA?",
+      "expected_sql_pattern": "WITH campaign_engagement AS (SELECT Campaign_Name, Platform, (SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100 as CTR, (SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100 as Conversion_Rate, SUM(Spend) / NULLIF(SUM(Conversions), 0) as CPA FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 60 DAY GROUP BY Campaign_Name, Platform), engagement_segments AS (SELECT *, CASE WHEN CTR >= 3.0 THEN 'High Engagement' WHEN CTR >= 1.5 THEN 'Medium Engagement' ELSE 'Low Engagement' END as Engagement_Level FROM campaign_engagement) SELECT Engagement_Level, COUNT(*) as Campaign_Count, ROUND(AVG(CTR), 2) as Avg_CTR, ROUND(AVG(Conversion_Rate), 2) as Avg_Conversion_Rate, ROUND(AVG(CPA), 2) as Avg_CPA FROM engagement_segments GROUP BY Engagement_Level ORDER BY Avg_Conversion_Rate DESC",
+      "analysis_type": "Segmentation with performance comparison",
+      "business_context": "Identify which engagement levels drive best results"
+    },
+    {
+      "id": "cohort_003",
+      "category": "Cohort & Segmentation Analysis",
+      "difficulty": "Medium",
+      "question": "Analyze the performance difference between mobile vs. desktop users over the last month. Should we adjust bid strategy based on device performance?",
+      "expected_sql_pattern": "SELECT Device_Type, SUM(Impressions) as Total_Impressions, SUM(Clicks) as Total_Clicks, ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as CTR, SUM(Conversions) as Total_Conversions, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Conversion_Rate, SUM(Spend) as Total_Spend, ROUND(SUM(Spend) / NULLIF(SUM(Conversions), 0), 2) as CPA, ROUND(SUM(Revenue) / NULLIF(SUM(Spend), 0), 2) as ROAS FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 30 DAY GROUP BY Device_Type ORDER BY ROAS DESC",
+      "analysis_type": "Device segmentation analysis",
+      "business_context": "Optimize device-specific bidding and creative"
+    },
+    {
+      "id": "forecast_001",
+      "category": "Trend Forecasting & Predictive Analysis",
+      "difficulty": "Hard",
+      "question": "Based on the last 6 months of data, forecast expected CPA for next month using historical average and trend",
+      "expected_sql_pattern": "WITH monthly_cpa AS (SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as Month, SUM(Spend) / NULLIF(SUM(Conversions), 0) as CPA FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 180 DAY GROUP BY Month ORDER BY Month), trend_analysis AS (SELECT AVG(CPA) as Avg_CPA, STDDEV(CPA) as StdDev_CPA, (MAX(CPA) - MIN(CPA)) / 6 as Monthly_Change FROM monthly_cpa) SELECT Avg_CPA as Historical_Avg_CPA, StdDev_CPA, Monthly_Change, ROUND(Avg_CPA + Monthly_Change, 2) as Forecasted_Next_Month_CPA, ROUND(Avg_CPA - StdDev_CPA, 2) as Conservative_Forecast, ROUND(Avg_CPA + StdDev_CPA, 2) as Optimistic_Forecast FROM trend_analysis",
+      "analysis_type": "Simple trend-based forecasting",
+      "business_context": "Plan budget and set expectations for next period"
+    },
+    {
+      "id": "forecast_002",
+      "category": "Trend Forecasting & Predictive Analysis",
+      "difficulty": "Hard",
+      "question": "Analyze the growth trajectory of conversions over the last year. Are we on track to meet annual goals? Calculate month-over-month growth rate.",
+      "expected_sql_pattern": "WITH monthly_conversions AS (SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as Month, SUM(Conversions) as Total_Conversions FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 365 DAY GROUP BY Month ORDER BY Month), growth_rates AS (SELECT Month, Total_Conversions, LAG(Total_Conversions) OVER (ORDER BY Month) as Prev_Month_Conversions, ROUND(((Total_Conversions - LAG(Total_Conversions) OVER (ORDER BY Month)) / NULLIF(LAG(Total_Conversions) OVER (ORDER BY Month), 0)) * 100, 2) as MoM_Growth_Pct FROM monthly_conversions) SELECT Month, Total_Conversions, Prev_Month_Conversions, MoM_Growth_Pct, AVG(MoM_Growth_Pct) OVER (ORDER BY Month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) as Rolling_3Month_Avg_Growth FROM growth_rates ORDER BY Month",
+      "analysis_type": "Growth trajectory analysis",
+      "business_context": "Track progress toward annual targets"
+    },
+    {
+      "id": "efficiency_001",
+      "category": "Efficiency & Optimization Insights",
+      "difficulty": "Hard",
+      "question": "Identify the top 20% of campaigns driving 80% of results (Pareto analysis) for the last 2 months",
+      "expected_sql_pattern": "WITH campaign_performance AS (SELECT Campaign_Name, SUM(Conversions) as Total_Conversions, SUM(Spend) as Total_Spend, ROUND(SUM(Spend) / NULLIF(SUM(Conversions), 0), 2) as CPA FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 60 DAY GROUP BY Campaign_Name), ranked_campaigns AS (SELECT Campaign_Name, Total_Conversions, Total_Spend, CPA, SUM(Total_Conversions) OVER (ORDER BY Total_Conversions DESC) as Cumulative_Conversions, SUM(Total_Conversions) OVER () as Grand_Total_Conversions, ROUND((SUM(Total_Conversions) OVER (ORDER BY Total_Conversions DESC) * 100.0 / SUM(Total_Conversions) OVER ()), 2) as Cumulative_Pct FROM campaign_performance) SELECT Campaign_Name, Total_Conversions, Total_Spend, CPA, Cumulative_Conversions, Cumulative_Pct, CASE WHEN Cumulative_Pct <= 80 THEN 'Top 20% (80% of results)' ELSE 'Bottom 80%' END as Pareto_Category FROM ranked_campaigns ORDER BY Total_Conversions DESC",
+      "analysis_type": "Pareto (80/20) analysis",
+      "business_context": "Focus resources on highest-impact campaigns"
+    },
+    {
+      "id": "efficiency_002",
+      "category": "Efficiency & Optimization Insights",
+      "difficulty": "Hard",
+      "question": "Compare the incremental ROAS of the last $10K spent vs. the first $10K spent in the past month. Are we seeing diminishing returns?",
+      "expected_sql_pattern": "WITH daily_spend AS (SELECT Date, SUM(Spend) as Daily_Spend, SUM(Revenue) as Daily_Revenue, SUM(SUM(Spend)) OVER (ORDER BY Date) as Cumulative_Spend FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 30 DAY GROUP BY Date ORDER BY Date), spend_buckets AS (SELECT *, CASE WHEN Cumulative_Spend <= 10000 THEN 'First $10K' WHEN Cumulative_Spend > (SELECT MAX(Cumulative_Spend) FROM daily_spend) - 10000 THEN 'Last $10K' ELSE 'Middle' END as Spend_Bucket FROM daily_spend) SELECT Spend_Bucket, SUM(Daily_Spend) as Total_Spend, SUM(Daily_Revenue) as Total_Revenue, ROUND(SUM(Daily_Revenue) / NULLIF(SUM(Daily_Spend), 0), 2) as ROAS FROM spend_buckets WHERE Spend_Bucket IN ('First $10K', 'Last $10K') GROUP BY Spend_Bucket",
+      "analysis_type": "Marginal/incremental ROAS analysis",
+      "business_context": "Detect diminishing returns to optimize budget"
+    },
+    {
+      "id": "attribution_001",
+      "category": "Cross-Channel & Attribution Analysis",
+      "difficulty": "Hard",
+      "question": "Compare the assisted conversion rate across channels for the last 2 months. Which channels play a supporting role vs. last-click role?",
+      "expected_sql_pattern": "WITH channel_conversions AS (SELECT Platform, SUM(Conversions) as Direct_Conversions, SUM(Assisted_Conversions) as Assisted_Conversions, SUM(Conversions) + SUM(Assisted_Conversions) as Total_Contribution FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 60 DAY GROUP BY Platform) SELECT Platform, Direct_Conversions, Assisted_Conversions, Total_Contribution, ROUND((Assisted_Conversions * 100.0 / NULLIF(Total_Contribution, 0)), 2) as Assisted_Conversion_Rate, CASE WHEN Assisted_Conversions > Direct_Conversions THEN 'Supporting Role' ELSE 'Closing Role' END as Channel_Role FROM channel_conversions ORDER BY Assisted_Conversion_Rate DESC",
+      "analysis_type": "Multi-touch attribution analysis",
+      "business_context": "Understand channel roles in customer journey"
+    },
+    {
+      "id": "creative_001",
+      "category": "Creative & Messaging Insights",
+      "difficulty": "Medium",
+      "question": "Analyze which ad copy themes drove the highest conversion rates over the last quarter. Compare performance across different messaging types.",
+      "expected_sql_pattern": "SELECT Ad_Copy_Theme, COUNT(DISTINCT Campaign_Name) as Campaign_Count, SUM(Impressions) as Total_Impressions, SUM(Clicks) as Total_Clicks, ROUND((SUM(Clicks) / NULLIF(SUM(Impressions), 0)) * 100, 2) as CTR, SUM(Conversions) as Total_Conversions, ROUND((SUM(Conversions) / NULLIF(SUM(Clicks), 0)) * 100, 2) as Conversion_Rate, ROUND(SUM(Spend) / NULLIF(SUM(Conversions), 0), 2) as CPA FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY AND Ad_Copy_Theme IS NOT NULL GROUP BY Ad_Copy_Theme ORDER BY Conversion_Rate DESC",
+      "analysis_type": "Creative messaging analysis",
+      "business_context": "Identify winning messaging themes to scale"
+    },
+    {
+      "id": "creative_002",
+      "category": "Creative & Messaging Insights",
+      "difficulty": "Hard",
+      "question": "Identify the optimal ad creative lifespan based on the last 6 months. At what point does CTR significantly decay?",
+      "expected_sql_pattern": "WITH creative_age AS (SELECT Campaign_Name, Creative_ID, MIN(Date) as First_Run_Date, MAX(Date) as Last_Run_Date, DATEDIFF('day', MIN(Date), MAX(Date)) as Days_Active FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 180 DAY GROUP BY Campaign_Name, Creative_ID), creative_performance AS (SELECT c.Creative_ID, ca.Days_Active, ROUND((SUM(c.Clicks) / NULLIF(SUM(c.Impressions), 0)) * 100, 2) as CTR FROM campaigns c JOIN creative_age ca ON c.Creative_ID = ca.Creative_ID WHERE c.Date >= CURRENT_DATE - INTERVAL 180 DAY GROUP BY c.Creative_ID, ca.Days_Active), age_buckets AS (SELECT CASE WHEN Days_Active <= 14 THEN '0-14 days' WHEN Days_Active <= 30 THEN '15-30 days' WHEN Days_Active <= 60 THEN '31-60 days' ELSE '60+ days' END as Age_Bucket, AVG(CTR) as Avg_CTR, COUNT(*) as Creative_Count FROM creative_performance GROUP BY Age_Bucket) SELECT Age_Bucket, ROUND(Avg_CTR, 2) as Avg_CTR, Creative_Count FROM age_buckets ORDER BY CASE Age_Bucket WHEN '0-14 days' THEN 1 WHEN '15-30 days' THEN 2 WHEN '31-60 days' THEN 3 ELSE 4 END",
+      "analysis_type": "Creative fatigue analysis",
+      "business_context": "Determine optimal creative refresh cycle"
+    },
+    {
+      "id": "budget_001",
+      "category": "Budget & Resource Allocation",
+      "difficulty": "Hard",
+      "question": "If we increased budget by 25% next month, which channels should receive the increase based on the last 3 months' ROAS and scalability?",
+      "expected_sql_pattern": "WITH channel_performance AS (SELECT Platform, SUM(Spend) as Current_Spend, SUM(Revenue) as Current_Revenue, ROUND(SUM(Revenue) / NULLIF(SUM(Spend), 0), 2) as ROAS, SUM(Conversions) as Total_Conversions FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY GROUP BY Platform), total_budget AS (SELECT SUM(Current_Spend) as Total_Current_Spend, SUM(Current_Spend) * 1.25 as Total_New_Budget FROM channel_performance), allocation AS (SELECT cp.Platform, cp.Current_Spend, cp.ROAS, cp.Total_Conversions, tb.Total_New_Budget, ROUND(cp.Current_Spend * (cp.ROAS / (SELECT SUM(ROAS) FROM channel_performance)), 2) as ROAS_Weighted_Allocation, ROUND((cp.Current_Spend * (cp.ROAS / (SELECT SUM(ROAS) FROM channel_performance))) * (tb.Total_New_Budget / tb.Total_Current_Spend), 2) as Recommended_New_Budget FROM channel_performance cp, total_budget tb) SELECT Platform, Current_Spend, ROAS, Recommended_New_Budget, ROUND(Recommended_New_Budget - Current_Spend, 2) as Budget_Increase, ROUND(((Recommended_New_Budget - Current_Spend) / NULLIF(Current_Spend, 0)) * 100, 2) as Increase_Pct FROM allocation ORDER BY ROAS DESC",
+      "analysis_type": "Budget optimization and allocation",
+      "business_context": "Maximize ROI with increased budget"
+    },
+    {
+      "id": "risk_001",
+      "category": "Risk & Volatility Analysis",
+      "difficulty": "Hard",
+      "question": "Calculate the performance volatility (standard deviation of CPA) for each campaign over the last 2 months. Which campaigns are most unpredictable?",
+      "expected_sql_pattern": "WITH daily_cpa AS (SELECT Campaign_Name, Date, SUM(Spend) / NULLIF(SUM(Conversions), 0) as Daily_CPA FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 60 DAY GROUP BY Campaign_Name, Date), campaign_volatility AS (SELECT Campaign_Name, AVG(Daily_CPA) as Avg_CPA, STDDEV(Daily_CPA) as CPA_Volatility, MIN(Daily_CPA) as Min_CPA, MAX(Daily_CPA) as Max_CPA, COUNT(*) as Days_Active FROM daily_cpa GROUP BY Campaign_Name) SELECT Campaign_Name, ROUND(Avg_CPA, 2) as Avg_CPA, ROUND(CPA_Volatility, 2) as CPA_StdDev, ROUND(Min_CPA, 2) as Min_CPA, ROUND(Max_CPA, 2) as Max_CPA, Days_Active, ROUND((CPA_Volatility / NULLIF(Avg_CPA, 0)) * 100, 2) as Coefficient_of_Variation_Pct, CASE WHEN (CPA_Volatility / NULLIF(Avg_CPA, 0)) > 0.3 THEN 'High Risk' WHEN (CPA_Volatility / NULLIF(Avg_CPA, 0)) > 0.15 THEN 'Medium Risk' ELSE 'Low Risk' END as Risk_Level FROM campaign_volatility ORDER BY CPA_Volatility DESC",
+      "analysis_type": "Volatility and risk assessment",
+      "business_context": "Identify unpredictable campaigns for closer monitoring"
+    },
+    {
+      "id": "strategic_001",
+      "category": "Strategic Recommendations",
+      "difficulty": "Expert",
+      "question": "Based on comprehensive analysis of the last 3 months, identify top 5 optimization opportunities ranked by potential impact",
+      "expected_sql_pattern": "WITH underperforming_campaigns AS (SELECT 'Pause Low ROAS Campaigns' as Opportunity, COUNT(*) as Affected_Campaigns, SUM(Spend) as Potential_Savings, 'High' as Impact FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY AND (Revenue / NULLIF(Spend, 0)) < 2.0 GROUP BY 1), budget_reallocation AS (SELECT 'Reallocate to Top Performers' as Opportunity, COUNT(DISTINCT Campaign_Name) as Affected_Campaigns, SUM(Spend) * 0.2 as Potential_Impact, 'High' as Impact FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY AND (Revenue / NULLIF(Spend, 0)) > 4.0), creative_refresh AS (SELECT 'Refresh Fatigued Creatives' as Opportunity, COUNT(DISTINCT Creative_ID) as Affected_Campaigns, AVG(Spend) * 0.15 as Potential_Impact, 'Medium' as Impact FROM campaigns WHERE Date >= CURRENT_DATE - INTERVAL 90 DAY AND Days_Since_Creative_Launch > 60) SELECT * FROM underperforming_campaigns UNION ALL SELECT * FROM budget_reallocation UNION ALL SELECT * FROM creative_refresh ORDER BY CASE Impact WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END, Potential_Impact DESC LIMIT 5",
+      "analysis_type": "Strategic prioritization",
+      "business_context": "Actionable roadmap for performance improvement"
+    }
+  ],
+  "agent_training_notes": {
+    "analytical_approach": [
+      "Always provide context and reasoning, not just numbers",
+      "Compare against relevant benchmarks or previous periods",
+      "Identify causation vs. correlation carefully",
+      "Quantify the business impact of insights",
+      "Prioritize actionable recommendations",
+      "Flag data quality issues or missing information",
+      "Consider multiple hypotheses for anomalies",
+      "Acknowledge uncertainty when appropriate",
+      "Think holistically across channels and metrics",
+      "Connect insights to business outcomes"
+    ],
+    "sql_patterns_for_insights": {
+      "anomaly_detection": "Use STDDEV, AVG, and window functions to identify outliers",
+      "cohort_analysis": "Use DATE_TRUNC and self-joins to compare time-based cohorts",
+      "trend_analysis": "Use LAG, LEAD, moving averages, and regression functions",
+      "segmentation": "Use CASE WHEN, NTILE, and PERCENT_RANK for bucketing",
+      "forecasting": "Use historical averages, growth rates, and seasonality patterns",
+      "efficiency_analysis": "Use RANK, ROW_NUMBER, and cumulative sums for Pareto",
+      "attribution": "Use window functions for first/last touch and journey analysis",
+      "risk_analysis": "Use STDDEV, VARIANCE, and coefficient of variation"
+    },
+    "business_context_required": [
+      "Industry benchmarks (if available)",
+      "Campaign goals and targets",
+      "Budget constraints",
+      "Competitive landscape",
+      "Seasonality factors",
+      "Product/service context",
+      "Customer lifecycle",
+      "Attribution model in use"
+    ]
+  }
+}

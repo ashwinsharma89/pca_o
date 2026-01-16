@@ -1,0 +1,51 @@
+Campaign_Name,Ad_Group_Name,Keyword,Match_Type,Date,Network,Device,Location,Age,Gender,Impressions,Clicks,CTR,Avg_CPC,Cost,Conversions,Conv_Rate,Cost_Per_Conv,Conv_Value,ROAS,Quality_Score,Impression_Share,Search_Impr_Share,Top_Impr_Rate
+Holiday_Shopping_2024,holiday_AG,holiday gifts,Broad,2024-06-01,Shopping,Desktop,United States,35-44,Male,405566,7528,1.86,1.83,13791.29,763,10.14,18.08,149464.43,10.84,7,64.6,74.5,59.9
+Holiday_Shopping_2024,christmas_AG,christmas presents,Phrase,2024-06-01,Shopping,Desktop,United States,35-44,Male,488172,8600,1.76,1.51,13026.78,852,9.91,15.29,116649.65,8.95,8,70.6,83.0,77.9
+Black_Friday_2024,black_AG,black friday deals,Exact,2024-06-01,Search,Desktop,United States,18-24,Female,541755,14038,2.59,2.06,28906.33,1159,8.26,24.94,223722.01,7.74,9,80.7,78.8,63.3
+Black_Friday_2024,black_AG,black friday sale,Phrase,2024-06-01,Shopping,Desktop,United States,18-24,Female,450119,11168,2.48,1.8,20090.25,718,6.43,27.98,100763.91,5.02,8,67.8,66.5,62.7
+Cyber_Monday_2024,cyber_AG,cyber monday tech,Exact,2024-06-01,Shopping,Mobile,United States,25-34,Female,517884,12603,2.43,2.01,25326.65,948,7.52,26.72,181903.72,7.18,10,76.2,79.3,76.7
+Cyber_Monday_2024,laptop_AG,laptop deals,Phrase,2024-06-01,Search,Desktop,United States,45-54,Female,631382,15101,2.39,1.93,29193.41,1171,7.75,24.93,155260.3,5.32,8,82.1,64.5,78.1
+Summer_Sale_2024,summer_AG,summer sale,Broad,2024-06-01,Shopping,Desktop,United States,18-24,Female,473293,12400,2.62,1.65,20517.12,1063,8.57,19.3,158634.87,7.73,7,69.4,80.2,65.6
+Summer_Sale_2024,summer_AG,summer deals,Phrase,2024-06-01,Shopping,Mobile,United States,18-24,Female,415785,12533,3.01,1.59,19899.78,1125,8.98,17.69,191432.51,9.62,9,73.3,80.2,77.0
+Back_To_School_2024,school_AG,school supplies,Exact,2024-06-01,Search,Desktop,United States,45-54,Male,787793,19176,2.43,2.0,38391.57,1848,9.64,20.77,325417.98,8.48,7,68.8,63.4,77.2
+Back_To_School_2024,back_AG,back to school,Phrase,2024-06-01,Search,Mobile,United States,45-54,Female,532662,14423,2.71,2.33,33583.06,1079,7.48,31.12,187679.76,5.59,8,66.2,83.3,59.0
+Spring_Launch_2024,spring_AG,spring sale,Broad,2024-06-01,Shopping,Mobile,United States,45-54,Female,362472,9261,2.55,2.29,21212.15,608,6.57,34.89,97944.74,4.62,9,70.5,68.9,73.7
+Spring_Launch_2024,spring_AG,spring deals,Phrase,2024-06-01,Search,Desktop,United States,25-34,Female,247715,7118,2.87,2.31,16445.42,750,10.54,21.93,130030.65,7.91,8,71.3,71.4,77.6
+Valentine_Day_2024,valentine_AG,valentine gifts,Exact,2024-06-01,Search,Desktop,United States,35-44,Female,1048987,25650,2.45,2.44,62664.57,2602,10.14,24.08,498209.96,7.95,10,79.1,80.8,76.0
+Valentine_Day_2024,valentine_AG,valentine presents,Phrase,2024-06-01,Shopping,Desktop,United States,25-34,Female,262746,8402,3.2,1.83,15406.02,688,8.19,22.39,126774.77,8.23,10,78.7,81.6,66.0
+New_Year_2024,new_AG,new year deals,Broad,2024-06-01,Shopping,Desktop,United States,35-44,Male,287156,5161,1.8,1.96,10129.63,497,9.63,20.38,75483.26,7.45,10,74.2,66.9,73.6
+New_Year_2024,new_AG,new year sale,Phrase,2024-06-01,Shopping,Mobile,United States,25-34,Female,273082,7668,2.81,1.88,14407.71,472,6.16,30.52,88891.28,6.17,8,74.7,75.2,72.7
+Q3_Promo_2024,summer_AG,summer promo,Phrase,2024-06-01,Shopping,Mobile,United States,45-54,Female,806505,22955,2.85,2.26,51930.68,2055,8.95,25.27,320851.46,6.18,8,69.2,81.8,77.6
+Q3_Promo_2024,q3_AG,q3 deals,Broad,2024-06-01,Search,Mobile,United States,25-34,Female,757679,14535,1.92,1.72,25037.08,1361,9.36,18.4,195185.91,7.8,10,81.3,82.3,77.5
+Flash_Sale_2024,flash_AG,flash sale,Exact,2024-06-01,Search,Desktop,United States,18-24,Female,594200,18938,3.19,2.24,42424.8,1207,6.37,35.15,192402.89,4.54,10,79.5,83.0,61.1
+Flash_Sale_2024,limited_AG,limited time,Phrase,2024-06-01,Shopping,Mobile,United States,18-24,Female,534727,13146,2.46,2.47,32445.63,1433,10.9,22.64,210711.72,6.49,8,70.9,81.9,72.8
+Holiday_Shopping_2024,holiday_AG,holiday gifts,Broad,2024-06-02,Shopping,Mobile,United States,35-44,Male,1091292,33717,3.09,1.72,57827.89,3312,9.82,17.46,447799.97,7.74,8,82.2,75.2,77.3
+Holiday_Shopping_2024,christmas_AG,christmas presents,Phrase,2024-06-02,Shopping,Mobile,United States,45-54,Male,820830,14990,1.83,1.66,24891.22,1262,8.42,19.72,239838.77,9.64,10,82.1,83.2,70.4
+Black_Friday_2024,black_AG,black friday deals,Exact,2024-06-02,Shopping,Desktop,United States,18-24,Female,427969,7650,1.79,1.72,13180.39,718,9.39,18.36,138670.31,10.52,9,71.0,81.2,65.9
+Black_Friday_2024,black_AG,black friday sale,Phrase,2024-06-02,Shopping,Desktop,United States,18-24,Female,729641,18337,2.51,1.94,35615.47,1945,10.61,18.31,316850.14,8.9,10,70.0,80.5,78.2
+Cyber_Monday_2024,cyber_AG,cyber monday tech,Exact,2024-06-02,Search,Desktop,United States,35-44,Female,507971,10797,2.13,1.74,18773.99,674,6.24,27.85,92406.3,4.92,10,84.3,64.2,67.7
+Cyber_Monday_2024,laptop_AG,laptop deals,Phrase,2024-06-02,Shopping,Mobile,United States,25-34,Female,508316,15379,3.03,1.67,25702.48,1258,8.18,20.43,186935.9,7.27,8,69.5,68.7,69.8
+Summer_Sale_2024,summer_AG,summer sale,Broad,2024-06-02,Search,Mobile,United States,45-54,Male,552029,13045,2.36,1.69,22004.7,1419,10.88,15.51,241882.92,10.99,8,83.3,66.3,74.3
+Summer_Sale_2024,summer_AG,summer deals,Phrase,2024-06-02,Shopping,Mobile,United States,25-34,Male,924883,18650,2.02,2.26,42172.22,1834,9.83,22.99,362634.26,8.6,8,81.3,65.2,64.4
+Back_To_School_2024,school_AG,school supplies,Exact,2024-06-02,Shopping,Mobile,United States,18-24,Male,764560,14832,1.94,2.29,33936.19,1280,8.63,26.51,248747.1,7.33,9,77.0,73.5,59.3
+Back_To_School_2024,back_AG,back to school,Phrase,2024-06-02,Search,Desktop,United States,18-24,Female,325149,9833,3.02,2.49,24490.82,793,8.06,30.88,147074.29,6.01,10,77.9,83.1,62.7
+Spring_Launch_2024,spring_AG,spring sale,Broad,2024-06-02,Search,Mobile,United States,35-44,Male,972217,22975,2.36,2.04,46908.42,1682,7.32,27.89,277279.8,5.91,9,77.8,63.8,73.0
+Spring_Launch_2024,spring_AG,spring deals,Phrase,2024-06-02,Search,Desktop,United States,35-44,Female,1017319,31238,3.07,1.93,60159.91,1956,6.26,30.76,317764.79,5.28,8,66.8,76.2,58.8
+Valentine_Day_2024,valentine_AG,valentine gifts,Exact,2024-06-02,Search,Desktop,United States,25-34,Male,689108,12915,1.87,1.5,19415.98,1401,10.85,13.86,277039.91,14.27,7,76.2,67.3,76.4
+Valentine_Day_2024,valentine_AG,valentine presents,Phrase,2024-06-02,Search,Mobile,United States,25-34,Male,613037,18585,3.03,2.04,37994.62,1176,6.33,32.31,162096.28,4.27,10,83.9,81.2,66.7
+New_Year_2024,new_AG,new year deals,Broad,2024-06-02,Shopping,Mobile,United States,35-44,Male,642919,17462,2.72,2.31,40284.62,1690,9.68,23.84,291744.35,7.24,9,69.0,67.8,72.6
+New_Year_2024,new_AG,new year sale,Phrase,2024-06-02,Search,Mobile,United States,18-24,Female,1031402,19846,1.92,1.69,33486.1,1869,9.42,17.92,294691.05,8.8,7,76.4,75.5,73.6
+Q3_Promo_2024,summer_AG,summer promo,Phrase,2024-06-02,Shopping,Desktop,United States,45-54,Male,623112,13522,2.17,2.04,27602.41,889,6.57,31.05,166752.4,6.04,7,82.8,68.6,61.1
+Q3_Promo_2024,q3_AG,q3 deals,Broad,2024-06-02,Search,Mobile,United States,45-54,Male,489064,12776,2.61,1.59,20332.09,1203,9.42,16.9,212637.88,10.46,7,77.6,81.2,65.5
+Flash_Sale_2024,flash_AG,flash sale,Exact,2024-06-02,Shopping,Desktop,United States,25-34,Male,612890,11065,1.81,1.61,17845.16,890,8.04,20.05,152371.15,8.54,10,64.5,74.5,64.1
+Flash_Sale_2024,limited_AG,limited time,Phrase,2024-06-02,Search,Mobile,United States,35-44,Female,856483,21839,2.55,2.09,45597.52,2352,10.77,19.39,429087.8,9.41,8,73.6,72.5,71.0
+Holiday_Shopping_2024,holiday_AG,holiday gifts,Broad,2024-06-03,Search,Desktop,United States,25-34,Female,627513,11815,1.88,1.81,21399.76,1172,9.92,18.26,174608.51,8.16,10,66.7,66.8,71.7
+Holiday_Shopping_2024,christmas_AG,christmas presents,Phrase,2024-06-03,Shopping,Mobile,United States,25-34,Male,766038,21314,2.78,1.82,38833.22,2247,10.54,17.28,363602.45,9.36,9,75.3,82.8,77.8
+Black_Friday_2024,black_AG,black friday deals,Exact,2024-06-03,Search,Mobile,United States,25-34,Female,1037355,32855,3.17,2.04,67073.73,2469,7.51,27.17,377253.64,5.62,9,76.3,75.3,66.8
+Black_Friday_2024,black_AG,black friday sale,Phrase,2024-06-03,Shopping,Mobile,United States,25-34,Male,965092,23066,2.39,1.77,40905.79,1381,5.99,29.62,270755.51,6.62,8,82.3,75.5,74.7
+Cyber_Monday_2024,cyber_AG,cyber monday tech,Exact,2024-06-03,Shopping,Mobile,United States,18-24,Male,1068037,33619,3.15,1.89,63407.71,2951,8.78,21.49,408741.39,6.45,7,85.5,83.6,73.9
+Cyber_Monday_2024,laptop_AG,laptop deals,Phrase,2024-06-03,Search,Mobile,United States,35-44,Male,596089,14871,2.49,1.94,28780.84,1107,7.44,26.0,184685.5,6.42,10,65.0,83.8,66.5
+Summer_Sale_2024,summer_AG,summer sale,Broad,2024-06-03,Shopping,Mobile,United States,45-54,Female,973155,27602,2.84,1.79,49406.0,1954,7.08,25.28,386334.29,7.82,10,81.1,67.5,59.2
+Summer_Sale_2024,summer_AG,summer deals,Phrase,2024-06-03,Shopping,Mobile,United States,45-54,Male,983776,21687,2.2,1.72,37330.5,2103,9.7,17.75,371876.11,9.96,9,74.6,82.7,71.7
+Back_To_School_2024,school_AG,school supplies,Exact,2024-06-03,Search,Mobile,United States,45-54,Female,1178837,23999,2.04,1.8,43117.71,1555,6.48,27.73,236519.05,5.49,9,85.6,83.1,73.3
+Back_To_School_2024,back_AG,back to school,Phrase,2024-06-03,Shopping,Desktop,United States,18-24,Female,623770,18221,2.92,2.05,37416.59,1087,5.97,34.42,179465.99,4.8,7,77.2,67.9,61.9

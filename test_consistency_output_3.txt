@@ -1,0 +1,9 @@
+/Users/ashwin/Desktop/pca_agent copy/.venv312/lib/python3.12/site-packages/_pytest/config/__init__.py:328: PluggyTeardownRaisedWarning: A plugin raised an exception during an old-style hookwrapper teardown.
+Plugin: helpconfig, Hook: pytest_cmdline_parse
+ConftestImportFailure: NameError: name 'is_port_open' is not defined (from /Users/ashwin/Desktop/pca_agent copy/tests/conftest.py)
+For more information see https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluggyTeardownRaisedWarning
+  config = pluginmanager.hook.pytest_cmdline_parse(
+ImportError while loading conftest '/Users/ashwin/Desktop/pca_agent copy/tests/conftest.py'.
+tests/conftest.py:31: in <module>
+    elif is_port_open("localhost", 5433):
+E   NameError: name 'is_port_open' is not defined

@@ -1,0 +1,255 @@
+PRIORITY 1 KNOWLEDGE SOURCES - ORDERED FOR INGESTION
+================================================================================
+Generated: 2025-11-23 03:31:10
+Total Sources: 45
+================================================================================
+
+
+================================================================================
+TERMINOLOGY
+================================================================================
+
+1. Digital marketing glossary
+   URL: https://www.impressiondigital.com/blog/digital-marketing-glossary/
+
+2. Marketing terms glossary
+   URL: https://www.marketingterms.com/glossary/
+
+3. Website terminology
+   URL: https://www.mtu.edu/umc/services/websites/terminology/
+
+
+================================================================================
+CAMPAIGN ANALYTICS
+================================================================================
+
+4. How to analyze campaigns
+   URL: https://supermetrics.com/blog/how-to-analyze-campaigns
+
+5. Campaign analytics guide
+   URL: https://improvado.io/blog/campaign-analytics
+
+6. Growth marketing analytics
+   URL: https://supermetrics.com/blog/growth-marketing-analytics
+
+7. Marketing data management
+   URL: https://supermetrics.com/blog/marketing-data-management
+
+
+================================================================================
+KPIS
+================================================================================
+
+8. Ultimate KPI examples guide
+   URL: https://www.dashthis.com/kpi-examples/
+
+9. Digital marketing KPI examples
+   URL: https://www.klipfolio.com/resources/kpi-examples/digital-marketing
+
+10. What are KPIs
+   URL: https://www.simplekpi.com/Resources/Articles/what-are-kpis
+
+
+================================================================================
+FUNNEL
+================================================================================
+
+11. Marketing funnel guide
+   URL: https://advertising.amazon.com/library/guides/marketing-funnel
+
+12. Marketing funnel stages
+   URL: https://www.semrush.com/blog/marketing-funnel/
+
+
+================================================================================
+HIERARCHY
+================================================================================
+
+13. DV360 campaign structure
+   URL: https://analyticsliv.com/blogs/dv360-campaign-structure-best-practices
+
+14. Google Ads reporting
+   URL: https://blog.adnabu.com/google-ads/google-ads-reporting/
+
+
+================================================================================
+GOOGLE ADS
+================================================================================
+
+15. Google Ads 101
+   URL: https://www.factors.ai/blog/google-ads-101-types-benefits
+
+
+================================================================================
+SEM
+================================================================================
+
+16. Search engine marketing
+   URL: https://www.semrush.com/blog/search-engine-marketing/
+
+
+================================================================================
+GOOGLE ADS
+================================================================================
+
+17. Types of Google Ads - Zapier
+   URL: https://zapier.com/blog/types-of-google-ads/
+
+18. Types of Google Ads - Demand Curve
+   URL: https://www.demandcurve.com/blog/types-of-google-ads
+
+19. Google Ads Help
+   URL: https://support.google.com/google-ads/answer/2580383?hl=en
+
+
+================================================================================
+BING ADS
+================================================================================
+
+20. Bing Ads campaign guide
+   URL: https://www.technadigital.com/bing-ads-effective-campaign-guide/
+
+21. Microsoft Bing Ads guide
+   URL: https://www.datafeedwatch.com/blog/microsoft-bing-ads-guide
+
+
+================================================================================
+META ADS
+================================================================================
+
+22. Meta Ads reporting guide
+   URL: https://magicbrief.com/post/understanding-meta-ads-reporting-a-complete-guide
+
+23. What are Meta Ads
+   URL: https://leadsbridge.com/blog/what-are-meta-ads/
+
+24. Meta Ads report explained
+   URL: https://support.agorapulse.com/en/articles/10137532-meta-ads-report-explained
+
+25. Facebook audience targeting
+   URL: https://www.facebook.com/business/help/1153577308409919?id=1858550721111595
+
+
+================================================================================
+LINKEDIN
+================================================================================
+
+26. LinkedIn Ads structure
+   URL: https://www.sprinklr.com/help/articles/getting-started/linkedin-ads-campaign-structure-roles/645234780d27fc559bbe4b62
+
+27. LinkedIn Ads targeting
+   URL: https://www.linkedin.com/help/lms/answer/a424171
+
+
+================================================================================
+SOCIAL
+================================================================================
+
+28. Social media platforms
+   URL: https://digitalbrolly.com/social-media-platforms-for-marketing/
+
+29. Best social platforms
+   URL: https://www.singlegrain.com/blog/ms/best-social-media-platforms-for-advertising/
+
+
+================================================================================
+TARGETING
+================================================================================
+
+30. Audience targeting glossary
+   URL: https://www.criteo.com/glossary/audience-targeting/
+
+31. Audience targeting examples
+   URL: https://www.brafton.com/blog/strategy/audience-targeting-examples/
+
+
+================================================================================
+DEMOGRAPHICS
+================================================================================
+
+32. Audience insights demographics
+   URL: https://www.taboola.com/help/en/articles/10695578-audience-insights-demographics
+
+33. Demographic reports best practices
+   URL: https://metricswatch.com/insights/best-practices-for-social-media-demographic-reports
+
+
+================================================================================
+DISPLAY
+================================================================================
+
+34. GDN vs DV360 comparison
+   URL: https://improvado.io/blog/gdn-vs-dv360-ad-platform-comparison
+
+35. Display marketing guide
+   URL: https://www.m3.agency/news-insights/ultimate-guide-to-display-marketing-gdn-vs-dsps
+
+
+================================================================================
+PROGRAMMATIC
+================================================================================
+
+36. What is programmatic advertising
+   URL: https://agencyanalytics.com/blog/what-is-programmatic-advertising
+
+37. The Trade Desk guide
+   URL: https://improvado.io/blog/the-trade-desk-guide
+
+
+================================================================================
+ANALYTICS
+================================================================================
+
+38. Looker vs Tableau vs Power BI
+   URL: https://improvado.io/blog/looker-vs-tableau-vs-power-bi
+
+39. Adobe Analytics guide
+   URL: https://improvado.io/blog/adobe-analytics
+
+
+================================================================================
+VISUALIZATION
+================================================================================
+
+40. Data visualization techniques
+   URL: https://improvado.io/blog/marketing-data-visualization-techniques
+
+41. Data visualization guide
+   URL: https://blog.coupler.io/data-visualization-guide/
+
+
+================================================================================
+CASE STUDY
+================================================================================
+
+42. Shopee case study
+   URL: https://supermetrics.com/customers/shopee
+
+43. VodafoneZiggo case study
+   URL: https://supermetrics.com/customers/vodafoneziggo
+
+44. Pattrns case study
+   URL: https://supermetrics.com/customers/pattrns
+
+45. Orange Line case study
+   URL: https://supermetrics.com/customers/orange-line
+
+
+================================================================================
+INGESTION INSTRUCTIONS
+================================================================================
+
+1. Start Streamlit app: streamlit run streamlit_apps/app.py
+2. Navigate to 'Knowledge Base' page
+3. For each URL above:
+   a. Copy the URL
+   b. Paste in the URL input field
+   c. Click 'Learn from URL'
+   d. Wait for extraction (30-60 seconds)
+   e. Check quality score (aim for 70+)
+   f. Move to next URL
+
+Estimated Time: 90-120 minutes for all 46 sources
+Average per source: 2-3 minutes
+
+================================================================================

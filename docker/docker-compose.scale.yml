@@ -1,0 +1,117 @@
+# docker-compose.scale.yml
+# Production configuration with horizontal scaling
+
+version: '3.8'
+
+services:
+  # Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: pca-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - frontend
+    restart: always
+    networks:
+      - pca-network
+
+  # API Service (scalable)
+  api:
+    image: ${REGISTRY:-ghcr.io}/pca-agent-api:${VERSION:-latest}
+    deploy:
+      mode: replicated
+      replicas: 3
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    environment:
+      - ENV=production
+      - DATABASE_URL=postgresql://pca:${DB_PASSWORD}@db:5432/pca
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - pca-network
+
+  # Frontend Service (scalable)
+  frontend:
+    image: ${REGISTRY:-ghcr.io}/pca-agent-frontend:${VERSION:-latest}
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      - NEXT_PUBLIC_API_URL=https://pca-agent.example.com/api/v1
+    networks:
+      - pca-network
+
+  # Database (single instance with replication in production)
+  db:
+    image: postgres:15-alpine
+    container_name: pca-db
+    environment:
+      - POSTGRES_USER=pca
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=pca
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+    networks:
+      - pca-network
+
+  # Redis (for caching and sessions)
+  redis:
+    image: redis:7-alpine
+    container_name: pca-redis
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - pca-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+
+networks:
+  pca-network:
+    driver: overlay
+    attachable: true

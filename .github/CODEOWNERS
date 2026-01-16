@@ -1,0 +1,16 @@
+# Default owners for everything
+* @your-username
+
+# Security-sensitive files
+/src/enterprise/auth.py @security-team
+/src/api/middleware/ @security-team
+/.github/workflows/ @devops-team
+
+# Core AI/ML components
+/src/agents/ @ml-team
+/src/knowledge/ @ml-team
+/src/predictive/ @ml-team
+
+# Infrastructure
+/Dockerfile @devops-team
+/docker-compose*.yml @devops-team

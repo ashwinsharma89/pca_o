@@ -1,0 +1,26 @@
+{
+  "data_source": "csv",
+  "data_path": "data/campaign_data.csv",
+  "schedule": {
+    "daily_report_time": "09:00",
+    "weekly_report_day": "Monday",
+    "weekly_report_time": "10:00"
+  },
+  "alerts": {
+    "budget_threshold": 0.8,
+    "performance_threshold": {
+      "min_roas": 2.0,
+      "max_cpa": 50.0,
+      "min_ctr": 1.0,
+      "min_conversion_rate": 2.0
+    }
+  },
+  "notifications": {
+    "email_enabled": false,
+    "email_recipients": ["team@company.com"],
+    "slack_enabled": false,
+    "slack_webhook": ""
+  },
+  "report_formats": ["json", "csv", "excel"],
+  "retention_days": 90
+}

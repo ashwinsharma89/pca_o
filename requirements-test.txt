@@ -1,0 +1,43 @@
+# Testing Requirements for PCA Agent
+
+# Core testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
+pytest-asyncio>=0.21.1
+pytest-timeout>=2.1.0
+pytest-xdist>=3.3.1  # Parallel test execution
+
+# Coverage reporting
+coverage>=7.3.0
+coverage[toml]>=7.3.0
+
+# Test data generation
+Faker>=19.3.1
+factory-boy>=3.3.0
+
+# Performance testing
+pytest-benchmark>=4.0.0
+
+# Mocking and fixtures
+responses>=0.23.3
+freezegun>=1.2.2  # Time mocking
+
+# Assertion helpers
+pytest-check>=2.2.2
+assertpy>=1.1
+
+# Test reporting
+pytest-html>=3.2.0
+pytest-json-report>=1.5.0
+
+# Code quality
+flake8>=6.1.0
+black>=23.7.0
+isort>=5.12.0
+mypy>=1.5.0
+pylint>=2.17.5
+
+# Security testing
+bandit>=1.7.5
+safety>=2.3.5

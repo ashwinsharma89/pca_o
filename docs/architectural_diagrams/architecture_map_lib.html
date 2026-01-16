@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+.markmap-dark {
+  background: #27272a;
+  color: white;
+}
+</style>
+
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js"></script><script>((getMarkmap, getOptions, root2, jsonOptions) => {
+              const markmap = getMarkmap();
+              window.mm = markmap.Markmap.create(
+                "svg#mindmap",
+                (getOptions || markmap.deriveOptions)(jsonOptions),
+                root2
+              );
+              if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.classList.add("markmap-dark");
+              }
+            })(() => window.markmap,null,{"content":"PCA Agent Architecture","children":[{"content":"Interface Layer","children":[{"content":"<strong>Frontend</strong>","children":[{"content":"Next.js App","children":[],"payload":{"tag":"li","lines":"4,5"}},{"content":"Components: ChatInterface, InsightCard","children":[],"payload":{"tag":"li","lines":"5,6"}}],"payload":{"tag":"li","lines":"3,6"}},{"content":"<strong>API Gateway (FastAPI)</strong>","children":[{"content":"Authentication (JWT)","children":[],"payload":{"tag":"li","lines":"7,8"}},{"content":"Rate Limiting","children":[],"payload":{"tag":"li","lines":"8,9"}},{"content":"Error Handling (Structured)","children":[],"payload":{"tag":"li","lines":"9,10"}},{"content":"OpenTelemetry","children":[],"payload":{"tag":"li","lines":"10,12"}}],"payload":{"tag":"li","lines":"6,12"}}],"payload":{"tag":"h2","lines":"2,3"}},{"content":"Orchestration Engine","children":[{"content":"<strong>Query Orchestrator</strong>","children":[{"content":"Intent Detection","children":[],"payload":{"tag":"li","lines":"14,15"}},{"content":"Ambiguity Check (<code>_needs_interpretation</code>)","children":[],"payload":{"tag":"li","lines":"15,16"}},{"content":"Direct Execution vs. specific Interpretation","children":[],"payload":{"tag":"li","lines":"16,17"}}],"payload":{"tag":"li","lines":"13,17"}},{"content":"<strong>Multi-Agent Orchestrator</strong>","children":[{"content":"Task Decomposition","children":[],"payload":{"tag":"li","lines":"18,19"}},{"content":"Agent Routing","children":[],"payload":{"tag":"li","lines":"19,21"}}],"payload":{"tag":"li","lines":"17,21"}}],"payload":{"tag":"h2","lines":"12,13"}},{"content":"Agent Layer","children":[{"content":"<strong>Core Agents</strong>","children":[{"content":"Reasoning Agent","children":[],"payload":{"tag":"li","lines":"23,24"}},{"content":"Visualization Agent","children":[],"payload":{"tag":"li","lines":"24,25"}},{"content":"B2B Specialist Agent","children":[],"payload":{"tag":"li","lines":"25,26"}},{"content":"Vision Agent","children":[],"payload":{"tag":"li","lines":"26,27"}}],"payload":{"tag":"li","lines":"22,27"}},{"content":"<strong>Capabilities</strong>","children":[{"content":"RAG (Knowledge Graph)","children":[],"payload":{"tag":"li","lines":"28,29"}},{"content":"Data Analysis (Pandas/SQL)","children":[],"payload":{"tag":"li","lines":"29,30"}},{"content":"Chart Generation","children":[],"payload":{"tag":"li","lines":"30,32"}}],"payload":{"tag":"li","lines":"27,32"}}],"payload":{"tag":"h2","lines":"21,22"}},{"content":"Data Layer","children":[{"content":"<strong>Knowledge Base</strong>","children":[{"content":"Neo4j / Graph","children":[],"payload":{"tag":"li","lines":"34,35"}},{"content":"Vector Store","children":[],"payload":{"tag":"li","lines":"35,36"}}],"payload":{"tag":"li","lines":"33,36"}},{"content":"<strong>Operational Data</strong>","children":[{"content":"Analytics DB","children":[],"payload":{"tag":"li","lines":"37,38"}},{"content":"Application State","children":[],"payload":{"tag":"li","lines":"38,39"}}],"payload":{"tag":"li","lines":"36,39"}}],"payload":{"tag":"h2","lines":"32,33"}}],"payload":{"tag":"h1","lines":"0,1"}},null)</script>
+</body>
+</html>

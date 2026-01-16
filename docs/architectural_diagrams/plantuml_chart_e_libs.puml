@@ -1,0 +1,52 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+
+title Chart E: Library Stack (Dependency Flow)
+
+package "Frontend Layer" {
+    component "Next.js 14" as Next
+    component "TailwindCSS" as Tail
+    component "Recharts" as Viz
+}
+
+package "API Layer" {
+    component "FastAPI" as API
+    component "Pydantic" as Pyd
+    component "Uvicorn" as Uvi
+}
+
+package "Orchestration Layer" {
+    component "LangGraph" as Graph
+    component "LangChain" as Chain
+    component "Loguru" as Log
+}
+
+package "Intelligence Layer" {
+    component "OpenAI SDK" as GPT
+    component "Anthropic SDK" as Claude
+}
+
+package "Data Layer" {
+    component "Neo4j Driver" as Neo
+    component "SQLAlchemy" as SQL
+}
+
+Tail --> Next
+Viz --> Next
+Next --> API
+
+Pyd --> API
+Uvi --> API
+
+API --> Graph
+Graph --> Chain
+Graph --> Log
+
+Chain --> GPT
+Chain --> Claude
+
+Graph --> Neo
+Graph --> SQL
+
+@enduml

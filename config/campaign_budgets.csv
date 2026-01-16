@@ -1,0 +1,6 @@
+campaign_id,campaign_name,total_budget,start_date,end_date,daily_budget,alert_threshold
+CAMP001,Q4 Brand Campaign,50000,2024-10-01,2024-12-31,543.48,0.8
+CAMP002,Holiday Sales Push,75000,2024-11-15,2024-12-25,1875.00,0.85
+CAMP003,Product Launch,30000,2024-12-01,2024-12-31,967.74,0.75
+CAMP004,Retargeting Campaign,15000,2024-11-01,2024-12-31,245.90,0.9
+CAMP005,Lead Generation,40000,2024-10-15,2024-12-31,512.82,0.8

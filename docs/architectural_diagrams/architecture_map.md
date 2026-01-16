@@ -1,0 +1,39 @@
+# PCA Agent Architecture
+
+## Interface Layer
+- **Frontend**
+  - Next.js App
+  - Components: ChatInterface, InsightCard
+- **API Gateway (FastAPI)**
+  - Authentication (JWT)
+  - Rate Limiting
+  - Error Handling (Structured)
+  - OpenTelemetry
+
+## Orchestration Engine
+- **Query Orchestrator**
+  - Intent Detection
+  - Ambiguity Check (`_needs_interpretation`)
+  - Direct Execution vs. specific Interpretation
+- **Multi-Agent Orchestrator**
+  - Task Decomposition
+  - Agent Routing
+
+## Agent Layer
+- **Core Agents**
+  - Reasoning Agent
+  - Visualization Agent
+  - B2B Specialist Agent
+  - Vision Agent
+- **Capabilities**
+  - RAG (Knowledge Graph)
+  - Data Analysis (Pandas/SQL)
+  - Chart Generation
+
+## Data Layer
+- **Knowledge Base**
+  - Neo4j / Graph
+  - Vector Store
+- **Operational Data**
+  - Analytics DB
+  - Application State

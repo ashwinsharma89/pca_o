@@ -1,0 +1,99 @@
+name: CD Pipeline (No Docker)
+
+on:
+  push:
+    branches: [main, feature/rag-executive-insights]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  build:
+    name: Build Python Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: pip install build wheel
+
+      - name: Build package
+        run: python -m build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package
+          path: dist/
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.pca-agent.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package
+          path: dist/
+
+      - name: Deploy to staging server
+        env:
+          DEPLOY_HOST: ${{ secrets.STAGING_HOST }}
+          DEPLOY_USER: ${{ secrets.STAGING_USER }}
+          DEPLOY_KEY: ${{ secrets.STAGING_SSH_KEY }}
+        run: |
+          echo "Deploying to staging..."
+          # Option 1: Deploy to VM via SSH
+          # mkdir -p ~/.ssh
+          # echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          # chmod 600 ~/.ssh/deploy_key
+          # scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no dist/*.whl $DEPLOY_USER@$DEPLOY_HOST:/app/
+          # ssh -i ~/.ssh/deploy_key $DEPLOY_USER@$DEPLOY_HOST "cd /app && pip install *.whl --force-reinstall && systemctl restart pca-agent"
+          
+          # Option 2: Deploy to Azure App Service
+          # az webapp deployment source config-zip -g myResourceGroup -n myAppName --src dist/
+          
+          # Option 3: Deploy to AWS Elastic Beanstalk
+          # eb deploy staging-environment
+          
+          echo "Staging deployment placeholder - configure your deployment target"
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    if: github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://pca-agent.example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package
+          path: dist/
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production..."
+          echo "Production deployment placeholder - configure your deployment target"

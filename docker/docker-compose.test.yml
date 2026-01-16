@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Ephemeral PostgreSQL for testing
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: pca-postgres-test-ephemeral
+    environment:
+      - POSTGRES_USER=pca_test
+      - POSTGRES_PASSWORD=pca_test_password
+      - POSTGRES_DB=pca_test_db
+    ports:
+      - "5434:5432" # Distinct port from dev (5432) and temp local (5433)
+    tmpfs:
+      - /var/lib/postgresql/data # Run in memory for speed and auto-cleanup
+    command:
+      - "postgres"
+      - "-c"
+      - "fsync=off" # Optimize for test speed
+      - "-c"
+      - "full_page_writes=off"
+      - "-c"
+      - "synchronous_commit=off"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pca_test -d pca_test_db" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+  # Ephemeral Redis for testing
+  redis-test:
+    image: redis:7-alpine
+    container_name: pca-redis-test-ephemeral
+    ports:
+      - "6380:6379" # Distinct port from dev (6379)
+    tmpfs:
+      - /data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 10

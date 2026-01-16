@@ -1,0 +1,88 @@
+## Datadog Agent Configuration
+
+# API Key (required)
+api_key: ${DATADOG_API_KEY}
+
+# Site (optional, defaults to datadoghq.com)
+site: datadoghq.com
+
+# Hostname (optional, defaults to auto-detection)
+hostname: pca-agent
+
+# Tags (optional)
+tags:
+  - env:${ENVIRONMENT}
+  - service:pca-agent
+  - version:${APP_VERSION}
+
+# APM Configuration
+apm_config:
+  enabled: true
+  env: ${ENVIRONMENT}
+  
+  # APM endpoint
+  apm_dd_url: https://trace.agent.datadoghq.com
+  
+  # Additional configuration
+  analyzed_spans:
+    pca-agent|http.request: 1.0
+  
+  # Filter sensitive data
+  obfuscation:
+    http:
+      remove_query_string: true
+      remove_paths_with_digits: false
+    
+    # Obfuscate SQL queries
+    sql_exec_plan:
+      enabled: true
+      max_entries: 5000
+    
+    # Obfuscate Redis commands
+    redis:
+      enabled: true
+
+# Logs Configuration
+logs_enabled: true
+logs_config:
+  container_collect_all: true
+  
+  # Log processing rules
+  processing_rules:
+    - type: exclude_at_match
+      name: exclude_healthcheck
+      pattern: /health
+    
+    - type: mask_sequences
+      name: mask_api_keys
+      pattern: api[_-]?key["\s:=]+([a-zA-Z0-9_-]{20,})
+      replace_placeholder: "***REDACTED***"
+
+# Process and Network Monitoring
+process_config:
+  enabled: true
+
+network_config:
+  enabled: true
+  
+system_probe_config:
+  enabled: true
+
+# Integrations
+integrations:
+  # PostgreSQL
+  postgres:
+    - host: localhost
+      port: 5432
+      username: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      dbname: ${POSTGRES_DB}
+      tags:
+        - db:pca-agent
+  
+  # Redis
+  redis:
+    - host: localhost
+      port: 6379
+      tags:
+        - cache:pca-agent

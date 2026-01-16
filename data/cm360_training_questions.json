@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "question": "What is the total media cost across all campaigns?",
+    "category": "basic_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Media_Cost) as total_media_cost FROM campaigns"
+  },
+  {
+    "id": 2,
+    "question": "Which campaign has the highest ROAS?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Revenue) / SUM(Media_Cost)) as roas FROM campaigns GROUP BY Campaign_Name ORDER BY roas DESC LIMIT 1"
+  },
+  {
+    "id": 3,
+    "question": "Show average CTR by ad type",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Ad_Type, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Ad_Type ORDER BY ctr DESC"
+  },
+  {
+    "id": 4,
+    "question": "What is the total conversions from video ads?",
+    "category": "filtered_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Total_Conversions) as total_conversions FROM campaigns WHERE Ad_Type = 'Video'"
+  },
+  {
+    "id": 5,
+    "question": "Compare post-click vs post-view conversions",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT SUM(Post_Click_Conversions) as post_click, SUM(Post_View_Conversions) as post_view FROM campaigns"
+  },
+  {
+    "id": 6,
+    "question": "Which placement has the best conversion rate?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Placement_Name, (SUM(Total_Conversions) * 100.0 / SUM(Clicks)) as conv_rate FROM campaigns GROUP BY Placement_Name ORDER BY conv_rate DESC LIMIT 1"
+  },
+  {
+    "id": 7,
+    "question": "Show daily conversion trend for the last 30 days",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Date, SUM(Total_Conversions) as daily_conversions FROM campaigns WHERE CAST(Date AS DATE) >= CURRENT_DATE - INTERVAL '30 days' GROUP BY Date ORDER BY Date"
+  },
+  {
+    "id": 8,
+    "question": "What is the viewability rate by environment?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, AVG(Viewability_Rate) as avg_viewability FROM campaigns GROUP BY Environment ORDER BY avg_viewability DESC"
+  },
+  {
+    "id": 9,
+    "question": "Which site has the highest CTR?",
+    "category": "performance_ranking",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Site_Name, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Site_Name ORDER BY ctr DESC LIMIT 1"
+  },
+  {
+    "id": 10,
+    "question": "Show top 5 campaigns by total revenue",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Revenue) as total_revenue FROM campaigns GROUP BY Campaign_Name ORDER BY total_revenue DESC LIMIT 5"
+  },
+  {
+    "id": 11,
+    "question": "What is the CPA by ad type?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Type, (SUM(Media_Cost) / SUM(Total_Conversions)) as cpa FROM campaigns GROUP BY Ad_Type ORDER BY cpa"
+  },
+  {
+    "id": 12,
+    "question": "Compare desktop vs mobile performance by ROAS",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, (SUM(Revenue) / SUM(Media_Cost)) as roas FROM campaigns GROUP BY Environment ORDER BY roas DESC"
+  },
+  {
+    "id": 13,
+    "question": "Which ad type has the highest viewable impressions?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Ad_Type, SUM(Viewable_Impressions) as total_viewable FROM campaigns GROUP BY Ad_Type ORDER BY total_viewable DESC LIMIT 1"
+  },
+  {
+    "id": 14,
+    "question": "Show weekly media cost trend",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as week, SUM(Media_Cost) as weekly_cost FROM campaigns GROUP BY week ORDER BY week"
+  },
+  {
+    "id": 15,
+    "question": "What is the click-through conversion rate by campaign?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Click_Through_Conversions) * 100.0 / SUM(Clicks)) as ct_conv_rate FROM campaigns GROUP BY Campaign_Name ORDER BY ct_conv_rate DESC"
+  },
+  {
+    "id": 16,
+    "question": "Which campaigns have viewability rate above 85%?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT DISTINCT Campaign_Name FROM campaigns WHERE Viewability_Rate > 85"
+  },
+  {
+    "id": 17,
+    "question": "Show total impressions by ad type and environment",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Type, Environment, SUM(Impressions) as total_impressions FROM campaigns GROUP BY Ad_Type, Environment ORDER BY total_impressions DESC"
+  },
+  {
+    "id": 18,
+    "question": "What is the average time in view by site?",
+    "category": "engagement_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Site_Name, AVG(Active_View_Avg_Time_Seconds) as avg_time_in_view FROM campaigns GROUP BY Site_Name ORDER BY avg_time_in_view DESC"
+  },
+  {
+    "id": 19,
+    "question": "Compare display vs video ads by conversion rate",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Type, (SUM(Total_Conversions) * 100.0 / SUM(Clicks)) as conv_rate FROM campaigns WHERE Ad_Type IN ('Display', 'Video') GROUP BY Ad_Type"
+  },
+  {
+    "id": 20,
+    "question": "What is the view-through conversion rate by placement?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Placement_Name, (SUM(View_Through_Conversions) * 100.0 / SUM(Impressions)) as vt_conv_rate FROM campaigns GROUP BY Placement_Name ORDER BY vt_conv_rate DESC"
+  },
+  {
+    "id": 21,
+    "question": "Show campaigns with CTR above 2.5%",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Campaign_Name HAVING (SUM(Clicks) * 100.0 / SUM(Impressions)) > 2.5"
+  },
+  {
+    "id": 22,
+    "question": "What is the CPM by ad type?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Type, (SUM(Media_Cost) / SUM(Impressions) * 1000) as cpm FROM campaigns GROUP BY Ad_Type ORDER BY cpm"
+  },
+  {
+    "id": 23,
+    "question": "Which environment generates the most conversions?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Environment, SUM(Total_Conversions) as total_conversions FROM campaigns GROUP BY Environment ORDER BY total_conversions DESC LIMIT 1"
+  },
+  {
+    "id": 24,
+    "question": "Show month-over-month clicks trend",
+    "category": "time_series",
+    "difficulty": "hard",
+    "expected_sql": "SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as month, SUM(Clicks) as monthly_clicks FROM campaigns GROUP BY month ORDER BY month"
+  },
+  {
+    "id": 25,
+    "question": "What is the post-click to post-view conversion ratio?",
+    "category": "comparative_analysis",
+    "difficulty": "hard",
+    "expected_sql": "SELECT (SUM(Post_Click_Conversions) * 1.0 / SUM(Post_View_Conversions)) as pc_to_pv_ratio FROM campaigns"
+  },
+  {
+    "id": 26,
+    "question": "Compare active view metrics by ad type",
+    "category": "engagement_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Ad_Type, SUM(Active_View_Viewable_Impressions) as viewable, SUM(Active_View_Measurable_Impressions) as measurable FROM campaigns GROUP BY Ad_Type"
+  },
+  {
+    "id": 27,
+    "question": "Which placements have the lowest CPC?",
+    "category": "efficiency_metrics",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Placement_Name, (SUM(Media_Cost) / SUM(Clicks)) as cpc FROM campaigns GROUP BY Placement_Name ORDER BY cpc LIMIT 5"
+  },
+  {
+    "id": 28,
+    "question": "Show total revenue by site",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Site_Name, SUM(Revenue) as total_revenue FROM campaigns GROUP BY Site_Name ORDER BY total_revenue DESC"
+  },
+  {
+    "id": 29,
+    "question": "What is the measurable impression rate by environment?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, (SUM(Measurable_Impressions) * 100.0 / SUM(Impressions)) as measurable_rate FROM campaigns GROUP BY Environment"
+  },
+  {
+    "id": 30,
+    "question": "Show campaigns where media cost exceeds $50,000",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign_Name, SUM(Media_Cost) as total_cost FROM campaigns GROUP BY Campaign_Name HAVING SUM(Media_Cost) > 50000 ORDER BY total_cost DESC"
+  }
+]

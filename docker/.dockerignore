@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+coverage.xml
+.mypy_cache/
+.venv/
+venv/
+ENV/
+env/
+
+# Tests & Docs
+tests/
+docs/
+*.md
+walkthrough.md
+implementation_plan.md
+task.md
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Data & Backups
+data/*.db
+data/*.csv
+data/*.xlsx
+data/*.json
+data/*.pkl
+backups/
+logs/
+*.db
+*.csv
+*.xlsx
+
+# Environment
+.env
+.env.example
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore

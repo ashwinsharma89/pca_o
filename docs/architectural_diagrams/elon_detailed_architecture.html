@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+.markmap-dark {
+  background: #27272a;
+  color: white;
+}
+</style>
+
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js"></script><script>((getMarkmap, getOptions, root2, jsonOptions) => {
+              const markmap = getMarkmap();
+              window.mm = markmap.Markmap.create(
+                "svg#mindmap",
+                (getOptions || markmap.deriveOptions)(jsonOptions),
+                root2
+              );
+              if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.classList.add("markmap-dark");
+              }
+            })(() => window.markmap,null,{"content":"PCA Agent: The Machine","children":[{"content":"1. The Neural Network (Agents)","children":[{"content":"Capabilities","children":[{"content":"<strong>Core Intelligence</strong>","children":[{"content":"<code>RouterAgent</code> (The Gatekeeper)","children":[{"content":"<em>Logic</em>: Keywords &#x2192; Specialist","children":[],"payload":{"tag":"li","lines":"7,8"}}],"payload":{"tag":"li","lines":"6,8"}},{"content":"<code>EnhancedReasoningAgent</code> (The Cortex)","children":[{"content":"<em>Logic</em>: Pattern Detection","children":[],"payload":{"tag":"li","lines":"9,10"}}],"payload":{"tag":"li","lines":"8,10"}},{"content":"<code>SynthesizerAgent</code> (The Voice)","children":[{"content":"<em>Logic</em>: Optimization &amp; Compression","children":[],"payload":{"tag":"li","lines":"11,12"}}],"payload":{"tag":"li","lines":"10,12"}}],"payload":{"tag":"li","lines":"5,12"}},{"content":"<strong>Specialized Neurons</strong>","children":[{"content":"<code>VisionAgent</code> (Visual Cortex)","children":[{"content":"<em>Input</em>: Images/Screenshots","children":[],"payload":{"tag":"li","lines":"14,15"}},{"content":"<em>Ops</em>: OCR, Platform Detection","children":[],"payload":{"tag":"li","lines":"15,16"}}],"payload":{"tag":"li","lines":"13,16"}},{"content":"<code>ExtractionAgent</code> (Data Ingestion)","children":[],"payload":{"tag":"li","lines":"16,17"}},{"content":"<code>VisualizationAgent</code> (Visual Output)","children":[],"payload":{"tag":"li","lines":"17,18"}}],"payload":{"tag":"li","lines":"12,18"}},{"content":"<strong>Channel Specialists</strong>","children":[{"content":"<code>SearchChannelAgent</code> (Google/Bing)","children":[],"payload":{"tag":"li","lines":"19,20"}},{"content":"<code>SocialChannelAgent</code> (Meta/LinkedIn)","children":[],"payload":{"tag":"li","lines":"20,21"}},{"content":"<code>ProgrammaticAgent</code> (DV360)","children":[],"payload":{"tag":"li","lines":"21,23"}}],"payload":{"tag":"li","lines":"18,23"}}],"payload":{"tag":"h3","lines":"4,5"}}],"payload":{"tag":"h2","lines":"3,4"}},{"content":"2. The Algorithm (Workflow)","children":[{"content":"<strong>Input Vector</strong>: User Query + Campaign Data","children":[],"payload":{"tag":"li","lines":"24,25"}},{"content":"<strong>Step 1: Routing</strong>","children":[{"content":"If <code>budget/spend</code> &#x2192; <code>BudgetAnalyzer</code>","children":[],"payload":{"tag":"li","lines":"26,27"}},{"content":"If <code>creative</code> &#x2192; <code>CreativeAnalyzer</code>","children":[],"payload":{"tag":"li","lines":"27,28"}},{"content":"Else &#x2192; <code>GeneralAnalyzer</code>","children":[],"payload":{"tag":"li","lines":"28,29"}}],"payload":{"tag":"li","lines":"25,29"}},{"content":"<strong>Step 2: Analysis (Compute)</strong>","children":[{"content":"Calculate Metrics (CTR, CPC, ROAS)","children":[],"payload":{"tag":"li","lines":"30,31"}},{"content":"Identify Anomalies","children":[],"payload":{"tag":"li","lines":"31,32"}}],"payload":{"tag":"li","lines":"29,32"}},{"content":"<strong>Step 3: Recommendation (Optimization)</strong>","children":[{"content":"Generate Actionable Insights","children":[],"payload":{"tag":"li","lines":"33,34"}},{"content":"<em>Goal</em>: Maximizing Utility","children":[],"payload":{"tag":"li","lines":"34,35"}}],"payload":{"tag":"li","lines":"32,35"}},{"content":"<strong>Step 4: Synthesis</strong>","children":[{"content":"Aggregate Results + Recommendations","children":[],"payload":{"tag":"li","lines":"36,37"}},{"content":"Filter by Confidence (&gt;0.85)","children":[],"payload":{"tag":"li","lines":"37,39"}}],"payload":{"tag":"li","lines":"35,39"}}],"payload":{"tag":"h2","lines":"23,24"}},{"content":"3. Responsibility Matrix (Swimlane Logic)","children":[{"content":"<strong>Orchestrator Lane</strong>","children":[{"content":"<code>Router</code>: Directs traffic","children":[],"payload":{"tag":"li","lines":"41,42"}},{"content":"<code>Monitor</code>: Tracks state &amp; errors","children":[],"payload":{"tag":"li","lines":"42,43"}}],"payload":{"tag":"li","lines":"40,43"}},{"content":"<strong>Analysis Lane</strong>","children":[{"content":"<code>Specialists</code>: Execute platform logic","children":[],"payload":{"tag":"li","lines":"44,45"}},{"content":"<code>Analyzers</code>: Crunch numbers","children":[],"payload":{"tag":"li","lines":"45,46"}}],"payload":{"tag":"li","lines":"43,46"}},{"content":"<strong>Output Lane</strong>","children":[{"content":"<code>Recommender</code>: Strategy generation","children":[],"payload":{"tag":"li","lines":"47,48"}},{"content":"<code>Synthesizer</code>: Final report assembly","children":[],"payload":{"tag":"li","lines":"48,49"}},{"content":"<code>Reporter</code>: PPTX Generation","children":[],"payload":{"tag":"li","lines":"49,51"}}],"payload":{"tag":"li","lines":"46,51"}}],"payload":{"tag":"h2","lines":"39,40"}},{"content":"4. System Architecture (The Hardware)","children":[{"content":"<strong>Visual Cortex (Frontend)</strong>","children":[{"content":"Next.js (React)","children":[],"payload":{"tag":"li","lines":"53,54"}},{"content":"<code>ChatInterface</code>","children":[],"payload":{"tag":"li","lines":"54,55"}}],"payload":{"tag":"li","lines":"52,55"}},{"content":"<strong>Nervous System (API)</strong>","children":[{"content":"FastAPI Gateway","children":[],"payload":{"tag":"li","lines":"56,57"}},{"content":"Rate Limiting (Protection)","children":[],"payload":{"tag":"li","lines":"57,58"}},{"content":"Auth (Security)","children":[],"payload":{"tag":"li","lines":"58,59"}}],"payload":{"tag":"li","lines":"55,59"}},{"content":"<strong>Brain Stem (Engine)</strong>","children":[{"content":"Multi-Agent Orchestrator","children":[],"payload":{"tag":"li","lines":"60,61"}},{"content":"LangGraph (State Mgmt)","children":[],"payload":{"tag":"li","lines":"61,62"}}],"payload":{"tag":"li","lines":"59,62"}},{"content":"<strong>Hippocampus (Memory)</strong>","children":[{"content":"Neo4j (Graph Knowledge)","children":[],"payload":{"tag":"li","lines":"63,64"}},{"content":"Postgres (Analytics Data)","children":[],"payload":{"tag":"li","lines":"64,65"}},{"content":"Vector Store (Embeddings)","children":[],"payload":{"tag":"li","lines":"65,67"}}],"payload":{"tag":"li","lines":"62,67"}}],"payload":{"tag":"h2","lines":"51,52"}},{"content":"5. Data Vector Flow","children":[{"content":"<strong>Input</strong>: User Query","children":[],"payload":{"tag":"li","lines":"68,69"}},{"content":"<strong>Transform</strong>:","children":[{"content":"<code>API</code> &#x2192; <code>Orchestrator</code>","children":[],"payload":{"tag":"li","lines":"70,71"}},{"content":"<code>Orchestrator</code> &#x2192; <code>Agent</code>","children":[],"payload":{"tag":"li","lines":"71,72"}},{"content":"<code>Agent</code> &#x2192; <code>Tool</code> (DB/Graph)","children":[],"payload":{"tag":"li","lines":"72,73"}}],"payload":{"tag":"li","lines":"69,73"}},{"content":"<strong>Output</strong>:","children":[{"content":"<code>Tool</code> &#x2192; <code>Agent</code> &#x2192; <code>Synthesizer</code> &#x2192; <code>JSON Response</code>","children":[],"payload":{"tag":"li","lines":"74,75"}}],"payload":{"tag":"li","lines":"73,75"}}],"payload":{"tag":"h2","lines":"67,68"}}],"payload":{"tag":"h1","lines":"0,1"}},null)</script>
+</body>
+</html>

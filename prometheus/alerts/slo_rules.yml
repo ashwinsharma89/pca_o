@@ -1,0 +1,119 @@
+# SLO (Service Level Objective) Recording Rules for PCA Agent
+# These rules calculate SLI metrics for tracking against SLO targets
+
+groups:
+  - name: slo_recording_rules
+    interval: 30s
+    rules:
+      # ================================================================
+      # SLO 1: Availability - Target 99.9% uptime
+      # ================================================================
+      
+      # Availability SLI - successful requests / total requests
+      - record: slo:api_availability:ratio
+        expr: |
+          sum(rate(pca_agent_http_responses_total{status!~"5.."}[5m]))
+          /
+          sum(rate(pca_agent_http_responses_total[5m]))
+      
+      # Error budget remaining (30-day window)
+      - record: slo:availability_error_budget:ratio
+        expr: |
+          1 - (
+            (1 - slo:api_availability:ratio) / (1 - 0.999)
+          )
+      
+      # ================================================================
+      # SLO 2: Latency - Target P95 < 1s
+      # ================================================================
+      
+      # P95 Latency SLI
+      - record: slo:api_latency_p95:seconds
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(pca_agent_api_response_time_bucket[5m])) by (le)
+          )
+      
+      # Latency SLI - requests under threshold / total requests
+      - record: slo:api_latency:ratio
+        expr: |
+          sum(rate(pca_agent_api_response_time_bucket{le="1.0"}[5m]))
+          /
+          sum(rate(pca_agent_api_response_time_count[5m]))
+      
+      # ================================================================
+      # SLO 3: Throughput - Baseline tracking
+      # ================================================================
+      
+      # Request rate per second
+      - record: slo:api_throughput:rate
+        expr: |
+          sum(rate(pca_agent_api_requests_total[5m]))
+
+  - name: slo_alerts
+    interval: 30s
+    rules:
+      # ================================================================
+      # SLO Burn Rate Alerts
+      # ================================================================
+      
+      # Fast burn - consuming 5% of monthly budget in 1 hour
+      - alert: SLOAvailabilityBurnRateCritical
+        expr: |
+          (
+            (1 - slo:api_availability:ratio) / (1 - 0.999)
+          ) > 14.4
+        for: 5m
+        labels:
+          severity: critical
+          slo: availability
+        annotations:
+          summary: "SLO Availability burn rate critical"
+          description: "Error budget consumption rate is {{ $value | humanize }}x normal - will exhaust monthly budget in < 2 hours"
+      
+      # Slow burn - consuming 2% of budget in 6 hours
+      - alert: SLOAvailabilityBurnRateWarning
+        expr: |
+          (
+            (1 - slo:api_availability:ratio) / (1 - 0.999)
+          ) > 6
+        for: 30m
+        labels:
+          severity: warning
+          slo: availability
+        annotations:
+          summary: "SLO Availability burn rate elevated"
+          description: "Error budget consumption rate is {{ $value | humanize }}x normal"
+      
+      # Error budget exhausted
+      - alert: SLOErrorBudgetExhausted
+        expr: slo:availability_error_budget:ratio < 0
+        for: 5m
+        labels:
+          severity: critical
+          slo: availability
+        annotations:
+          summary: "SLO error budget exhausted"
+          description: "Monthly error budget is exhausted - availability has dropped below 99.9% target"
+      
+      # Latency SLO violation
+      - alert: SLOLatencyViolation
+        expr: slo:api_latency_p95:seconds > 1
+        for: 10m
+        labels:
+          severity: warning
+          slo: latency
+        annotations:
+          summary: "SLO Latency target exceeded"
+          description: "P95 latency is {{ $value }}s (target: < 1s)"
+      
+      # Latency SLO critical - P95 > 3s
+      - alert: SLOLatencyCritical
+        expr: slo:api_latency_p95:seconds > 3
+        for: 5m
+        labels:
+          severity: critical
+          slo: latency
+        annotations:
+          summary: "SLO Latency critically exceeded"
+          description: "P95 latency is {{ $value }}s - significantly above 1s target"

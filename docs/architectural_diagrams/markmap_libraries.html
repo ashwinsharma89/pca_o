@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+.markmap-dark {
+  background: #27272a;
+  color: white;
+}
+</style>
+
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js"></script><script>((getMarkmap, getOptions, root2, jsonOptions) => {
+              const markmap = getMarkmap();
+              window.mm = markmap.Markmap.create(
+                "svg#mindmap",
+                (getOptions || markmap.deriveOptions)(jsonOptions),
+                root2
+              );
+              if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.classList.add("markmap-dark");
+              }
+            })(() => window.markmap,null,{"content":"&#x1f4da; Libraries &amp; Role (Order of Flow)","children":[{"content":"1. Frontend (Entry)","children":[{"content":"<strong>React 18</strong> (UI Library)","children":[],"payload":{"tag":"li","lines":"8,9"}},{"content":"<strong>Next.js 14</strong> (App Framework)","children":[],"payload":{"tag":"li","lines":"9,10"}},{"content":"<strong>TailwindCSS</strong> (Styling)","children":[],"payload":{"tag":"li","lines":"10,11"}},{"content":"<strong>Framer Motion</strong> (Animations)","children":[],"payload":{"tag":"li","lines":"11,12"}},{"content":"<strong>Recharts</strong> (Data Visualization)","children":[],"payload":{"tag":"li","lines":"12,13"}},{"content":"<strong>Lucide React</strong> (Icons)","children":[],"payload":{"tag":"li","lines":"13,14"}},{"content":"<strong>Axios / Fetch</strong> (HTTP Client)","children":[],"payload":{"tag":"li","lines":"14,16"}}],"payload":{"tag":"h2","lines":"7,8"}},{"content":"2. API Gateway (Ingress)","children":[{"content":"<strong>Uvicorn</strong> (ASGI Server)","children":[],"payload":{"tag":"li","lines":"17,18"}},{"content":"<strong>FastAPI</strong> (Web Framework)","children":[],"payload":{"tag":"li","lines":"18,19"}},{"content":"<strong>Pydantic</strong> (Data Validation)","children":[],"payload":{"tag":"li","lines":"19,20"}},{"content":"<strong>Python-Multipart</strong> (File Uploads)","children":[],"payload":{"tag":"li","lines":"20,21"}},{"content":"<strong>Starlette</strong> (Core ASGI)","children":[],"payload":{"tag":"li","lines":"21,23"}}],"payload":{"tag":"h2","lines":"16,17"}},{"content":"3. Orchestration (Control)","children":[{"content":"<strong>LangChain Core</strong> (LLM Interface)","children":[],"payload":{"tag":"li","lines":"24,25"}},{"content":"<strong>LangGraph</strong> (Workflow State Machine)","children":[],"payload":{"tag":"li","lines":"25,26"}},{"content":"<strong>Tenacity</strong> (Retries/Resilience)","children":[],"payload":{"tag":"li","lines":"26,27"}},{"content":"<strong>Loguru</strong> (Structured Logging)","children":[],"payload":{"tag":"li","lines":"27,29"}}],"payload":{"tag":"h2","lines":"23,24"}},{"content":"4. Intelligence (Processing)","children":[{"content":"<strong>OpenAI SDK</strong> (LLM Access - GPT-4)","children":[],"payload":{"tag":"li","lines":"30,31"}},{"content":"<strong>Anthropic SDK</strong> (LLM Access - Claude)","children":[],"payload":{"tag":"li","lines":"31,32"}},{"content":"<strong>NumPy</strong> (Math Operations)","children":[],"payload":{"tag":"li","lines":"32,33"}},{"content":"<strong>Pandas</strong> (Dataframes/Analysis)","children":[],"payload":{"tag":"li","lines":"33,35"}}],"payload":{"tag":"h2","lines":"29,30"}},{"content":"5. Data Access (Storage)","children":[{"content":"<strong>Neo4j Driver</strong> (Graph Database)","children":[],"payload":{"tag":"li","lines":"36,37"}},{"content":"<strong>DuckDB</strong> (OLAP SQL Database)","children":[],"payload":{"tag":"li","lines":"37,38"}},{"content":"<strong>SQLAlchemy</strong> (ORM)","children":[],"payload":{"tag":"li","lines":"38,39"}},{"content":"<strong>Pydantic Settings</strong> (Config Management)","children":[],"payload":{"tag":"li","lines":"39,40"}},{"content":"<strong>Redis</strong> (Caching - Optional)","children":[],"payload":{"tag":"li","lines":"40,42"}}],"payload":{"tag":"h2","lines":"35,36"}},{"content":"6. Testing &amp; Ops (Support)","children":[{"content":"<strong>Pytest</strong> (Testing)","children":[],"payload":{"tag":"li","lines":"43,44"}},{"content":"<strong>Docker</strong> (Containerization)","children":[],"payload":{"tag":"li","lines":"44,45"}},{"content":"<strong>Celery</strong> (Async Workers)","children":[],"payload":{"tag":"li","lines":"45,46"}}],"payload":{"tag":"h2","lines":"42,43"}}],"payload":{"tag":"h1","lines":"5,6"}},null)</script>
+</body>
+</html>

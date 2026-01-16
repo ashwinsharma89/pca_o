@@ -1,0 +1,68 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam roundCorner 10
+
+title Chart A: Architecture Swimlanes (Functional Topology)
+
+scale 1.5
+
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+
+title Chart A: Architecture Swimlanes (Functional Topology)
+
+package "1. Interface (The Skin)" {
+    actor "User/Director" as User
+    component "Next.js App\n(Visual Cortex)" as UI
+    component "API Gateway\n(Nervous System)" as API
+}
+
+package "2. Orchestration (The Brain Stem)" {
+    component "Router Agent\n(Gatekeeper)" as Router
+    component "LangGraph\n(State Machine)" as Graph
+    component "Synthesizer\n(Compression)" as Synth
+}
+
+package "3. Intelligence (The Neural Net)" {
+    component "Budget"
+    component "Creative"
+    component "Trend"
+    component "Google"
+    component "Meta"
+    component "LinkedIn"
+}
+
+package "4. Memory (The Hippocampus)" {
+    database "Neo4j\n(Knowledge Graph)" as Neo4j
+    database "Postgres\n(Analytics DB)" as SQL
+    database "Vector Store" as Vec
+}
+
+User -> UI : Query/Input
+UI -> API
+API -> Router : Request
+
+Router --> Graph
+Graph --> Budget
+Graph --> Creative
+Graph --> Trend
+Graph --> Google
+Graph --> Meta
+Graph --> LinkedIn
+
+Budget ..> SQL
+Creative ..> SQL
+Trend ..> SQL
+
+Google ..> Neo4j
+Meta ..> Neo4j
+LinkedIn ..> Neo4j
+LinkedIn ..> Vec
+
+Budget --> Synth
+Google --> Synth
+Synth -> API : Response
+
+@enduml

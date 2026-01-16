@@ -1,0 +1,93 @@
+# Alert rules for PCA Agent monitoring
+
+groups:
+  - name: agent_alerts
+    interval: 30s
+    rules:
+      # High fallback rate alert
+      - alert: HighAgentFallbackRate
+        expr: agent_fallback_rate > 20
+        for: 5m
+        labels:
+          severity: warning
+          component: agent
+        annotations:
+          summary: "High agent fallback rate detected"
+          description: "Agent {{ $labels.agent_name }} has a fallback rate of {{ $value }}% (threshold: 20%)"
+          
+      # Critical fallback rate
+      - alert: CriticalAgentFallbackRate
+        expr: agent_fallback_rate > 50
+        for: 2m
+        labels:
+          severity: critical
+          component: agent
+        annotations:
+          summary: "Critical agent fallback rate"
+          description: "Agent {{ $labels.agent_name }} has a fallback rate of {{ $value }}% (threshold: 50%)"
+      
+      # Low confidence scores
+      - alert: LowAgentConfidence
+        expr: agent_avg_confidence < 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: agent
+        annotations:
+          summary: "Low agent confidence scores"
+          description: "Agent {{ $labels.agent_name }} has average confidence of {{ $value }} (threshold: 0.5)"
+      
+      # Agent unhealthy
+      - alert: AgentUnhealthy
+        expr: agent_health_status == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: agent
+        annotations:
+          summary: "Agent is unhealthy"
+          description: "Agent {{ $labels.agent_name }} is in UNHEALTHY state"
+      
+      # Circuit breaker open
+      - alert: CircuitBreakerOpen
+        expr: circuit_breaker_state == 2
+        for: 5m
+        labels:
+          severity: warning
+          component: circuit_breaker
+        annotations:
+          summary: "Circuit breaker is OPEN"
+          description: "Circuit breaker for {{ $labels.service_name }} has been OPEN for 5 minutes"
+      
+      # High execution duration
+      - alert: HighAgentExecutionDuration
+        expr: histogram_quantile(0.95, sum(rate(agent_execution_duration_seconds_bucket[5m])) by (le, agent_name)) > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: agent
+        annotations:
+          summary: "High agent execution duration"
+          description: "Agent {{ $labels.agent_name }} p95 execution time is {{ $value }}s (threshold: 5s)"
+      
+      # No agent executions
+      - alert: NoAgentExecutions
+        expr: rate(agent_executions_total[5m]) == 0
+        for: 15m
+        labels:
+          severity: warning
+          component: agent
+        annotations:
+          summary: "No agent executions detected"
+          description: "Agent {{ $labels.agent_name }} has had no executions in the last 15 minutes"
+      
+      # High error rate
+      - alert: HighAgentErrorRate
+        expr: rate(agent_executions_total{status="error"}[5m]) / rate(agent_executions_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: agent
+        annotations:
+          summary: "High agent error rate"
+          description: "Agent {{ $labels.agent_name }} error rate is {{ $value | humanizePercentage }} (threshold: 10%)"

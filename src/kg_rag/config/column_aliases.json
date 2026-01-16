@@ -1,0 +1,625 @@
+{
+    "spend": {
+        "aliases": [
+            "cost",
+            "total_cost",
+            "amount_spent",
+            "media_cost",
+            "Total Spent",
+            "Amount Spent",
+            "Media Cost",
+            "Spend",
+            "spend",
+            "Cost",
+            "total spent",
+            "Total Cost",
+            "amount spent",
+            "Ad Spend",
+            "ad_spend",
+            "Total Cost"
+        ],
+        "type": "float",
+        "aggregation": "sum"
+    },
+    "impressions": {
+        "aliases": [
+            "impr",
+            "Impr.",
+            "Impressions",
+            "impressions",
+            "Total Impressions",
+            "Impr",
+            "imps",
+            "Show",
+            "shows",
+            "Billable Impressions"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "clicks": {
+        "aliases": [
+            "click",
+            "Clicks",
+            "clicks",
+            "Link Clicks",
+            "link_clicks",
+            "Outbound Clicks",
+            "outbound_clicks",
+            "Total Clicks",
+            "All Clicks",
+            "Swipe Ups",
+            "swipe_ups"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "conversions": {
+        "aliases": [
+            "conv",
+            "Conversions",
+            "conversions",
+            "Results",
+            "results",
+            "Leads",
+            "leads",
+            "orders",
+            "Purchases",
+            "purchases",
+            "Total Conversions",
+            "All Conv.",
+            "Actions",
+            "Form Fills",
+            "Orders"
+        ],
+        "type": "float",
+        "aggregation": "sum"
+    },
+    "revenue": {
+        "aliases": [
+            "conv_value",
+            "Conv. Value",
+            "Conversion Value",
+            "conversion_value",
+            "Value",
+            "value",
+            "Purchase Value",
+            "purchase_value",
+            "Revenue",
+            "Total Revenue",
+            "revenue",
+            "sales",
+            "Sales",
+            "Total Sales"
+        ],
+        "type": "float",
+        "aggregation": "sum"
+    },
+    "date": {
+        "aliases": [
+            "day",
+            "Day",
+            "Date",
+            "date",
+            "start_date",
+            "Start Date",
+            "report_date",
+            "Report Date",
+            "week_start",
+            "Week Start",
+            "date_start",
+            "Reporting Date",
+            "Start Time"
+        ],
+        "type": "date",
+        "aggregation": "none"
+    },
+    "campaign_id": {
+        "aliases": [
+            "Campaign ID",
+            "campaign_id",
+            "CampaignId",
+            "campaignId",
+            "Campaign Id",
+            "Order ID",
+            "order_id",
+            "Insertion Order ID"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "campaign_name": {
+        "aliases": [
+            "Campaign",
+            "campaign",
+            "Campaign Name",
+            "campaign_name",
+            "CampaignName",
+            "Campaign name",
+            "Order Name",
+            "order_name",
+            "Insertion Order"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "ad_group_id": {
+        "aliases": [
+            "Ad Group ID",
+            "ad_group_id",
+            "AdGroupId",
+            "adGroupId",
+            "Ad group Id",
+            "Ad Set ID",
+            "ad_set_id",
+            "Line Item ID",
+            "line_item_id"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "ad_group_name": {
+        "aliases": [
+            "Ad Group",
+            "ad_group",
+            "Ad Group Name",
+            "ad_group_name",
+            "AdGroupName",
+            "Ad group name",
+            "Ad Set Name",
+            "ad_set_name",
+            "Line Item",
+            "line_item"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "platform": {
+        "aliases": [
+            "Platform",
+            "platform",
+            "Source",
+            "source",
+            "Network",
+            "network",
+            "Channel",
+            "channel",
+            "Publisher"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "objective": {
+        "aliases": [
+            "Objective",
+            "objective",
+            "Campaign Objective",
+            "campaign_objective",
+            "Goal",
+            "goal",
+            "Objective Type",
+            "objective_type"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "status": {
+        "aliases": [
+            "Status",
+            "status",
+            "Campaign Status",
+            "campaign_status",
+            "State",
+            "state",
+            "Campaign state"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "budget": {
+        "aliases": [
+            "Budget",
+            "budget",
+            "Daily Budget",
+            "daily_budget",
+            "Lifetime Budget",
+            "lifetime_budget",
+            "Campaign Budget",
+            "Total Budget"
+        ],
+        "type": "float",
+        "aggregation": "sum"
+    },
+    "reach": {
+        "aliases": [
+            "Reach",
+            "reach",
+            "Unique Users",
+            "unique_users",
+            "Unique Reach",
+            "unique_reach"
+        ],
+        "type": "integer",
+        "aggregation": "max"
+    },
+    "frequency": {
+        "aliases": [
+            "Frequency",
+            "frequency",
+            "Avg Frequency",
+            "avg_frequency",
+            "Average Frequency"
+        ],
+        "type": "float",
+        "aggregation": "avg"
+    },
+    "video_plays": {
+        "aliases": [
+            "Video Plays",
+            "video_plays",
+            "Video Views",
+            "video_views",
+            "Video Play Actions",
+            "video_play_actions",
+            "Plays",
+            "Views"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "video_completes": {
+        "aliases": [
+            "Video Completions",
+            "video_completions",
+            "ThruPlay",
+            "thruplay",
+            "Video Views P100",
+            "video_views_p100",
+            "100% Watched",
+            "Video Completes",
+            "video_completes"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "video_25": {
+        "aliases": [
+            "Video 25%",
+            "video_25",
+            "Video Views P25",
+            "video_views_p25",
+            "25% Watched",
+            "Video played to: 25%"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "video_50": {
+        "aliases": [
+            "Video 50%",
+            "video_50",
+            "Video Views P50",
+            "video_views_p50",
+            "50% Watched",
+            "Video played to: 50%"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "video_75": {
+        "aliases": [
+            "Video 75%",
+            "video_75",
+            "Video Views P75",
+            "video_views_p75",
+            "75% Watched",
+            "Video played to: 75%"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "placement": {
+        "aliases": [
+            "Placement",
+            "placement",
+            "Placement Name",
+            "placement_name",
+            "Site",
+            "site",
+            "Publisher",
+            "publisher",
+            "App",
+            "app"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "device": {
+        "aliases": [
+            "Device",
+            "device",
+            "Device Type",
+            "device_type",
+            "Platform Device",
+            "platform_device"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "age": {
+        "aliases": [
+            "Age",
+            "age",
+            "Age Range",
+            "age_range",
+            "Age Group",
+            "age_group"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "gender": {
+        "aliases": [
+            "Gender",
+            "gender",
+            "Sex",
+            "sex"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "geo": {
+        "aliases": [
+            "Country",
+            "country",
+            "Region",
+            "region",
+            "Location",
+            "location",
+            "Geo",
+            "geo",
+            "City",
+            "city",
+            "State",
+            "state"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "keyword": {
+        "aliases": [
+            "Keyword",
+            "keyword",
+            "Search Term",
+            "search_term",
+            "Query",
+            "query",
+            "Keyword Text",
+            "keyword_text"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "match_type": {
+        "aliases": [
+            "Match Type",
+            "match_type",
+            "MatchType",
+            "matchType",
+            "Keyword Match Type"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "quality_score": {
+        "aliases": [
+            "Quality Score",
+            "quality_score",
+            "QualityScore",
+            "qualityScore",
+            "QS"
+        ],
+        "type": "integer",
+        "aggregation": "avg"
+    },
+    "bid_strategy": {
+        "aliases": [
+            "Bid Strategy",
+            "bid_strategy",
+            "Bidding Strategy",
+            "bidding_strategy",
+            "Bid Type",
+            "bid_type"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "creative_type": {
+        "aliases": [
+            "Creative Type",
+            "creative_type",
+            "Ad Type",
+            "ad_type",
+            "Format",
+            "format",
+            "Ad Format"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "headline": {
+        "aliases": [
+            "Headline",
+            "headline",
+            "Title",
+            "title",
+            "Ad Title",
+            "ad_title",
+            "Headlines"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "description": {
+        "aliases": [
+            "Description",
+            "description",
+            "Body",
+            "body",
+            "Ad Body",
+            "ad_body",
+            "Descriptions"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "landing_url": {
+        "aliases": [
+            "Final URL",
+            "final_url",
+            "Landing Page",
+            "landing_page",
+            "Destination URL",
+            "destination_url",
+            "URL",
+            "url"
+        ],
+        "type": "string",
+        "aggregation": "none"
+    },
+    "pc_conversions": {
+        "aliases": [
+            "Post-Click Conversions",
+            "pc_conversions",
+            "Click-through Conversions",
+            "click_through_conversions",
+            "Post Click Conv"
+        ],
+        "type": "float",
+        "aggregation": "sum"
+    },
+    "pv_conversions": {
+        "aliases": [
+            "Post-View Conversions",
+            "pv_conversions",
+            "View-through Conversions",
+            "view_through_conversions",
+            "Post View Conv"
+        ],
+        "type": "float",
+        "aggregation": "sum"
+    },
+    "viewability": {
+        "aliases": [
+            "Viewability Rate",
+            "viewability_rate",
+            "Viewability",
+            "viewability",
+            "Viewable Rate",
+            "viewable_rate",
+            "Viewable Impressions"
+        ],
+        "type": "float",
+        "aggregation": "avg"
+    },
+    "acos": {
+        "aliases": [
+            "ACOS",
+            "acos",
+            "ACoS",
+            "Ad Cost of Sales",
+            "ad_cost_of_sales",
+            "Total ACOS"
+        ],
+        "type": "float",
+        "aggregation": "avg"
+    },
+    "dpv": {
+        "aliases": [
+            "Detail Page Views",
+            "dpv",
+            "DPV",
+            "detail_page_views",
+            "Product Page Views"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "atc": {
+        "aliases": [
+            "Add to Cart",
+            "atc",
+            "ATC",
+            "add_to_cart",
+            "Add to Carts"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "engagements": {
+        "aliases": [
+            "Engagements",
+            "engagements",
+            "Total Engagements",
+            "total_engagements",
+            "Engagement"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "likes": {
+        "aliases": [
+            "Likes",
+            "likes",
+            "Post Likes",
+            "post_likes",
+            "Reactions"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "comments": {
+        "aliases": [
+            "Comments",
+            "comments",
+            "Post Comments",
+            "post_comments"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "shares": {
+        "aliases": [
+            "Shares",
+            "shares",
+            "Post Shares",
+            "post_shares",
+            "Retweets",
+            "retweets"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "saves": {
+        "aliases": [
+            "Saves",
+            "saves",
+            "Pin Saves",
+            "pin_saves",
+            "Story Saves"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    },
+    "follows": {
+        "aliases": [
+            "Follows",
+            "follows",
+            "New Followers",
+            "new_followers",
+            "Profile Follows"
+        ],
+        "type": "integer",
+        "aggregation": "sum"
+    }
+}

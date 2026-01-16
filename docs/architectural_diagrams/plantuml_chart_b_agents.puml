@@ -1,0 +1,66 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+title Chart B: Agent Swarm (21 Agents)
+
+component "Orchestrator" as Orch
+
+package "Perception Layer" {
+    [Vision Agent] as Vision
+    [OCR Specialist] as OCR
+    [Extraction Agent] as Extract
+    [Validation Agent] as Valid
+}
+
+package "Analysis Layer" {
+    [Budget Analyzer] as Budget
+    [Creative Analyzer] as Creative
+    [Audience Analyzer] as Audience
+    [Trend Analyzer] as Trend
+    [B2B Specialist] as B2B
+    [General Analyzer] as General
+}
+
+package "Channel Layer" {
+    [Google Specialist] as Google
+    [Meta Specialist] as Meta
+    [LinkedIn Specialist] as LinkedIn
+    [TikTok Specialist] as TikTok
+    [Programmatic Agent] as DV360
+}
+
+package "Synthesis Layer" {
+    [Recommender] as Rec
+    [Chart Generator] as Charts
+    [Report Agent] as Report
+    [Synthesizer] as Synth
+}
+
+Orch --> Vision
+Vision --> OCR
+OCR --> Extract
+Extract --> Valid
+Valid --> Orch
+
+Orch --> Budget
+Orch --> Creative
+Orch --> Audience
+Orch --> Trend
+Orch --> B2B
+Orch --> General
+
+Orch --> Google
+Orch --> Meta
+Orch --> LinkedIn
+Orch --> TikTok
+Orch --> DV360
+
+Budget --> Rec
+Google --> Rec
+Rec --> Charts
+Charts --> Report
+Report --> Synth
+
+@enduml

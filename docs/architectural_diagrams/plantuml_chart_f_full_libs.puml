@@ -1,0 +1,69 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+title Chart F: The Full Tech Universe (Comprehensive Stack)
+
+package "Frontend Experience" {
+    component "Next.js 14" as Next
+    component "TailwindCSS"
+    component "Recharts"
+    component "Framer Motion"
+}
+
+package "API & Security Layer" {
+    component "FastAPI" as API
+    component "Pydantic"
+    component "SlowAPI (Rate Limit)"
+    component "HashiCorp Vault"
+    component "PyJWT / Bcrypt"
+}
+
+package "Agent Orchestration" {
+    component "LangGraph" as Graph
+    component "LangChain"
+    component "LangSmith"
+    component "Groq (Fast Inference)"
+}
+
+package "Advanced Data Processing" {
+    component "DuckDB (In-Process OLAP)" as Duck
+    component "Polars (Rust DF)" as Polars
+    component "Pandas 2.0"
+    component "Pandera (Schema Validation)" as Pandera
+    component "SQLGlot (Transpilation)"
+}
+
+package "Knowledge & Storage" {
+    component "Neo4j (Graph)" as Neo
+    component "ChromaDB (Vector)" as Chroma
+    component "PostgreSQL"
+    component "Redis (Cache)"
+}
+
+package "Observability & Ops" {
+    component "OpenTelemetry" as OTel
+    component "Prometheus"
+    component "Sentry"
+    component "Celery + Flower" as Celery
+    component "Docker"
+}
+
+' Relationships
+Next --> API : HTTP/JSON
+API --> Graph : Request
+Graph --> Duck : Analytical Query
+Graph --> Neo : Knowledge Query
+Graph --> Chroma : Semantic Search
+
+API ..> Pandera : Validate Input
+Pandera --> Polars : Transform
+Polars --> Duck : Load
+
+API ..> OTel : Trace
+OTel --> Sentry
+OTel --> Prometheus
+
+Celery ..> Redis : Broker
+Graph ..> Groq : Fast LLM
+
+@enduml

@@ -1,0 +1,265 @@
+{
+  "training_questions": [
+    {
+      "id": 1,
+      "category": "Revenue Analysis",
+      "question": "What is the total revenue across all campaigns?",
+      "expected_sql": "SELECT SUM(Revenue) as Total_Revenue FROM funnel_data",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 2,
+      "category": "ROAS Analysis",
+      "question": "Which platform has the highest average ROAS?",
+      "expected_sql": "SELECT Platform, AVG(ROAS) as Avg_ROAS FROM funnel_data GROUP BY Platform ORDER BY Avg_ROAS DESC LIMIT 1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 3,
+      "category": "Device Performance",
+      "question": "Show total purchases by device type",
+      "expected_sql": "SELECT Device, SUM(Purchases) as Total_Purchases FROM funnel_data GROUP BY Device ORDER BY Total_Purchases DESC",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 4,
+      "category": "AOV Analysis",
+      "question": "What is the average order value by platform?",
+      "expected_sql": "SELECT Platform, AVG(AOV) as Avg_Order_Value FROM funnel_data GROUP BY Platform ORDER BY Avg_Order_Value DESC",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 5,
+      "category": "Cart Abandonment",
+      "question": "Which campaign had the lowest cart abandonment rate?",
+      "expected_sql": "SELECT Campaign_Name, AVG(Cart_Abandonment_Rate) as Avg_Cart_Abandonment FROM funnel_data GROUP BY Campaign_Name ORDER BY Avg_Cart_Abandonment LIMIT 1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 6,
+      "category": "Demographic Spend",
+      "question": "Show total spend by age group",
+      "expected_sql": "SELECT Age_Group, SUM(Spend) as Total_Spend FROM funnel_data GROUP BY Age_Group ORDER BY Total_Spend DESC",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 7,
+      "category": "Conversion Rate",
+      "question": "What is the average conversion rate for mobile devices?",
+      "expected_sql": "SELECT AVG(Conversion_Rate) as Avg_Conv_Rate FROM funnel_data WHERE Device = 'Mobile'",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 8,
+      "category": "Gender Performance",
+      "question": "Which gender has higher total revenue?",
+      "expected_sql": "SELECT Gender, SUM(Revenue) as Total_Revenue FROM funnel_data GROUP BY Gender ORDER BY Total_Revenue DESC LIMIT 1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 9,
+      "category": "Funnel Metrics",
+      "question": "Show total clicks by platform",
+      "expected_sql": "SELECT Platform, SUM(Clicks) as Total_Clicks FROM funnel_data GROUP BY Platform ORDER BY Total_Clicks DESC",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 10,
+      "category": "Checkout Abandonment",
+      "question": "What is the average checkout abandonment rate?",
+      "expected_sql": "SELECT AVG(Checkout_Abandonment_Rate) as Avg_Checkout_Abandonment FROM funnel_data",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 11,
+      "category": "Device Comparison",
+      "question": "Compare ROAS between mobile and desktop",
+      "expected_sql": "SELECT Device, AVG(ROAS) as Avg_ROAS, SUM(Revenue) as Total_Revenue, SUM(Spend) as Total_Spend FROM funnel_data WHERE Device IN ('Mobile', 'Desktop') GROUP BY Device",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 12,
+      "category": "Full Funnel",
+      "question": "Show funnel metrics from impressions to purchases for Cyber Monday",
+      "expected_sql": "SELECT SUM(Impressions) as Impressions, SUM(Clicks) as Clicks, SUM(Website_Visits) as Visits, SUM(Add_to_Cart) as Cart, SUM(Checkout_Initiated) as Checkout, SUM(Purchases) as Purchases FROM funnel_data WHERE Campaign_Name = 'Cyber_Monday_2024'",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 13,
+      "category": "Age Group Analysis",
+      "question": "Which age group has the best conversion rate?",
+      "expected_sql": "SELECT Age_Group, AVG(Conversion_Rate) as Avg_Conv_Rate FROM funnel_data GROUP BY Age_Group ORDER BY Avg_Conv_Rate DESC LIMIT 1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 14,
+      "category": "Cost Efficiency",
+      "question": "Calculate cost per purchase by platform",
+      "expected_sql": "SELECT Platform, SUM(Spend) / SUM(Purchases) as Cost_Per_Purchase FROM funnel_data GROUP BY Platform ORDER BY Cost_Per_Purchase",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 15,
+      "category": "Revenue Efficiency",
+      "question": "Show revenue per click by device",
+      "expected_sql": "SELECT Device, SUM(Revenue) / SUM(Clicks) as Revenue_Per_Click FROM funnel_data GROUP BY Device ORDER BY Revenue_Per_Click DESC",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 16,
+      "category": "Best Combinations",
+      "question": "Which campaign-platform combination has the best ROAS?",
+      "expected_sql": "SELECT Campaign_Name, Platform, AVG(ROAS) as Avg_ROAS FROM funnel_data GROUP BY Campaign_Name, Platform ORDER BY Avg_ROAS DESC LIMIT 1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 17,
+      "category": "Abandonment by Demographics",
+      "question": "Compare cart abandonment rates across age groups",
+      "expected_sql": "SELECT Age_Group, AVG(Cart_Abandonment_Rate) as Avg_Cart_Abandonment FROM funnel_data GROUP BY Age_Group ORDER BY Avg_Cart_Abandonment",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 18,
+      "category": "Revenue Share",
+      "question": "What percentage of total revenue came from Google Ads?",
+      "expected_sql": "SELECT (SUM(CASE WHEN Platform = 'google_ads' THEN Revenue ELSE 0 END) * 100.0 / SUM(Revenue)) as Google_Revenue_Percentage FROM funnel_data",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 19,
+      "category": "Top Segments",
+      "question": "Show top 5 segments by total revenue",
+      "expected_sql": "SELECT Campaign_Name, Platform, Device, SUM(Revenue) as Total_Revenue FROM funnel_data GROUP BY Campaign_Name, Platform, Device ORDER BY Total_Revenue DESC LIMIT 5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 20,
+      "category": "Profit Analysis",
+      "question": "Calculate profit margin by campaign",
+      "expected_sql": "SELECT Campaign_Name, ((SUM(Revenue) - SUM(Spend)) / SUM(Revenue) * 100) as Profit_Margin FROM funnel_data GROUP BY Campaign_Name ORDER BY Profit_Margin DESC",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 21,
+      "category": "Funnel Conversion Rates",
+      "question": "Show full funnel conversion rates by device",
+      "expected_sql": "SELECT Device, (SUM(Clicks) * 100.0 / SUM(Impressions)) as CTR, (SUM(Website_Visits) * 100.0 / SUM(Clicks)) as Click_to_Visit, (SUM(Add_to_Cart) * 100.0 / SUM(Website_Visits)) as Visit_to_Cart, (SUM(Purchases) * 100.0 / SUM(Clicks)) as Conv_Rate FROM funnel_data GROUP BY Device",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 22,
+      "category": "Best Demographics",
+      "question": "Which demographic combination (age + gender) has the highest ROAS?",
+      "expected_sql": "SELECT Age_Group, Gender, AVG(ROAS) as Avg_ROAS, SUM(Revenue) as Total_Revenue FROM funnel_data GROUP BY Age_Group, Gender ORDER BY Avg_ROAS DESC LIMIT 1",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 23,
+      "category": "Campaign Comparison",
+      "question": "Compare Black Friday vs Cyber Monday across all key metrics",
+      "expected_sql": "SELECT Campaign_Name, SUM(Spend) as Total_Spend, SUM(Revenue) as Total_Revenue, AVG(ROAS) as Avg_ROAS, AVG(Conversion_Rate) as Avg_Conv_Rate, AVG(AOV) as Avg_AOV FROM funnel_data WHERE Campaign_Name IN ('Black_Friday_2024', 'Cyber_Monday_2024') GROUP BY Campaign_Name",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 24,
+      "category": "Cost Per Stage",
+      "question": "Show cost per funnel stage (visit, cart, checkout, purchase)",
+      "expected_sql": "SELECT SUM(Spend) / SUM(Website_Visits) as Cost_Per_Visit, SUM(Spend) / SUM(Add_to_Cart) as Cost_Per_Cart, SUM(Spend) / SUM(Checkout_Initiated) as Cost_Per_Checkout, SUM(Spend) / SUM(Purchases) as Cost_Per_Purchase FROM funnel_data",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 25,
+      "category": "High Performers",
+      "question": "Which segments have ROAS greater than 8 and conversion rate greater than 10%?",
+      "expected_sql": "SELECT Campaign_Name, Platform, Device, AVG(ROAS) as Avg_ROAS, AVG(Conversion_Rate) as Avg_Conv_Rate FROM funnel_data WHERE ROAS > 8 AND Conversion_Rate > 10 GROUP BY Campaign_Name, Platform, Device ORDER BY Avg_ROAS DESC",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 26,
+      "category": "Revenue Per Visit",
+      "question": "Calculate revenue per website visit by platform and device",
+      "expected_sql": "SELECT Platform, Device, SUM(Revenue) / SUM(Website_Visits) as Revenue_Per_Visit FROM funnel_data GROUP BY Platform, Device ORDER BY Revenue_Per_Visit DESC",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 27,
+      "category": "Abandonment Impact",
+      "question": "Show correlation between cart abandonment and conversion rate",
+      "expected_sql": "SELECT CASE WHEN Cart_Abandonment_Rate < 65 THEN 'Low' WHEN Cart_Abandonment_Rate < 70 THEN 'Medium' ELSE 'High' END as Abandonment_Level, AVG(Conversion_Rate) as Avg_Conv_Rate, COUNT(*) as Count FROM funnel_data GROUP BY Abandonment_Level ORDER BY Avg_Conv_Rate DESC",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 28,
+      "category": "Checkout Efficiency",
+      "question": "Which campaign has the best checkout-to-purchase rate?",
+      "expected_sql": "SELECT Campaign_Name, (SUM(Purchases) * 100.0 / SUM(Checkout_Initiated)) as Checkout_to_Purchase_Rate FROM funnel_data GROUP BY Campaign_Name ORDER BY Checkout_to_Purchase_Rate DESC LIMIT 1",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 29,
+      "category": "Gender Comparison",
+      "question": "Compare male vs female performance across all platforms",
+      "expected_sql": "SELECT Gender, Platform, SUM(Revenue) as Total_Revenue, AVG(ROAS) as Avg_ROAS, AVG(Conversion_Rate) as Avg_Conv_Rate, AVG(AOV) as Avg_AOV FROM funnel_data GROUP BY Gender, Platform ORDER BY Gender, Avg_ROAS DESC",
+      "difficulty": "Advanced"
+    },
+    {
+      "id": 30,
+      "category": "Seasonal Trends",
+      "question": "Show seasonal trends in ROAS and conversion rates by month",
+      "expected_sql": "SELECT DATE_TRUNC('MONTH', CAST(Date AS DATE)) as Month, AVG(ROAS) as Avg_ROAS, AVG(Conversion_Rate) as Avg_Conv_Rate, SUM(Revenue) as Total_Revenue FROM funnel_data GROUP BY Month ORDER BY Month",
+      "difficulty": "Advanced"
+    }
+  ],
+  "metadata": {
+    "total_questions": 30,
+    "difficulty_breakdown": {
+      "Easy": 10,
+      "Medium": 10,
+      "Advanced": 10
+    },
+    "category_breakdown": {
+      "Revenue Analysis": 1,
+      "ROAS Analysis": 1,
+      "Device Performance": 1,
+      "AOV Analysis": 1,
+      "Cart Abandonment": 1,
+      "Demographic Spend": 1,
+      "Conversion Rate": 1,
+      "Gender Performance": 1,
+      "Funnel Metrics": 1,
+      "Checkout Abandonment": 1,
+      "Device Comparison": 1,
+      "Full Funnel": 1,
+      "Age Group Analysis": 1,
+      "Cost Efficiency": 1,
+      "Revenue Efficiency": 1,
+      "Best Combinations": 1,
+      "Abandonment by Demographics": 1,
+      "Revenue Share": 1,
+      "Top Segments": 1,
+      "Profit Analysis": 1,
+      "Funnel Conversion Rates": 1,
+      "Best Demographics": 1,
+      "Campaign Comparison": 1,
+      "Cost Per Stage": 1,
+      "High Performers": 1,
+      "Revenue Per Visit": 1,
+      "Abandonment Impact": 1,
+      "Checkout Efficiency": 1,
+      "Gender Comparison": 1,
+      "Seasonal Trends": 1
+    },
+    "dataset": "funnel_revenue_dataset.csv",
+    "focus_areas": [
+      "Full funnel analysis",
+      "Revenue optimization",
+      "ROAS maximization",
+      "Conversion rate optimization",
+      "Cart abandonment reduction",
+      "Demographic targeting",
+      "Device optimization",
+      "Campaign effectiveness"
+    ]
+  }
+}

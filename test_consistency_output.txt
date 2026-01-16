@@ -1,0 +1,38 @@
+[Config] Using local fallback database
+[32m2026-01-12 08:55:27[0m | [1mINFO    [0m | [36msrc.core.utils.logger[0m:[36msetup_logger[0m:[36m137[0m - [1mLogger initialized with production features[0m
+============================= test session starts ==============================
+platform darwin -- Python 3.13.7, pytest-8.0.0, pluggy-1.6.0 -- /Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /Users/ashwin/Desktop/pca_agent copy
+configfile: pytest.ini
+plugins: asyncio-0.23.3, anyio-4.12.0, timeout-2.4.0, langsmith-0.6.2, cov-4.1.0, locust-2.42.6, mock-3.12.0, typeguard-4.4.4
+asyncio: mode=Mode.STRICT
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+________________________ ERROR collecting test session _________________________
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pluggy/_hooks.py:512: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pluggy/_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pytest_asyncio/plugin.py:626: in pytest_collectstart
+    pyobject = collector.obj
+E   AttributeError: 'Package' object has no attribute 'obj'
+=============================== warnings summary ===============================
+src/core/database/models.py:12
+  /Users/ashwin/Desktop/pca_agent copy/src/core/database/models.py:12: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+../../../../Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jupyter_client/connect.py:22
+  /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/jupyter_client/connect.py:22: DeprecationWarning: Jupyter is migrating its paths to use standard platformdirs
+  given by the platformdirs library.  To remove this warning and
+  see the appropriate new directories, set the environment variable
+  `JUPYTER_PLATFORM_DIRS=1` and then run `jupyter --paths`.
+  The use of platformdirs will be the default in `jupyter_core` v6
+    from jupyter_core.paths import jupyter_data_dir, jupyter_runtime_dir, secure_write
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR  - AttributeError: 'Package' object has no attribute 'obj'
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+========================= 2 warnings, 1 error in 0.07s =========================

@@ -1,0 +1,59 @@
+filebeat.inputs:
+  # Application logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/pca-agent/*.log
+      - /var/log/pca-agent/**/*.log
+    json.keys_under_root: true
+    json.add_error_key: true
+    fields:
+      service: pca-agent
+      log_type: application
+    fields_under_root: true
+    
+  # Error logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/pca-agent/errors/*.log
+    json.keys_under_root: true
+    fields:
+      service: pca-agent
+      log_type: error
+      severity: high
+    fields_under_root: true
+    
+  # Access logs
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/pca-agent/access.log
+    json.keys_under_root: true
+    fields:
+      service: pca-agent
+      log_type: access
+    fields_under_root: true
+
+# Processors
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+# Output to Logstash
+output.logstash:
+  hosts: ["logstash:5044"]
+  compression_level: 3
+  bulk_max_size: 2048
+
+# Logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644

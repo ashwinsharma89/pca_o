@@ -1,0 +1,69 @@
+# docker-compose.neo4j.yml
+# Neo4j Setup for KG-RAG System
+# Usage: docker-compose -f docker-compose.neo4j.yml up -d
+
+version: '3.8'
+
+services:
+  neo4j:
+    image: neo4j:5.15.0-community
+    container_name: pca_neo4j
+    hostname: neo4j
+
+    ports:
+      - "7474:7474" # HTTP (Browser)
+      - "7687:7687" # Bolt (Driver)
+
+    environment:
+      # Authentication
+      NEO4J_AUTH: neo4j/pca_kg_rag_2026
+
+      # Memory Configuration
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 2G
+      NEO4J_server_memory_pagecache_size: 512m
+
+      # APOC Plugin (for advanced procedures)
+      NEO4J_PLUGINS: '["apoc"]'
+
+      # Performance
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_dbms_security_procedures_allowlist: apoc.*
+
+      # Logging
+      NEO4J_dbms_logs_query_enabled: "INFO"
+      NEO4J_dbms_logs_query_threshold: 1s
+
+    volumes:
+      # Persistent data
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+      - neo4j_plugins:/plugins
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+    restart: unless-stopped
+
+    networks:
+      - pca_network
+
+volumes:
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  neo4j_import:
+    driver: local
+  neo4j_plugins:
+    driver: local
+
+networks:
+  pca_network:
+    driver: bridge
+    name: pca_network

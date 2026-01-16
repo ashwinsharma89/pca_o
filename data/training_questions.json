@@ -1,0 +1,174 @@
+{
+  "training_questions": [
+    {
+      "id": 1,
+      "category": "Basic Aggregation",
+      "question": "What is the total spend across all campaigns?",
+      "expected_sql": "SELECT SUM(Spend) as Total_Spend FROM campaigns",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 2,
+      "category": "Platform Comparison",
+      "question": "Which platform generated the highest total conversions?",
+      "expected_sql": "SELECT Platform, SUM(Conversions) as Total_Conversions FROM campaigns GROUP BY Platform ORDER BY Total_Conversions DESC LIMIT 1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 3,
+      "category": "Campaign Performance",
+      "question": "Show me the top 3 campaigns by ROAS",
+      "expected_sql": "SELECT Campaign_Name, AVG(ROAS) as Avg_ROAS FROM campaigns GROUP BY Campaign_Name ORDER BY Avg_ROAS DESC LIMIT 3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 4,
+      "category": "Time-based Analysis",
+      "question": "Compare performance of last 2 months",
+      "expected_sql": "SELECT DATE_TRUNC('MONTH', Date) as Month, SUM(Spend) as Total_Spend, SUM(Conversions) as Total_Conversions, AVG(ROAS) as Avg_ROAS FROM campaigns WHERE Date >= DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '2 MONTH' GROUP BY Month ORDER BY Month DESC",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 5,
+      "category": "Cost Metrics",
+      "question": "What is the average CPC by platform?",
+      "expected_sql": "SELECT Platform, AVG(CPC) as Avg_CPC FROM campaigns GROUP BY Platform ORDER BY Avg_CPC",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 6,
+      "category": "Efficiency Analysis",
+      "question": "Which campaign has the lowest CPA?",
+      "expected_sql": "SELECT Campaign_Name, MIN(CPA) as Lowest_CPA FROM campaigns GROUP BY Campaign_Name ORDER BY Lowest_CPA LIMIT 1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 7,
+      "category": "Multi-metric Comparison",
+      "question": "Show total impressions, clicks, and conversions for each platform",
+      "expected_sql": "SELECT Platform, SUM(Impressions) as Total_Impressions, SUM(Clicks) as Total_Clicks, SUM(Conversions) as Total_Conversions FROM campaigns GROUP BY Platform",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 8,
+      "category": "Specific Campaign",
+      "question": "What was the total spend for Black Friday 2024 campaign?",
+      "expected_sql": "SELECT SUM(Spend) as Total_Spend FROM campaigns WHERE Campaign_Name = 'Black_Friday_2024'",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 9,
+      "category": "CTR Analysis",
+      "question": "Which platform has the highest average CTR?",
+      "expected_sql": "SELECT Platform, AVG(CTR) as Avg_CTR FROM campaigns GROUP BY Platform ORDER BY Avg_CTR DESC LIMIT 1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 10,
+      "category": "Date Range",
+      "question": "Show all campaigns that ran in November 2024",
+      "expected_sql": "SELECT DISTINCT Campaign_Name, Platform, Date, Spend, Conversions FROM campaigns WHERE EXTRACT(MONTH FROM Date) = 11 AND EXTRACT(YEAR FROM Date) = 2024",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 11,
+      "category": "Reach & Frequency",
+      "question": "What is the total reach and average frequency for Google Ads?",
+      "expected_sql": "SELECT SUM(Reach) as Total_Reach, AVG(Frequency) as Avg_Frequency FROM campaigns WHERE Platform = 'google_ads'",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 12,
+      "category": "ROI Comparison",
+      "question": "Compare ROAS between Google Ads and Meta Ads",
+      "expected_sql": "SELECT Platform, AVG(ROAS) as Avg_ROAS FROM campaigns WHERE Platform IN ('google_ads', 'meta_ads') GROUP BY Platform",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 13,
+      "category": "Budget Analysis",
+      "question": "What percentage of total spend was on LinkedIn Ads?",
+      "expected_sql": "SELECT (SUM(CASE WHEN Platform = 'linkedin_ads' THEN Spend ELSE 0 END) * 100.0 / SUM(Spend)) as LinkedIn_Spend_Percentage FROM campaigns",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 14,
+      "category": "Seasonal Performance",
+      "question": "Which month had the highest total conversions?",
+      "expected_sql": "SELECT DATE_TRUNC('MONTH', Date) as Month, SUM(Conversions) as Total_Conversions FROM campaigns GROUP BY Month ORDER BY Total_Conversions DESC LIMIT 1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 15,
+      "category": "Campaign Count",
+      "question": "How many unique campaigns are in the dataset?",
+      "expected_sql": "SELECT COUNT(DISTINCT Campaign_Name) as Unique_Campaigns FROM campaigns",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 16,
+      "category": "Platform Distribution",
+      "question": "Show the number of campaigns per platform",
+      "expected_sql": "SELECT Platform, COUNT(*) as Campaign_Count FROM campaigns GROUP BY Platform ORDER BY Campaign_Count DESC",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 17,
+      "category": "Performance Threshold",
+      "question": "Show campaigns with ROAS greater than 4.5",
+      "expected_sql": "SELECT Campaign_Name, Platform, ROAS FROM campaigns WHERE ROAS > 4.5 ORDER BY ROAS DESC",
+      "difficulty": "Easy"
+    },
+    {
+      "id": 18,
+      "category": "Cost Efficiency",
+      "question": "What is the average CPA for campaigns with more than 1000 conversions?",
+      "expected_sql": "SELECT AVG(CPA) as Avg_CPA FROM campaigns WHERE Conversions > 1000",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 19,
+      "category": "Top Performers",
+      "question": "Show the top 5 campaign-platform combinations by total spend",
+      "expected_sql": "SELECT Campaign_Name, Platform, SUM(Spend) as Total_Spend FROM campaigns GROUP BY Campaign_Name, Platform ORDER BY Total_Spend DESC LIMIT 5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": 20,
+      "category": "Quarterly Analysis",
+      "question": "What was the total spend in Q4 2024 (October-December)?",
+      "expected_sql": "SELECT SUM(Spend) as Q4_Spend FROM campaigns WHERE Date >= '2024-10-01' AND Date <= '2024-12-31'",
+      "difficulty": "Medium"
+    }
+  ],
+  "metadata": {
+    "total_questions": 20,
+    "difficulty_breakdown": {
+      "Easy": 12,
+      "Medium": 8,
+      "Hard": 0
+    },
+    "category_breakdown": {
+      "Basic Aggregation": 1,
+      "Platform Comparison": 1,
+      "Campaign Performance": 1,
+      "Time-based Analysis": 1,
+      "Cost Metrics": 1,
+      "Efficiency Analysis": 1,
+      "Multi-metric Comparison": 1,
+      "Specific Campaign": 1,
+      "CTR Analysis": 1,
+      "Date Range": 1,
+      "Reach & Frequency": 1,
+      "ROI Comparison": 1,
+      "Budget Analysis": 1,
+      "Seasonal Performance": 1,
+      "Campaign Count": 1,
+      "Platform Distribution": 1,
+      "Performance Threshold": 1,
+      "Cost Efficiency": 1,
+      "Top Performers": 1,
+      "Quarterly Analysis": 1
+    }
+  }
+}

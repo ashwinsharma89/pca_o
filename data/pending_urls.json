@@ -1,0 +1,644 @@
+[
+  {
+    "url": "https://www.criteo.com/digital-advertising-glossary/audience-targeting/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.bannerflow.com/blog/guide-to-audience-targeting",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.salesforce.com/in/marketing/target-audience/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.sprinklr.com/cxm/audience-targeting/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://getuntitled.ai/blog/audience-targeting/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.htmedia.in/blog/how-to-do-effective-audience-targeting-a-guide-for-cmos",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.htmedia.in/blog/audience-targeting-strategies-for-cmos-to-boost-conversions",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://resources.audiense.com/en/blog/audience-targeting-strategies-definition-types",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://leadsbridge.com/blog/target-audience-examples/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.experian.co.uk/blogs/latest-thinking/marketing-solutions/6-best-practices-implementing-segmentation/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.brafton.com/blog/strategy/best-practices-for-market-segmentation/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.taboola.com/help/en/articles/10695578-audience-insights-demographics",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://www.adverity.com/blog/how-to-compare-campaign-performance-across-regions-using-location-data",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://umbrex.com/resources/ultimate-guide-to-company-analysis/ultimate-guide-to-marketing-analysis/campaign-reach-analysis/",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://help.groundtruth.com/hc/en-us/articles/360001577587-Campaign-Settings-Summary-Performance-Reporting",
+    "source_file": "knowledge_sources\\AUDIENCE_TARGETING_SOURCES.md",
+    "category": "AUDIENCE_TARGETING_SOURCES",
+    "description": "AUDIENCE_TARGETING_SOURCES source"
+  },
+  {
+    "url": "https://agencyanalytics.com/solutions/marketing-campaign-analysis",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://camphouse.io/blog/campaign-reporting",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://metricswatch.com/campaign-reports",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.smartinsights.com/traffic-building-strategy/campaign-analytics/how-to-review-a-marketing-campaigns-effectiveness/",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://supermetrics.com/blog/digital-marketing-analytics",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/data-extraction-guide",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/data-ingestion",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/data-loading",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/data-transformation",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://supermetrics.com/blog/metrics-for-agency-marketers",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/b2b-marketing-reporting",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://supermetrics.com/platform/connect-data#unified-marketing-data",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://supermetrics.com/platform/manage-data#make-your-data-decision-ready",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://supermetrics.com/platform/analyze-data#automated-marketing-analytics",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://supermetrics.com/platform/activate-data#close-the-loop-from-insight-to-action",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/ai-marketing-agents-guide",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/ai-marketing-agent",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.discuss.io/blog/how-to-use-ai-agents-for-smarter-marketing-campaigns/",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.glean.com/perspectives/ai-agents-for-campaign-ideation-content-generation",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/what-is-marketing-intelligence",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/ad-intelligence-solutions",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/increase-marketing-roi",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/supermetrics-alternatives-competitors",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/what-is-an-insertion-order",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/what-is-location-data",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/walmart-advertising-metrics",
+    "source_file": "knowledge_sources\\CAMPAIGN_ANALYTICS_SOURCES.md",
+    "category": "CAMPAIGN_ANALYTICS_SOURCES",
+    "description": "CAMPAIGN_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.centrahubcrm.com/support-center/reporting-hierarchy",
+    "source_file": "knowledge_sources\\CAMPAIGN_HIERARCHY.md",
+    "category": "CAMPAIGN_HIERARCHY",
+    "description": "CAMPAIGN_HIERARCHY source"
+  },
+  {
+    "url": "https://365lessons.in/dv360-hierarchy/",
+    "source_file": "knowledge_sources\\CAMPAIGN_HIERARCHY.md",
+    "category": "CAMPAIGN_HIERARCHY",
+    "description": "CAMPAIGN_HIERARCHY source"
+  },
+  {
+    "url": "https://support.google.com/campaignmanager/answer/2709362?hl=en",
+    "source_file": "knowledge_sources\\CAMPAIGN_HIERARCHY.md",
+    "category": "CAMPAIGN_HIERARCHY",
+    "description": "CAMPAIGN_HIERARCHY source"
+  },
+  {
+    "url": "https://supermetrics.com/case-studies/vodafoneziggo",
+    "source_file": "knowledge_sources\\CASE_STUDIES.md",
+    "category": "CASE_STUDIES",
+    "description": "CASE_STUDIES source"
+  },
+  {
+    "url": "https://dashthis.com/blog/digital-marketing-kpis-and-metrics-ultimate-guide/",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://amityonline.com/blog/search-engine-marketing-for-online-success",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://spideraf.com/articles/maximize-lead-acquisition-with-3-sem-checkpoints",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://www.interteammarketing.com/blog/qualified-b2b-targeting-with-google-display-ads",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://www.channable.com/blog/google-display-network-quick-guide",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://advertising.inmobi.com/blog/programmatic-advertising-explained",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://www.growthchannel.com/blog/understanding-programmatic-ads-attribution-a-deep-dive",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://mountain.com/blog/programmatic-advertising/",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://bidscube.com/blog/2025/02/13/strategic-approaches-programmatic-advertising/",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://www.mile.tech/blog/learn-programmatic",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://biziq.com/blog/top-programmatic-advertising-platforms-to-use/",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://www.linkedin.com/pulse/google-meta-ads-whats-right-your-business-nshuc",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=khG9KX5094A",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://whatagraph.com/snapchat-reporting-tool",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://grapeseedmedia.com/blog/trade-desk-best-practices/",
+    "source_file": "knowledge_sources\\CHANNEL_SOURCES.md",
+    "category": "CHANNEL_SOURCES",
+    "description": "CHANNEL_SOURCES source"
+  },
+  {
+    "url": "https://camphouse.io/blog/marketing-insights",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.salesforce.com/in/marketing/data-driven-marketing/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://deepsense.in/data-driven-marketing-strategy-2025/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.digitalsilk.com/digital-trends/data-driven-marketing-strategy/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.measured.com/faq/the-benefits-of-data-driven-marketing-for-marketers/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.guvi.in/blog/benefits-and-challenges-of-data-driven-marketing/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://blog.se.com/life-at-schneider-electric/2025/06/11/data-driven-marketing-beyond-perception-and-into-insights/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.adaglobal.com/resources/insights/how-to-do-data-driven-marketing-strategy",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.o8.agency/blog/data-driven/data-driven-marketing-strategy-examples-and-results",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.invoca.com/blog/state-of-data-driven-marketing-update-your-strategy",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.delve.ai/blog/data-driven-marketing",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://business.adobe.com/blog/basics/data-driven-marketing",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.adaglobal.com/resources/insights/data-driven-marketing",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.apsis.com/blog/data-driven-marketing-success-5-case-examples",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://triggerbee.com/blog/data-driven-marketing-examples/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.hubspot.com/marketing-statistics",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.nielsen.com/insights/2025/annual-marketing-report-2025-chaos-to-clarity/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.nielsen.com/solutions/audience-measurement/nielsen-one/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.nielsen.com/solutions/audience-measurement/#audio-measurement",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.nielsen.com/solutions/media-planning/#audience-segmentation",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.nielsen.com/solutions/media-planning/ad-intelligence/",
+    "source_file": "knowledge_sources\\DATA_DRIVEN_MARKETING.md",
+    "category": "DATA_DRIVEN_MARKETING",
+    "description": "DATA_DRIVEN_MARKETING source"
+  },
+  {
+    "url": "https://www.epsilon.com/us/insights/blog/what-is-first-second-third-and-zero-party-data",
+    "source_file": "knowledge_sources\\DATA_SOURCES.md",
+    "category": "DATA_SOURCES",
+    "description": "DATA_SOURCES source"
+  },
+  {
+    "url": "https://www.lotame.com/resources/1st-party-2nd-party-3rd-party-data-what-does-it-all-mean/",
+    "source_file": "knowledge_sources\\DATA_SOURCES.md",
+    "category": "DATA_SOURCES",
+    "description": "DATA_SOURCES source"
+  },
+  {
+    "url": "https://mailchimp.com/resources/third-party-data/",
+    "source_file": "knowledge_sources\\DATA_SOURCES.md",
+    "category": "DATA_SOURCES",
+    "description": "DATA_SOURCES source"
+  },
+  {
+    "url": "https://www.salesforce.com/in/blog/first-party-customer-data/",
+    "source_file": "knowledge_sources\\DATA_SOURCES.md",
+    "category": "DATA_SOURCES",
+    "description": "DATA_SOURCES source"
+  },
+  {
+    "url": "https://pipeline.zoominfo.com/marketing/marketing-first-party-data-vs-third",
+    "source_file": "knowledge_sources\\DATA_SOURCES.md",
+    "category": "DATA_SOURCES",
+    "description": "DATA_SOURCES source"
+  },
+  {
+    "url": "https://advertising.amazon.com/library/guides/marketing-funnel#2",
+    "source_file": "knowledge_sources\\FUNNEL_ANALYTICS_SOURCES.md",
+    "category": "FUNNEL_ANALYTICS_SOURCES",
+    "description": "FUNNEL_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://contentsquare.com/guides/marketing-funnel/",
+    "source_file": "knowledge_sources\\FUNNEL_ANALYTICS_SOURCES.md",
+    "category": "FUNNEL_ANALYTICS_SOURCES",
+    "description": "FUNNEL_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.taboola.com/marketing-hub/marketing-funnel/",
+    "source_file": "knowledge_sources\\FUNNEL_ANALYTICS_SOURCES.md",
+    "category": "FUNNEL_ANALYTICS_SOURCES",
+    "description": "FUNNEL_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.impressiondigital.com/blog/granularity-marketing-mix-modelling/",
+    "source_file": "knowledge_sources\\FUNNEL_ANALYTICS_SOURCES.md",
+    "category": "FUNNEL_ANALYTICS_SOURCES",
+    "description": "FUNNEL_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.fifty-five.com/tea-house/granularity-a-key-to-measure-and-optimize-marketing-effectiveness",
+    "source_file": "knowledge_sources\\FUNNEL_ANALYTICS_SOURCES.md",
+    "category": "FUNNEL_ANALYTICS_SOURCES",
+    "description": "FUNNEL_ANALYTICS_SOURCES source"
+  },
+  {
+    "url": "https://www.fifteendesign.co.uk/blog/your-ultimate-guide-to-digital-marketing-kpis-and-metrics/",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://www.teamwork.com/blog/kpis-for-digital-marketing/",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://www.wrike.com/digital-marketing-guide/digital-marketing-kpi-metrics/",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://www.tekrevol.com/blogs/understanding-social-media-kpis-what-to-measure-and-why/",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://www.simplekpi.com/Blog/KPI-Dashboards-a-comprehensive-guide",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://dashthis.com/kpi-examples/impression-share/",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://sellforte.com/dictionary/impression-share",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://www.klipfolio.com/resources/kpi-examples/digital-marketing/search-impression-share",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://www.mobileaction.co/glossary/what-is-impression-share/",
+    "source_file": "knowledge_sources\\KPI_METRICS_SOURCES.md",
+    "category": "KPI_METRICS_SOURCES",
+    "description": "KPI_METRICS_SOURCES source"
+  },
+  {
+    "url": "https://www.linkedin.com/pulse/effective-data-visualization-examples-elevate-your-insights-yopaf",
+    "source_file": "knowledge_sources\\VISUALIZATION_SOURCES.md",
+    "category": "VISUALIZATION_SOURCES",
+    "description": "VISUALIZATION_SOURCES source"
+  },
+  {
+    "url": "https://blog.coupler.io/types-of-graphs/",
+    "source_file": "knowledge_sources\\VISUALIZATION_SOURCES.md",
+    "category": "VISUALIZATION_SOURCES",
+    "description": "VISUALIZATION_SOURCES source"
+  },
+  {
+    "url": "https://www.oviond.com/data-visualization-for-your-report/",
+    "source_file": "knowledge_sources\\VISUALIZATION_SOURCES.md",
+    "category": "VISUALIZATION_SOURCES",
+    "description": "VISUALIZATION_SOURCES source"
+  },
+  {
+    "url": "https://www.adverity.com/blog/6-effective-data-visualization-techniques-you-should-know",
+    "source_file": "knowledge_sources\\VISUALIZATION_SOURCES.md",
+    "category": "VISUALIZATION_SOURCES",
+    "description": "VISUALIZATION_SOURCES source"
+  },
+  {
+    "url": "https://improvado.io/blog/data-visualization-guide",
+    "source_file": "knowledge_sources\\VISUALIZATION_SOURCES.md",
+    "category": "VISUALIZATION_SOURCES",
+    "description": "VISUALIZATION_SOURCES source"
+  },
+  {
+    "url": "https://agencyanalytics.com/blog/data-visualization-examples",
+    "source_file": "knowledge_sources\\VISUALIZATION_SOURCES.md",
+    "category": "VISUALIZATION_SOURCES",
+    "description": "VISUALIZATION_SOURCES source"
+  },
+  {
+    "url": "https://blog.hubspot.com/marketing/types-of-graphs-for-data-visualization",
+    "source_file": "knowledge_sources\\VISUALIZATION_SOURCES.md",
+    "category": "VISUALIZATION_SOURCES",
+    "description": "VISUALIZATION_SOURCES source"
+  }
+]

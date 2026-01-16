@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+.markmap-dark {
+  background: #27272a;
+  color: white;
+}
+</style>
+
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js"></script><script>((getMarkmap, getOptions, root2, jsonOptions) => {
+              const markmap = getMarkmap();
+              window.mm = markmap.Markmap.create(
+                "svg#mindmap",
+                (getOptions || markmap.deriveOptions)(jsonOptions),
+                root2
+              );
+              if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.classList.add("markmap-dark");
+              }
+            })(() => window.markmap,null,{"content":"&#x1f3d7;&#xfe0f; PCA Agent Architecture","children":[{"content":"1. Interface Layer (The Skin)","children":[{"content":"<strong>Frontend</strong>","children":[{"content":"Next.js (React Framework)","children":[],"payload":{"tag":"li","lines":"10,11"}},{"content":"TailwindCSS (Styling)","children":[],"payload":{"tag":"li","lines":"11,12"}},{"content":"Recharts (Data Viz)","children":[],"payload":{"tag":"li","lines":"12,13"}}],"payload":{"tag":"li","lines":"9,13"}},{"content":"<strong>API Gateway</strong>","children":[{"content":"FastAPI (Python)","children":[],"payload":{"tag":"li","lines":"14,15"}},{"content":"Pydantic (Validation)","children":[],"payload":{"tag":"li","lines":"15,16"}},{"content":"Uvicorn (Server)","children":[],"payload":{"tag":"li","lines":"16,18"}}],"payload":{"tag":"li","lines":"13,18"}}],"payload":{"tag":"h2","lines":"8,9"}},{"content":"2. Orchestration Layer (The Brain Stem)","children":[{"content":"<strong>Router Agent</strong>","children":[{"content":"Intent Classification","children":[],"payload":{"tag":"li","lines":"20,21"}},{"content":"Query Routing","children":[],"payload":{"tag":"li","lines":"21,22"}}],"payload":{"tag":"li","lines":"19,22"}},{"content":"<strong>LangGraph</strong>","children":[{"content":"State Management","children":[],"payload":{"tag":"li","lines":"23,24"}},{"content":"Workflow DAGs","children":[],"payload":{"tag":"li","lines":"24,25"}},{"content":"Cyclic Execution","children":[],"payload":{"tag":"li","lines":"25,27"}}],"payload":{"tag":"li","lines":"22,27"}}],"payload":{"tag":"h2","lines":"18,19"}},{"content":"3. Intelligence Layer (The Neural Net)","children":[{"content":"<strong>Core Agents</strong>","children":[{"content":"Vision Agent (GPT-4V)","children":[],"payload":{"tag":"li","lines":"29,30"}},{"content":"Reasoning Agent (Claude 3.5)","children":[],"payload":{"tag":"li","lines":"30,31"}}],"payload":{"tag":"li","lines":"28,31"}},{"content":"<strong>Specialist Swarm</strong>","children":[{"content":"<em>Analyzers</em>: Budget, Creative, Trend","children":[],"payload":{"tag":"li","lines":"32,33"}},{"content":"<em>Channel Experts</em>: Google, Meta, LinkedIn","children":[],"payload":{"tag":"li","lines":"33,34"}},{"content":"<em>Utility</em>: Extractor, Validator","children":[],"payload":{"tag":"li","lines":"34,36"}}],"payload":{"tag":"li","lines":"31,36"}}],"payload":{"tag":"h2","lines":"27,28"}},{"content":"4. Data Layer (The Memory)","children":[{"content":"<strong>Knowledge Graph</strong>","children":[{"content":"Neo4j (Graph DB)","children":[],"payload":{"tag":"li","lines":"38,39"}},{"content":"Cypher Queries","children":[],"payload":{"tag":"li","lines":"39,40"}}],"payload":{"tag":"li","lines":"37,40"}},{"content":"<strong>Vector Store</strong>","children":[{"content":"OpenAI Embeddings","children":[],"payload":{"tag":"li","lines":"41,42"}},{"content":"Semantic Search","children":[],"payload":{"tag":"li","lines":"42,43"}}],"payload":{"tag":"li","lines":"40,43"}},{"content":"<strong>Analytics DB</strong>","children":[{"content":"DuckDB/Postgres","children":[],"payload":{"tag":"li","lines":"44,45"}},{"content":"SQL Metrics","children":[],"payload":{"tag":"li","lines":"45,46"}}],"payload":{"tag":"li","lines":"43,46"}}],"payload":{"tag":"h2","lines":"36,37"}}],"payload":{"tag":"h1","lines":"6,7"}},null)</script>
+</body>
+</html>

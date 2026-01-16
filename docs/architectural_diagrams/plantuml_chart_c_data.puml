@@ -1,0 +1,42 @@
+@startuml
+!theme plain
+skinparam linetype ortho
+
+title Chart C: Data Physics (Flow & Retrieval)
+
+package "Ingestion" {
+    [Raw Input] as Raw
+    [Normalization] as Norm
+    [Sanitization] as Clean
+    [Embedding] as Embed
+}
+
+package "Storage" {
+    database "Vector Index" as Vector
+    database "Neo4j Graph" as Graph
+    database "Postgres" as SQL
+}
+
+package "Physics (Processing)" {
+    [Model Inference] as Compute
+    [Aggregation] as Agg
+}
+
+Raw --> Norm
+Norm --> Clean
+Clean --> Embed
+Clean --> Graph
+Clean --> SQL
+Embed --> Vector
+
+[User Query] --> Compute
+Compute --> Graph : Fetch Cxt
+Compute --> Vector : Fetch Sim
+Compute --> SQL : Agg Stats
+
+Graph --> Agg
+Vector --> Agg
+SQL --> Agg
+Agg --> [Final Response]
+
+@enduml

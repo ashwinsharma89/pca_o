@@ -1,0 +1,40 @@
+{
+    "scenarios": [
+        {
+            "id": "std_01",
+            "category": "Standard Edge Cases",
+            "question": "What was the average ROAS for each platform during the last 30 days?",
+            "objective": "Temporal window and aggregation check"
+        },
+        {
+            "id": "std_02",
+            "category": "Standard Edge Cases",
+            "question": "Show total clicks and impressions for campaign '2025_Performance_Meta_Advantage_Conversion_Standard_Q1'",
+            "objective": "Exact string matching and quoting"
+        },
+        {
+            "id": "analytic_01",
+            "category": "Complex Analytics",
+            "question": "Which channels represent the top 80% of our total spend?",
+            "objective": "Pareto/Cumulative sum logic"
+        },
+        {
+            "id": "exec_01",
+            "category": "Executive Decisions",
+            "question": "If we shifted 20% of budget from low-ROAS platforms to high-ROAS ones, what is the projected efficiency gain?",
+            "objective": "Simulation and reallocation logic"
+        },
+        {
+            "id": "plan_01",
+            "category": "Media Planning",
+            "question": "Did our planned channel mix align with actual performance?",
+            "objective": "Plan vs Actual alignment"
+        },
+        {
+            "id": "train_01",
+            "category": "Learning & Training",
+            "question": "What media variables are the primary drivers of conversion performance?",
+            "objective": "Causal/Driver analysis identification"
+        }
+    ]
+}

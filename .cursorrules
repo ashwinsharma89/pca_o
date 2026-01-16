@@ -1,0 +1,41 @@
+---
+description: Project rules and conventions that must be followed
+---
+
+# PCA Agent Rulebook
+
+## 🔐 Authentication Credentials (FROZEN)
+
+**PERMANENT LOGIN CREDENTIALS - DO NOT CHANGE**
+
+| Field | Value |
+|-------|-------|
+| Username | `ashwin` |
+| Password | `Pca12345!` |
+| Role | `admin` |
+| Tier | `enterprise` |
+| Database | `data/campaigns.duckdb` |
+
+> [!CAUTION]
+> These credentials are **FROZEN**. They represent the root administrative access. Any code change, security update, or database migration MUST preserve these exact credentials without modification.
+
+## 🏗️ Enterprise Robustness & Agent Reliability
+
+To maintain a production-grade system, every code change must adhere to these pillars:
+
+1. **Architectural Decoupling**: Agents must be stateless and isolated. No agent should depend on the internal side-effects of another. Use the `StateExchange` for context.
+2. **Contract-Based Development**: All agent inputs and outputs must be strictly typed using **Pydantic schemas**. A change in one agent must not implicitly break another's interface.
+3. **Automated Evaluation ("Golden Set")**: Every PR or code change must pass the full verification suite of 35+ marketing scenarios. Regressions in SQL generation logic are unacceptable.
+4. **Intelligent Caching**: Use Semantic (Tier 1), SQL (Tier 2), and Result (Tier 3) caching to ensure determinism and cost-efficiency. 
+5. **Agent A/B Testing**: New model versions or prompt strategies must be dark-launched (Shadow Mode) before a full canary rollout.
+
+## General Rules
+
+1. **Login Integrity**: The username `ashwin` with password `Pca12345!` must always work.
+2. **DuckDB Persistence**: Authentication must use the DuckDB instance at `data/campaigns.duckdb`.
+3. **User ID Safety**: The user record for `ashwin` (id=3) is immutable.
+4. **LLM Priority**: `gpt-4o` is the Tier 1 production model. Use `gemini-1.5-flash` or `deepseek-chat` only as fallback.
+
+---
+
+*Last updated: 2025-12-23*

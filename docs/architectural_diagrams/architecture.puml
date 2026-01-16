@@ -1,0 +1,54 @@
+@startuml
+!theme plain
+title PCA Agent - High Level Architecture & Flow
+
+skinparam componentStyle uml2
+
+actor "User" as user
+participant "Frontend (Next.js)" as frontend
+
+box "Backend API" #LightBlue
+    participant "API Gateway\n(FastAPI)" as api
+    participant "Auth & Rate Limit" as middleware
+end box
+
+box "Orchestration Engine" #LightYellow
+    participant "Query Orchestrator" as orchestrator
+    participant "Query Interpreter" as interpreter
+    participant "Multi-Agent\nOrchestrator" as multi_agent
+end box
+
+box "Agent Layer" #LightGreen
+    collections "Specialist Agents\n(Reasoning, Viz, Vision)" as agents
+    database "Knowledge Graph\n(Neo4j/RAG)" as kg
+    database "Analytics db" as db
+end box
+
+user -> frontend: Enters Query
+frontend -> api: POST /api/v1/query
+api -> middleware: Validate Auth/Rate
+middleware -> api: OK
+
+api -> orchestrator: process_query(query)
+
+alt Ambiguous Query
+    orchestrator -> interpreter: _needs_interpretation?
+    interpreter -> orchestrator: Yes (Ambiguous)
+    orchestrator -> interpreter: generate_interpretations()
+    interpreter -> orchestrator: Options
+    orchestrator -> api: Return Options
+    api -> frontend: Display Clarification Options
+    frontend -> user: Show Options
+else Clear Query
+    orchestrator -> multi_agent: Execute Query
+    multi_agent -> agents: Dispatch to Specialist
+    agents -> kg: Query Context
+    agents -> db: Fetch Data
+    agents -> multi_agent: Results / Artifacts
+    multi_agent -> orchestrator: Final Response
+    orchestrator -> api: JSON Response
+    api -> frontend: Render Results
+    frontend -> user: View Visualization/Answer
+end
+
+@enduml

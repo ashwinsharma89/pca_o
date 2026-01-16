@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "question": "What is the total media cost across all campaigns?",
+    "category": "basic_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Media_Cost) as total_media_cost FROM campaigns"
+  },
+  {
+    "id": 2,
+    "question": "Which campaign has the highest ROAS?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign, (SUM(Revenue) / SUM(Media_Cost)) as roas FROM campaigns GROUP BY Campaign ORDER BY roas DESC LIMIT 1"
+  },
+  {
+    "id": 3,
+    "question": "Show average CTR by channel",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Channel, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Channel ORDER BY ctr DESC"
+  },
+  {
+    "id": 4,
+    "question": "What is the total conversions from video channel?",
+    "category": "filtered_aggregation",
+    "difficulty": "easy",
+    "expected_sql": "SELECT SUM(Conversions) as total_conversions FROM campaigns WHERE Channel = 'Video'"
+  },
+  {
+    "id": 5,
+    "question": "Compare post-click vs post-view conversions",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT SUM(Post_Click_Conv) as post_click, SUM(Post_View_Conv) as post_view FROM campaigns"
+  },
+  {
+    "id": 6,
+    "question": "Which ad group has the best conversion rate?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Ad_Group, (SUM(Conversions) * 100.0 / SUM(Clicks)) as conv_rate FROM campaigns GROUP BY Ad_Group ORDER BY conv_rate DESC LIMIT 1"
+  },
+  {
+    "id": 7,
+    "question": "Show daily revenue trend for the last 30 days",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Date, SUM(Revenue) as daily_revenue FROM campaigns WHERE CAST(Date AS DATE) >= CURRENT_DATE - INTERVAL '30 days' GROUP BY Date ORDER BY Date"
+  },
+  {
+    "id": 8,
+    "question": "What is the viewability rate by environment?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, AVG(Viewability_Rate) as avg_viewability FROM campaigns GROUP BY Environment ORDER BY avg_viewability DESC"
+  },
+  {
+    "id": 9,
+    "question": "Which data provider has the highest CTR?",
+    "category": "performance_ranking",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Data_Provider, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Data_Provider ORDER BY ctr DESC LIMIT 1"
+  },
+  {
+    "id": 10,
+    "question": "Show top 5 campaigns by total revenue",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign, SUM(Revenue) as total_revenue FROM campaigns GROUP BY Campaign ORDER BY total_revenue DESC LIMIT 5"
+  },
+  {
+    "id": 11,
+    "question": "What is the eCPA by audience segment?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Audience_Segment, (SUM(Media_Cost) / SUM(Conversions)) as ecpa FROM campaigns GROUP BY Audience_Segment ORDER BY ecpa"
+  },
+  {
+    "id": 12,
+    "question": "Compare CTV vs Mobile performance by ROAS",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Device, (SUM(Revenue) / SUM(Media_Cost)) as roas FROM campaigns WHERE Device IN ('Connected_TV', 'Mobile') GROUP BY Device"
+  },
+  {
+    "id": 13,
+    "question": "Which channel has the highest video completion rate?",
+    "category": "video_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Channel, AVG(Video_Completion_Rate) as avg_completion FROM campaigns WHERE Video_Completions > 0 GROUP BY Channel ORDER BY avg_completion DESC LIMIT 1"
+  },
+  {
+    "id": 14,
+    "question": "Show weekly media cost trend",
+    "category": "time_series",
+    "difficulty": "medium",
+    "expected_sql": "SELECT DATE_TRUNC('week', CAST(Date AS DATE)) as week, SUM(Media_Cost) as weekly_cost FROM campaigns GROUP BY week ORDER BY week"
+  },
+  {
+    "id": 15,
+    "question": "What is the unique reach by campaign?",
+    "category": "reach_frequency",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign, SUM(Unique_Reach) as total_unique_reach FROM campaigns GROUP BY Campaign ORDER BY total_unique_reach DESC"
+  },
+  {
+    "id": 16,
+    "question": "Which campaigns have ROAS greater than 6?",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign, (SUM(Revenue) / SUM(Media_Cost)) as roas FROM campaigns GROUP BY Campaign HAVING (SUM(Revenue) / SUM(Media_Cost)) > 6"
+  },
+  {
+    "id": 17,
+    "question": "Show total impressions by channel and device",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Channel, Device, SUM(Impressions) as total_impressions FROM campaigns GROUP BY Channel, Device ORDER BY total_impressions DESC"
+  },
+  {
+    "id": 18,
+    "question": "What is the eCPM by data provider?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Data_Provider, (SUM(Media_Cost) / SUM(Impressions) * 1000) as ecpm FROM campaigns GROUP BY Data_Provider ORDER BY ecpm"
+  },
+  {
+    "id": 19,
+    "question": "Compare display vs video by conversion rate",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Channel, (SUM(Conversions) * 100.0 / SUM(Clicks)) as conv_rate FROM campaigns WHERE Channel IN ('Display', 'Video') GROUP BY Channel"
+  },
+  {
+    "id": 20,
+    "question": "What is the post-view conversion rate by audience segment?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Audience_Segment, (SUM(Post_View_Conv) * 100.0 / SUM(Impressions)) as pv_conv_rate FROM campaigns GROUP BY Audience_Segment ORDER BY pv_conv_rate DESC"
+  },
+  {
+    "id": 21,
+    "question": "Show ad groups with CTR above 2%",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Ad_Group, (SUM(Clicks) * 100.0 / SUM(Impressions)) as ctr FROM campaigns GROUP BY Ad_Group HAVING (SUM(Clicks) * 100.0 / SUM(Impressions)) > 2"
+  },
+  {
+    "id": 22,
+    "question": "What is the eCPC by environment?",
+    "category": "efficiency_metrics",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Environment, (SUM(Media_Cost) / SUM(Clicks)) as ecpc FROM campaigns GROUP BY Environment ORDER BY ecpc"
+  },
+  {
+    "id": 23,
+    "question": "Which audience segment generates the most conversions?",
+    "category": "performance_ranking",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Audience_Segment, SUM(Conversions) as total_conversions FROM campaigns GROUP BY Audience_Segment ORDER BY total_conversions DESC LIMIT 1"
+  },
+  {
+    "id": 24,
+    "question": "Show month-over-month video completions trend",
+    "category": "time_series",
+    "difficulty": "hard",
+    "expected_sql": "SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as month, SUM(Video_Completions) as monthly_completions FROM campaigns WHERE Video_Completions > 0 GROUP BY month ORDER BY month"
+  },
+  {
+    "id": 25,
+    "question": "What is the frequency by campaign?",
+    "category": "reach_frequency",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Campaign, (SUM(Impressions) * 1.0 / SUM(Reach)) as frequency FROM campaigns GROUP BY Campaign ORDER BY frequency DESC"
+  },
+  {
+    "id": 26,
+    "question": "Compare In-Market vs Lookalike audiences by ROAS",
+    "category": "comparative_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Audience_Segment, (SUM(Revenue) / SUM(Media_Cost)) as roas FROM campaigns WHERE Audience_Segment IN ('In_Market_Shoppers', 'Lookalike_Purchasers') GROUP BY Audience_Segment"
+  },
+  {
+    "id": 27,
+    "question": "Which data providers have the lowest eCPA?",
+    "category": "efficiency_metrics",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Data_Provider, (SUM(Media_Cost) / SUM(Conversions)) as ecpa FROM campaigns GROUP BY Data_Provider ORDER BY ecpa LIMIT 5"
+  },
+  {
+    "id": 28,
+    "question": "Show total revenue by advertiser",
+    "category": "dimensional_analysis",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Advertiser, SUM(Revenue) as total_revenue FROM campaigns GROUP BY Advertiser ORDER BY total_revenue DESC"
+  },
+  {
+    "id": 29,
+    "question": "What is the viewable impression rate by channel?",
+    "category": "dimensional_analysis",
+    "difficulty": "medium",
+    "expected_sql": "SELECT Channel, (SUM(Viewable_Impressions) * 100.0 / SUM(Measurable_Impressions)) as viewable_rate FROM campaigns GROUP BY Channel ORDER BY viewable_rate DESC"
+  },
+  {
+    "id": 30,
+    "question": "Show campaigns where media cost exceeds $50,000",
+    "category": "performance_filtering",
+    "difficulty": "easy",
+    "expected_sql": "SELECT Campaign, SUM(Media_Cost) as total_cost FROM campaigns GROUP BY Campaign HAVING SUM(Media_Cost) > 50000 ORDER BY total_cost DESC"
+  }
+]

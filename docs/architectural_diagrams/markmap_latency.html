@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+.markmap-dark {
+  background: #27272a;
+  color: white;
+}
+</style>
+
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js"></script><script>((getMarkmap, getOptions, root2, jsonOptions) => {
+              const markmap = getMarkmap();
+              window.mm = markmap.Markmap.create(
+                "svg#mindmap",
+                (getOptions || markmap.deriveOptions)(jsonOptions),
+                root2
+              );
+              if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.documentElement.classList.add("markmap-dark");
+              }
+            })(() => window.markmap,null,{"content":"&#x23f1;&#xfe0f; Layer Latency Topology","children":[{"content":"L1: Perception (&lt;100ms)","children":[{"content":"<strong>User Interface</strong> (React)","children":[{"content":"<em>Rendering</em>: 16ms (60fps)","children":[],"payload":{"tag":"li","lines":"9,10"}},{"content":"<em>Network</em>: ~50ms","children":[],"payload":{"tag":"li","lines":"10,11"}}],"payload":{"tag":"li","lines":"8,11"}},{"content":"<strong>Feedback Loop</strong>","children":[{"content":"<em>Optimistic Updates</em>: Immediate","children":[],"payload":{"tag":"li","lines":"12,14"}}],"payload":{"tag":"li","lines":"11,14"}}],"payload":{"tag":"h2","lines":"7,8"}},{"content":"L2: Gateway (&lt;50ms)","children":[{"content":"<strong>API (FastAPI)</strong>","children":[{"content":"<em>Validation</em>: 5ms","children":[],"payload":{"tag":"li","lines":"16,17"}},{"content":"<em>Auth Check</em>: 10ms","children":[],"payload":{"tag":"li","lines":"17,18"}},{"content":"<em>Serialization</em>: 5ms","children":[],"payload":{"tag":"li","lines":"18,20"}}],"payload":{"tag":"li","lines":"15,20"}}],"payload":{"tag":"h2","lines":"14,15"}},{"content":"L3: Orchestration (200ms)","children":[{"content":"<strong>Routing</strong>","children":[{"content":"<em>Intent Analysis</em>: 150ms","children":[],"payload":{"tag":"li","lines":"22,23"}},{"content":"<em>Decision Tree</em>: 50ms","children":[],"payload":{"tag":"li","lines":"23,25"}}],"payload":{"tag":"li","lines":"21,25"}}],"payload":{"tag":"h2","lines":"20,21"}},{"content":"L4: Deep Reasoning (2s - 15s)","children":[{"content":"<strong>Agent Thinking</strong>","children":[{"content":"<em>LLM Token Generation</em>: 30-50 tokens/sec","children":[],"payload":{"tag":"li","lines":"27,28"}},{"content":"<em>Multi-step Chain</em>: 3-5 hops","children":[],"payload":{"tag":"li","lines":"28,29"}}],"payload":{"tag":"li","lines":"26,29"}},{"content":"<strong>Tool Execution</strong>","children":[{"content":"<em>DB Query</em>: 100ms","children":[],"payload":{"tag":"li","lines":"30,31"}},{"content":"<em>External API</em>: 500ms+","children":[],"payload":{"tag":"li","lines":"31,33"}}],"payload":{"tag":"li","lines":"29,33"}}],"payload":{"tag":"h2","lines":"25,26"}},{"content":"L5: Data Fetch (50ms)","children":[{"content":"<strong>Knowledge Graph</strong>","children":[{"content":"<em>Cypher Query</em>: 20-50ms","children":[],"payload":{"tag":"li","lines":"35,36"}}],"payload":{"tag":"li","lines":"34,36"}},{"content":"<strong>Vector Search</strong>","children":[{"content":"<em>ANN Search</em>: 10-30ms","children":[],"payload":{"tag":"li","lines":"37,38"}}],"payload":{"tag":"li","lines":"36,38"}}],"payload":{"tag":"h2","lines":"33,34"}}],"payload":{"tag":"h1","lines":"5,6"}},null)</script>
+</body>
+</html>

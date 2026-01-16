@@ -1,0 +1,56 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+
+title Chart G: Observability Pipeline (The Nervous System)
+
+package "Application Layer" {
+    component "FastAPI" as API
+    component "Celery Workers" as Workers
+    component "LangGraph Agents" as Agents
+}
+
+package "Telemetry Collection" {
+    component "Loguru (Logs)" as Loguru
+    component "OpenTelemetry SDK" as OTel
+    component "Prometheus Client" as PromClient
+}
+
+package "Aggregation & Storage" {
+    component "Prometheus DB" as PromDB
+    component "Sentry Cloud" as Sentry
+    component "Redis (Broker)" as Redis
+}
+
+package "Visualization (The Cockpit)" {
+    component "Grafana" as Grafana
+    component "Flower UI" as Flower
+    component "Sentry Dashboard" as SentryUI
+}
+
+' Flow
+API --> Loguru : Info/Debug
+Workers --> Loguru
+Agents --> Loguru
+
+API --> OTel : Traces
+Agents --> OTel : Spans
+
+API --> PromClient : Metrics
+Workers --> PromClient
+
+' Export
+PromClient --> PromDB : Scrape (Pull)
+OTel --> Sentry : Push Errors/Trans
+Loguru --> Sentry : Events
+
+' Async Specific
+Workers <--> Redis : Task State
+Redis --> Flower : Poll Status
+
+' Viz
+PromDB --> Grafana : Query PromQL
+Sentry --> SentryUI : Issues
+Flower --> Flower : Task View
+
+@enduml
