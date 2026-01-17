@@ -12,9 +12,13 @@ FastAPI Application v3.0 - With Structured Error Handling
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env from project root
+project_root = Path(__file__).parent.parent.parent.parent
+env_path = project_root / ".env"
+load_dotenv(dotenv_path=env_path)
 
 from src.core.utils.logger import setup_logger
 logger = setup_logger(__name__)

@@ -156,35 +156,42 @@ async def get_chart_data(
             
             where_sql = " AND ".join(where_clauses)
             
-            # Build metric expression
-            is_calculated = False
-            y_lower = y_axis.lower()
+            # Build metric expressions
+            y_metrics = [y.strip() for y in y_axis.split(',')]
+            select_metrics = []
             
-            if y_lower in ['spend', 'cost']:
-                y_col_sql = f'COALESCE({col_spend}, 0)'
-            elif y_lower == 'impressions':
-                y_col_sql = f'COALESCE({col_impressions}, 0)'
-            elif y_lower == 'clicks':
-                y_col_sql = f'COALESCE({col_clicks}, 0)'
-            elif y_lower == 'conversions':
-                y_col_sql = f'COALESCE({col_conversions}, 0)'
-            elif y_lower == 'ctr':
-                y_col_sql = f'CASE WHEN SUM(COALESCE({col_impressions}, 0)) > 0 THEN (SUM(COALESCE({col_clicks}, 0)) / SUM(COALESCE({col_impressions}, 0))) * 100 ELSE 0 END'
-                is_calculated = True
-            elif y_lower == 'cpc':
-                y_col_sql = f'CASE WHEN SUM(COALESCE({col_clicks}, 0)) > 0 THEN SUM(COALESCE({col_spend}, 0)) / SUM(COALESCE({col_clicks}, 0)) ELSE 0 END'
-                is_calculated = True
-            elif y_lower == 'cpa':
-                y_col_sql = f'CASE WHEN SUM(COALESCE({col_conversions}, 0)) > 0 THEN SUM(COALESCE({col_spend}, 0)) / SUM(COALESCE({col_conversions}, 0)) ELSE 0 END'
-                is_calculated = True
-            elif y_lower == 'roas':
-                y_col_sql = f'CASE WHEN SUM(COALESCE({col_spend}, 0)) > 0 THEN (SUM(COALESCE({col_conversions}, 0)) * 50) / SUM(COALESCE({col_spend}, 0)) ELSE 0 END'
-                is_calculated = True
-            else:
-                y_col_sql = f'COALESCE({resolve(y_axis)}, 0)'
-            
-            agg_func = aggregation.upper() if aggregation.upper() in ["SUM", "AVG", "COUNT", "MAX", "MIN"] else "SUM"
-            select_y = y_col_sql if is_calculated else f"{agg_func}({y_col_sql})"
+            for i, metric in enumerate(y_metrics):
+                is_calculated = False
+                y_lower = metric.lower()
+                
+                if y_lower in ['spend', 'cost']:
+                    y_col_sql = f'COALESCE({col_spend}, 0)'
+                elif y_lower == 'impressions':
+                    y_col_sql = f'COALESCE({col_impressions}, 0)'
+                elif y_lower == 'clicks':
+                    y_col_sql = f'COALESCE({col_clicks}, 0)'
+                elif y_lower == 'conversions':
+                    y_col_sql = f'COALESCE({col_conversions}, 0)'
+                elif y_lower == 'ctr':
+                    y_col_sql = f'CASE WHEN SUM(COALESCE({col_impressions}, 0)) > 0 THEN (SUM(COALESCE({col_clicks}, 0)) / SUM(COALESCE({col_impressions}, 0))) * 100 ELSE 0 END'
+                    is_calculated = True
+                elif y_lower == 'cpc':
+                    y_col_sql = f'CASE WHEN SUM(COALESCE({col_clicks}, 0)) > 0 THEN SUM(COALESCE({col_spend}, 0)) / SUM(COALESCE({col_clicks}, 0)) ELSE 0 END'
+                    is_calculated = True
+                elif y_lower == 'cpa':
+                    y_col_sql = f'CASE WHEN SUM(COALESCE({col_conversions}, 0)) > 0 THEN SUM(COALESCE({col_spend}, 0)) / SUM(COALESCE({col_conversions}, 0)) ELSE 0 END'
+                    is_calculated = True
+                elif y_lower == 'roas':
+                    y_col_sql = f'CASE WHEN SUM(COALESCE({col_spend}, 0)) > 0 THEN (SUM(COALESCE({col_conversions}, 0)) * 50) / SUM(COALESCE({col_spend}, 0)) ELSE 0 END'
+                    is_calculated = True
+                else:
+                    y_col_sql = f'COALESCE({resolve(metric)}, 0)'
+                
+                agg_func = aggregation.upper() if aggregation.upper() in ["SUM", "AVG", "COUNT", "MAX", "MIN"] else "SUM"
+                metric_sql = y_col_sql if is_calculated else f"{agg_func}({y_col_sql})"
+                select_metrics.append(f"{metric_sql} as y_{i}")
+
+            select_y_clause = ", ".join(select_metrics)
             
             group_cols = [db_x]
             if db_group:
@@ -195,7 +202,7 @@ async def get_chart_data(
                 SELECT 
                     {db_x} as x,
                     {f"{db_group} as group_col," if db_group else ""}
-                    {select_y} as y
+                    {select_y_clause}
                 FROM {duckdb_mgr.get_optimized_table()}
                 WHERE {where_sql}
                 GROUP BY {group_sql}
@@ -207,10 +214,15 @@ async def get_chart_data(
             if df.empty:
                 return {"data": []}
             
-            # Rename columns to match the requested axis names for frontend compatibility
-            rename_map = {'x': x_axis, 'y': y_axis}
+            # Rename columns to match the requested axis names
+            rename_map = {'x': x_axis}
             if 'group_col' in df.columns and group_by:
                 rename_map['group_col'] = group_by
+            
+            # Map y_0, y_1... back to metric names
+            for i, metric in enumerate(y_metrics):
+                rename_map[f'y_{i}'] = metric
+                
             df = df.rename(columns=rename_map)
             
             if x_axis in df.columns:

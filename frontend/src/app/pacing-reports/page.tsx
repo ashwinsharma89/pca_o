@@ -46,8 +46,8 @@ export default function PacingReportsPage() {
         setLoading(true);
         try {
             const [templatesRes, reportsRes] = await Promise.all([
-                api.get<{ templates: PacingTemplate[] }>('/campaigns/pacing/templates'),
-                api.get<{ reports: PacingReport[] }>('/campaigns/pacing/reports')
+                api.get<{ templates: PacingTemplate[] }>('/pacing/templates'),
+                api.get<{ reports: PacingReport[] }>('/pacing/reports')
             ]);
             setTemplates(templatesRes.templates || []);
             setReports(reportsRes.reports || []);
@@ -83,7 +83,7 @@ export default function PacingReportsPage() {
         setSuccess(null);
 
         try {
-            const response = await api.post<{ filename: string; message: string }>('/campaigns/pacing/generate', {
+            const response = await api.post<{ filename: string; message: string }>('/pacing/generate', {
                 template_id: selectedTemplate
             });
             setSuccess(`Report generated: ${response.filename}`);
@@ -112,7 +112,7 @@ export default function PacingReportsPage() {
             formData.append('file', file);
 
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/v1/campaigns/pacing/templates/upload', {
+            const response = await fetch('/api/v1/pacing/templates/upload', {
                 method: 'POST',
                 headers: token ? { 'Authorization': `Bearer ${token}` } : {},
                 body: formData,
@@ -130,7 +130,7 @@ export default function PacingReportsPage() {
 
     const handleDownloadReport = async (report: PacingReport) => {
         try {
-            const response = await fetch(`/api/v1/campaigns/pacing/reports/${report.id}/download`, {
+            const response = await fetch(`/api/v1/pacing/reports/${report.id}/download`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
