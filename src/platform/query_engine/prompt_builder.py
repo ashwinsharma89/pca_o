@@ -154,7 +154,7 @@ class PromptBuilder:
             granularity_sql = {
                 'daily': "DATE_TRUNC('day', \"Date\") AS date",
                 'weekly': "DATE_TRUNC('week', \"Date\") AS week_start",
-                'monthly': "STRFTIME(\"Date\", 'Mon-YY') AS month",
+                'monthly': "STRFTIME(\"Date\", '%b-%y') AS month",
             }
             sql_hints.append(f"GRANULARITY: {entities.granularity}")
             mandatory_instructions.append(

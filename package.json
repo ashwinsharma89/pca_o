@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "start": "python manage.py start",
+    "stop": "python manage.py stop",
+    "setup": "python manage.py setup",
+    "dev": "python manage.py start"
+  },
   "dependencies": {
     "markmap-lib": "^0.18.12",
     "markmap-render": "^0.18.12"
