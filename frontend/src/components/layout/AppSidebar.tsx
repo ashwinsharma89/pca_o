@@ -72,11 +72,6 @@ export function AppSidebar({ className }: SidebarProps) {
             icon: MessageSquare,
         },
         {
-            title: "Campaigns List",
-            href: "/campaigns",
-            icon: List,
-        },
-        {
             title: "Pacing Reports",
             href: "/pacing-reports",
             icon: FileSpreadsheet,

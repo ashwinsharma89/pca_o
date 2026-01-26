@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 // Simple layout without auth
 function SimpleLayout({ children }: { children: React.ReactNode }) {
@@ -107,8 +108,9 @@ export default function AdExplorerPage() {
     async function fetchData() {
         setLoading(true);
         try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api/v1";
             const res = await fetch(
-                `http://localhost:8000/api/v1/connectors/${platform}/hierarchy?mock_mode=true&start_date=${startDate}&end_date=${endDate}`
+                `${apiUrl}/connectors/${platform}/hierarchy?mock_mode=true&start_date=${startDate}&end_date=${endDate}`
             );
             const json = await res.json();
             setRawData(json.data || []);
@@ -253,8 +255,8 @@ export default function AdExplorerPage() {
     const columnGroups = Array.from(new Set(validColumns.map(c => c.group)));
 
     return (
-        <SimpleLayout>
-            <div className="p-6 space-y-6">
+        <DashboardLayout>
+            <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -454,6 +456,6 @@ export default function AdExplorerPage() {
                     </div>
                 </div>
             </div>
-        </SimpleLayout>
+        </DashboardLayout>
     );
 }

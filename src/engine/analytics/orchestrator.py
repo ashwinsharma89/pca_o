@@ -132,13 +132,34 @@ class AnalyticsOrchestrator:
         
         # 5. Generate LLM Narrative (Creative)
         # We construct a highly optimized prompt with just the necessary data
+        # Using the Dentsu template now as the standard
         prompt = self._construct_prompt(global_metrics, status, recommendations)
         
         try:
-            narrative = self.llm_service.generate_completion(
+            response_text = self.llm_service.generate_completion(
                 prompt=prompt,
-                system_prompt="You are a senior media buyer. Be concise and actionable."
+                system_prompt="You are a senior media buyer. Return valid JSON."
             )
+            
+            # Parse JSON from the Dentsu template output
+            import json
+            import re
+            
+            # Find JSON block using regex if it's wrapped in text
+            json_match = re.search(r'(\{.*\})', response_text, re.DOTALL)
+            if json_match:
+                cleaned = json_match.group(1)
+            else:
+                cleaned = response_text.replace('```json', '').replace('```', '').strip()
+            
+            try:
+                result_json = json.loads(cleaned)
+                # Use the overview/brief as the simple narrative
+                narrative = result_json.get('overview', result_json.get('brief', 'Analysis generated.'))
+            except:
+                # Fallback if specific keys missing or partial JSON
+                narrative = response_text[:500] + "..."
+
             # 6. Clean Output (Janitor)
             narrative = self.text_cleaner.strip_italics(narrative)
         except Exception as e:
@@ -160,14 +181,6 @@ class AnalyticsOrchestrator:
         # Platform Breakdown
         if "platform" in df.columns or "Platform" in df.columns:
             col = "platform" if "platform" in df.columns else "Platform"
-            # Normalize column name for calculation
-            # We assume MetricsCalculator handles standard names like 'spend', 'clicks'
-            # If input df has 'Platform', we group by it.
-            
-            # Map columns if needed (Polars case sensitivity)
-            # This is a simplified mapping. Real world needs robust mapping.
-            # Assuming input DF is already normalized or we do it here.
-            
             try:
                 platform_metrics = MetricsCalculator.calculate_aggregated_metrics(df, [col])
                 breakdowns["by_platform"] = platform_metrics.to_dicts()
@@ -198,8 +211,11 @@ class AnalyticsOrchestrator:
             f"- CTR: {metrics.get('ctr', 0):.2f}%"
         )
         
+        # Use Dentsu template
         return get_prompt(
-            "standard_analysis_narrative",
+            "rag_executive_summary",
+            objective="Performance Review",
+            context="Standard Campaign Analysis",
             metrics=metrics_str,
             status=status,
             recommendations=RecommendationEngine._format_for_llm(recs) if hasattr(RecommendationEngine, '_format_for_llm') else str(recs[:3])

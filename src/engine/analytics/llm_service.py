@@ -22,31 +22,41 @@ class LLMService:
         self.openai_api_key = os.getenv('OPENAI_API_KEY') or api_key
         self.gemini_api_key = os.getenv('GOOGLE_API_KEY')
         
+        # Configuration
+        self.primary_provider = os.getenv('PRIMARY_LLM_PROVIDER', 'openai').lower()
+        self.gemini_model = os.getenv('GEMINI_MODEL', 'gemini-1.5-pro')
+        
         self.openai_client = None
         self.gemini_client = None
         
         # Initialize Primary Provider
-        if self.use_anthropic:
+        if self.primary_provider == 'anthropic' or self.use_anthropic:
             if not self.anthropic_api_key:
                 logger.warning("Anthropic requested but no key found. Falling back to OpenAI.")
-                self.use_anthropic = False
+                self.primary_provider = 'openai'
             else:
                 self.model = os.getenv('DEFAULT_ANTHROPIC_MODEL', 'claude-3-5-sonnet-20240620')
                 logger.info(f"Initialized LLMService with Anthropic: {self.model}")
         
-        if not self.use_anthropic:
+        if self.primary_provider == 'openai':
             if not self.openai_api_key:
-                raise ValueError("OPENAI_API_KEY is required")
-            self.openai_client = OpenAI(api_key=self.openai_api_key)
-            self.model = os.getenv('DEFAULT_OPENAI_MODEL', 'gpt-4o')
-            logger.info(f"Initialized LLMService with OpenAI: {self.model}")
-            
-        # Initialize Fallback (Gemini)
+                # If OpenAI is default but no key, check if Gemini is available
+                if self.gemini_api_key:
+                    logger.warning("OpenAI key missing, switching to Gemini as primary.")
+                    self.primary_provider = 'gemini'
+                else:
+                    raise ValueError("OPENAI_API_KEY is required")
+            else:
+                self.openai_client = OpenAI(api_key=self.openai_api_key)
+                self.model = os.getenv('DEFAULT_OPENAI_MODEL', 'gpt-4o')
+                logger.info(f"Initialized LLMService with OpenAI: {self.model}")
+
+        # Initialize Gemini (Primary or Fallback)
         if self.gemini_api_key:
             try:
                 genai.configure(api_key=self.gemini_api_key)
-                self.gemini_client = genai.GenerativeModel('gemini-2.0-flash-exp')
-                logger.info("Gemini fallback initialized")
+                self.gemini_client = genai.GenerativeModel(self.gemini_model)
+                logger.info(f"Gemini initialized ({self.gemini_model})")
             except Exception as e:
                 logger.warning(f"Failed to init Gemini: {e}")
 
@@ -56,14 +66,21 @@ class LLMService:
         Generate text completion with automatic fallback.
         """
         try:
-            if self.use_anthropic:
+            if self.primary_provider == 'gemini' and self.gemini_client:
+                return self._call_gemini(prompt, system_prompt)
+            elif self.primary_provider == 'anthropic':
                 return self._call_anthropic(prompt, system_prompt)
             else:
                 return self._call_openai(prompt, system_prompt)
         except Exception as e:
-            logger.error(f"Primary LLM failed: {e}. Trying fallback...")
-            if self.gemini_client:
+            logger.error(f"Primary LLM ({self.primary_provider}) failed: {e}. Trying fallback...")
+            
+            # Fallback Logic
+            if self.primary_provider != 'gemini' and self.gemini_client:
                 return self._call_gemini(prompt, system_prompt)
+            elif self.primary_provider != 'openai' and self.openai_client:
+                return self._call_openai(prompt, system_prompt)
+            
             raise e
 
     def _call_anthropic(self, prompt: str, system_prompt: str) -> str:

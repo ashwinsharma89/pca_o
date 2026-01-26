@@ -60,7 +60,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         { href: '/pacing-reports', label: 'Pacing Reports', icon: FileSpreadsheet },
         { href: '/chat', label: 'Q&A', icon: MessageSquare },
         { href: '/ad-explorer', label: 'API Connections', icon: Globe },
-        { href: '/settings', label: 'Settings', icon: Settings },
     ];
 
     return (
@@ -68,7 +67,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {/* Sidebar */}
             <aside className="fixed inset-y-0 left-0 z-20 w-64 border-r border-white/10 bg-black/40 backdrop-blur-xl">
                 <div className="flex h-16 items-center border-b border-white/10 px-6">
-                    <Link href="/campaigns" className="flex items-center gap-2 font-bold text-lg">
+                    <Link href="/upload" className="flex items-center gap-2 font-bold text-lg">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
                             <Bot className="h-5 w-5" />
                         </div>

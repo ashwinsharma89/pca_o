@@ -31,7 +31,7 @@ FRONTEND_PID=$!
 echo "Frontend started (PID: $FRONTEND_PID)"
 
 echo "✅ All services are starting in the background."
-echo "   - API: http://localhost:8000"
+echo "   - API: http://localhost:8001"
 echo "   - Web: http://localhost:3000"
 echo "   - Logs: logs/backend.log and logs/frontend.log"
 

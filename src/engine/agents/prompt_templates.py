@@ -261,69 +261,195 @@ Write in a professional, concise tone suitable for C-suite executives.""",
 
         self.register(PromptTemplate(
             name="rag_executive_summary",
-            template="""You are a world-class Media Analyst. Write a highly structured, data-driven executive summary for these campaigns. Use a professional, authoritative tone.
+            template="""You are a marketing performance analyst at Dentsu conducting post-campaign analysis for clients. Analyze the campaign data and generate a concise 5-page strategic review focused on ROI impact, channel performance, and actionable recommendations.
 
-OBJECTIVE: {objective}
-CONTEXT: {context}
+## INPUT CONTEXT
+- Campaign Period: {context}
+- Client: Dentsu Client
+- Campaign Objective: {objective}
+- Total Budget: (Derived from Data)
+- Channels Used: (Derived from Data)
 
-PERFORMANCE DATA:
 {metrics}
 
-KEY METRICS STATUS:
-{status}
+---
 
-RECOMMENDATIONS GENERATED:
-{recommendations}
+## OUTPUT STRUCTURE (MAXIMUM 5 PAGES)
 
-INSTRUCTIONS:
-1. Use markdown headers for structure. Specifically use these headers: **Performance Overview:**, **What Is Working:**, **What Is Not Working:**, **Root Cause Analysis:**, **Priority Actions:**, and **Strategic Recommendations:**.
-2. Quantify everything. Use percentages and dollar amounts from the data.
-3. Don't be generic. Explain the "So What?" for every data point.
-4. Output must be valid JSON matching the format below.
+### PAGE 1: EXECUTIVE SUMMARY
 
-OUTPUT FORMAT:
-Return a JSON object with:
+**Campaign Performance Snapshot:**
+- Total Spend: [AMOUNT]
+- Total Results: [LEADS/CONVERSIONS/REACH]
+- Overall ROI/ROAS: [METRIC]
+- vs. Target: [% TO GOAL]
+
+**Key Outcomes:**
+✅ **Top 3 Wins:**
+1. [Win] - [Metric/Impact]
+2. [Win] - [Metric/Impact]
+3. [Win] - [Metric/Impact]
+
+⚠️ **Top 3 Challenges:**
+1. [Issue] - [Impact]
+2. [Issue] - [Impact]
+3. [Issue] - [Impact]
+
+**Critical Recommendations:**
+1. [Action] → Expected Impact: [QUANTIFIED]
+2. [Action] → Expected Impact: [QUANTIFIED]
+3. [Action] → Expected Impact: [QUANTIFIED]
+
+---
+
+### PAGE 2: CHANNEL & PLATFORM PERFORMANCE
+
+**Channel Performance Matrix:**
+
+| Channel | Spend | Spend % | Results | CPL/CPA | ROI | Status | Action |
+|---------|-------|---------|---------|---------|-----|--------|--------|
+| LinkedIn | $X | X% | X | $X | X | 🟢 | Scale +20% |
+| Google | $X | X% | X | $X | X | 🟡 | Optimize targeting |
+| Meta | $X | X% | X | $X | X | 🔴 | Reduce budget |
+| Display | $X | X% | X | $X | X | 🟡 | Test new creative |
+
+**Channel Insights:**
+- **Best Performer:** [Channel] - [Why it worked] - [Scale recommendation]
+- **Biggest Opportunity:** [Channel] - [What to fix] - [Expected improvement]
+- **Underperformer:** [Channel] - [Root cause] - [Action: optimize or pause]
+
+**Budget Reallocation:**
+- Move $[X] from [Channel] to [Channel]
+- Expected ROI improvement: [%]
+
+---
+
+### PAGE 3: FUNNEL & AUDIENCE PERFORMANCE
+
+**Funnel Analysis:**
+```
+IMPRESSIONS (X) → CLICKS (X) → LEADS (X) → CONVERSIONS (X)
+     100%            X%           X%            X%
+                   [vs benchmark]
+```
+
+**Funnel Insights:**
+- **Biggest Drop-off:** [Stage] - [X% loss] - **Fix:** [Specific action]
+- **Best Performing Stage:** [Stage] - [Benchmark comparison]
+- **Conversion Rate:** [X%] vs. Target [Y%] - [Gap analysis]
+
+**Audience Performance:**
+
+**Top 3 Segments (Scale These):**
+1. [Segment] - Conv Rate: [X%] - CPL: $[X]
+2. [Segment] - Conv Rate: [X%] - CPL: $[X]
+3. [Segment] - Conv Rate: [X%] - CPL: $[X]
+
+**Bottom 3 Segments (Exclude These):**
+1. [Segment] - Conv Rate: [X%] - CPL: $[X]
+2. [Segment] - Conv Rate: [X%] - CPL: $[X]
+3. [Segment] - Conv Rate: [X%] - CPL: $[X]
+
+**Targeting Recommendation:** [Specific audience expansion/exclusion strategy]
+
+---
+
+### PAGE 4: CREATIVE & TACTICAL INSIGHTS
+
+**Creative Performance:**
+
+**What Worked:**
+- **Ad Format:** [Format] outperformed by [X%]
+- **Messaging:** [Theme/Angle] drove [X%] higher CTR
+- **Visual:** [Style/Element] increased engagement by [X%]
+- **CTA:** "[Text]" converted [X%] better
+
+**What Didn't Work:**
+- [Creative element] - [Performance issue]
+- [Creative element] - [Performance issue]
+
+**Creative Recommendations:**
+1. [Specific change] → Expected lift: [%]
+2. [Specific change] → Expected lift: [%]
+
+**Tactical Optimization:**
+- **Best Day/Time:** [Finding] - [Action]
+- **Device Performance:** [Mobile/Desktop] - [X%] better - [Bid adjustment]
+- **Placement:** [Top performing placement] - [Budget allocation]
+- **Bid Strategy:** [What worked] - [Recommendation]
+
+**A/B Test Results:**
+- Test: [What was tested]
+- Winner: [Variation X] by [X%]
+- Learning: [Insight]
+- Next Test: [Recommendation]
+
+---
+
+### PAGE 5: STRATEGIC RECOMMENDATIONS & NEXT STEPS
+
+**Budget Optimization:**
+
+| Action | From | To | Amount | Expected Impact |
+|--------|------|-----|--------|-----------------|
+| Shift | [Channel/Campaign] | [Channel/Campaign] | $[X] | +[X] leads, +[Y%] ROI |
+| Scale | [Top performer] | - | +$[X] | +[X] leads |
+| Pause | [Underperformer] | - | -$[X] | Reallocate to better ROI |
+
+**Total Expected Improvement:** +[X%] ROI, +[X] additional conversions
+
+**Campaign Action Plan:**
+
+**Immediate Actions (Week 1-2):**
+1. ✓ [Action] - Owner: [Name] - Impact: [Metric]
+2. ✓ [Action] - Owner: [Name] - Impact: [Metric]
+3. ✓ [Action] - Owner: [Name] - Impact: [Metric]
+
+**Short-term Optimizations (Month 1):**
+1. [Action] - Expected: [Result]
+2. [Action] - Expected: [Result]
+
+**Strategic Initiatives (Next Campaign):**
+1. [Initiative] - Test budget: $[X] - Success metric: [KPI]
+2. [Initiative] - Test budget: $[X] - Success metric: [KPI]
+
+**Next Campaign Recommendations:**
+- **Budget:** $[X] (based on [rationale])
+- **Channel Mix:** [X% / Y% / Z%] across [channels]
+- **Primary Audience:** [Segment focus]
+- **Creative Strategy:** [Approach]
+- **Success Metrics:** [KPI] = [Target]
+
+**Key Learnings for Future Campaigns:**
+1. [Learning from this campaign]
+2. [Learning from this campaign]
+3. [Learning from this campaign]
+
+---
+
+## OUTPUT FORMAT
+
+Return a valid JSON object matching this structure exactly:
 {{
-    "overview": "A 3-4 sentence comprehensive overview of the portfolio health.",
+    "overview": "A 3-4 sentence comprehensive overview of the portfolio health (Executive Summary Page 1).",
     "key_takeaways": [
-        "**Performance Overview:** [Detailed analysis of core metrics vs goals]",
-        "**What Is Working:** [Top performing segments and positive trends]",
-        "**What Is Not Working:** [Underperforming areas and wasted spend]",
-        "**Root Cause Analysis:** [Explain the 'Why' behind the performance patterns]",
-        "**Priority Actions:** [Immediate, high-impact changes to make]",
-        "**Strategic Recommendations:** [Longer-term strategic advice based on knowledge base context]"
+        "**Page 1: Executive Summary**\\n[Content for Page 1]",
+        "**Page 2: Channel Performance**\\n[Content for Page 2]",
+        "**Page 3: Funnel & Audience**\\n[Content for Page 3]",
+        "**Page 4: Creative & Tactics**\\n[Content for Page 4]",
+        "**Page 5: Strategic Recommendations**\\n[Content for Page 5]"
     ],
     "rag_metadata": {{
-        "sources_used": ["Campaign Data", "Knowledge Base"],
-        "confidence_score": 0.98
+        "sources_used": ["Campaign Data", "Dentsu Strategy Base"],
+        "confidence_score": 0.99
     }}
-}}""",
-            version="1.1.0",
+}}
+
+IMPORTANT: Ensure the JSON is valid. Escape newlines in the strings as \\n.""",
+            version="2.0.0",
             category=PromptCategory.REPORT,
-            description="Enhanced RAG-enhanced executive summary with detailed structured sections",
+            description="Dentsu Strategic Review Template (5-Page Format)",
             variables=["objective", "context", "metrics", "status", "recommendations"]
-        ))
-        
-        self.register(PromptTemplate(
-            name="standard_analysis_narrative",
-            template="""Analyze the following campaign performance data as a senior media buyer. 
-
-DATA:
-{metrics}
-
-STATUS:
-{status}
-
-RECOMMENDATIONS:
-{recommendations}
-
-Provide a structured analysis focusing on critical issues and opportunities.
-Use markdown headers: **Performance Overview:**, **Key Strengths:**, **Priority Actions:**.
-Be concise but highly actionable.""",
-            version="1.0.0",
-            category=PromptCategory.ANALYSIS,
-            description="Standard automated analysis narrative",
-            variables=["metrics", "status", "recommendations"]
         ))
         
         # ========================

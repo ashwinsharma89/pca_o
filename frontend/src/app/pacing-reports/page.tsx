@@ -13,6 +13,7 @@ import {
     FileSpreadsheet, Upload, Download, Play, Clock, CheckCircle2,
     AlertCircle, Loader2, RefreshCw, Trash2, Eye, Calendar
 } from 'lucide-react';
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 interface PacingTemplate {
     id: string;
@@ -174,8 +175,8 @@ export default function PacingReportsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <DashboardLayout>
+            <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -392,6 +393,6 @@ export default function PacingReportsPage() {
                     </TabsContent>
                 </Tabs>
             </div>
-        </div>
+        </DashboardLayout>
     );
 }
