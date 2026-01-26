@@ -43,10 +43,9 @@ MARKETING_ANALYTICS_PRINCIPLES = """
    - "Show me corrupted rows"
    - For these, use: WHERE clicks <= impressions AND conversions <= clicks
 
-## Rule 6: SAMPLE SIZE - Include confidence indicators
+## Rule 6: SAMPLE SIZE - Include sample size indicator
 ✅ ALWAYS add to results:
    - SUM(conversions) AS sample_size
-   - CASE WHEN SUM(conversions) < 100 THEN 'Low Confidence' ELSE 'High Confidence' END AS confidence
 
 ## Rule 7: DATE HANDLING - Dates are stored as proper datetime type
 ✅ The Date column is stored as datetime64 (proper DATE type)

@@ -9,16 +9,15 @@ from typing import Dict, Any, List, Optional
 
 # Template: Compare two channels by metric
 COMPARE_CHANNELS = """
-MATCH (ch:Channel)
-WHERE ch.id = $channel1 OR ch.id = $channel2
-MATCH (ch)-[:CATEGORIZES]->(p:Platform)<-[:BELONGS_TO]-(c:Campaign)
-WITH ch.name AS channel,
-     count(DISTINCT c) AS campaigns,
-     SUM(c.impressions_total) AS impressions,
-     SUM(c.clicks_total) AS clicks,
-     SUM(c.spend_total) AS spend,
-     SUM(c.conversions_total) AS conversions,
-     SUM(c.revenue_total) AS revenue
+MATCH (m:Metric)
+WHERE toLower(m.channel) = toLower($channel1) OR toLower(m.channel) = toLower($channel2)
+WITH m.channel AS channel,
+     count(DISTINCT m.campaign_id) AS campaigns,
+     SUM(m.impressions) AS impressions,
+     SUM(m.clicks) AS clicks,
+     SUM(m.spend) AS spend,
+     SUM(coalesce(m.conversions, 0)) AS conversions,
+     SUM(coalesce(m.revenue, 0)) AS revenue
 RETURN channel,
        campaigns,
        spend,

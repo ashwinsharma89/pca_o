@@ -378,6 +378,26 @@ ORDER BY total_spend DESC
         """,
         description="Performance matrix showing all platform-channel combinations"
     ),
+    "general_performance": QueryTemplate(
+        name="General Performance Data",
+        patterns=["show", "all", "campaigns", "data", "list", "report", "performance", "details"],
+        sql="""
+SELECT
+    "Campaign_Name_Full",
+    platform,
+    channel,
+    "Total Spent" AS spend,
+    "Impressions" AS impressions,
+    "Clicks" AS clicks,
+    "Site Visit" AS conversions,
+    "ROAS" AS roas,
+    date
+FROM all_campaigns
+ORDER BY date DESC
+LIMIT 50
+        """,
+        description="General data export of recent campaign performance"
+    ),
 }
 
 

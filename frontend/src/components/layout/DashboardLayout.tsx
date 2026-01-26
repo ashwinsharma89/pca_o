@@ -21,7 +21,6 @@ import {
     TrendingUp,
     Zap,
     AlertTriangle,
-    Brain,
     Palette,
     Globe,
     FileSpreadsheet
@@ -58,8 +57,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         { href: '/visualizations-2', label: 'Executive Overview', icon: Palette },
         { href: '/in-depth-analysis', label: 'Analytics Studio', icon: Activity },
         { href: '/dashboard-builder', label: 'Dashboard Builder', icon: Layout },
-        { href: '/intelligence-studio', label: 'Intelligence Studio', icon: Brain },
-        { href: '/regression', label: 'Regression', icon: TrendingUp },
         { href: '/pacing-reports', label: 'Pacing Reports', icon: FileSpreadsheet },
         { href: '/chat', label: 'Q&A', icon: MessageSquare },
         { href: '/ad-explorer', label: 'API Connections', icon: Globe },

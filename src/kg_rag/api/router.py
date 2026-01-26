@@ -8,7 +8,7 @@ import logging
 import time
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
 from src.kg_rag.api.models import (
     KGQueryRequest,
@@ -28,6 +28,7 @@ from src.kg_rag.query.cypher_generator import CypherGenerator
 from src.kg_rag.context.context_builder import ContextBuilder
 from src.kg_rag.client.connection import get_neo4j_connection
 from src.kg_rag.config.settings import get_kg_rag_settings
+from src.interface.api.middleware.rate_limit import limiter
 
 
 logger = logging.getLogger(__name__)
@@ -46,7 +47,8 @@ def get_formatter() -> ResultFormatter:
 
 
 @router.post("/query", response_model=KGQueryResponse)
-async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
+@limiter.limit("50/minute")
+async def query_knowledge_graph(request: Request, body: KGQueryRequest) -> KGQueryResponse:
     """
     Query the Knowledge Graph with natural language.
     
@@ -66,19 +68,19 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
         
         # Build context
         context = {
-            "date_from": request.date_from,
-            "date_to": request.date_to,
-            "platform": request.platform,
-            "limit": request.limit,
+            "date_from": body.date_from,
+            "date_to": body.date_to,
+            "platform": body.platform,
+            "limit": body.limit,
         }
         
         # Route query
         query_router = get_router()
         
-        if request.use_llm:
+        if body.use_llm:
             # Force LLM generation
             generator = CypherGenerator()
-            gen_result = generator.generate(request.query, context)
+            gen_result = generator.generate(body.query, context)
             
             if gen_result["success"]:
                 # Execute generated Cypher
@@ -96,7 +98,7 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
                     data=formatted.data,
                     summary=KGQuerySummary(**formatted.summary),
                     metadata=KGQueryMetadata(
-                        query=request.query,
+                        query=body.query,
                         intent="llm_generated",
                         confidence=1.0,
                         routing="llm",
@@ -109,7 +111,7 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
                     success=False,
                     error=gen_result.get("error", "LLM generation failed"),
                     metadata=KGQueryMetadata(
-                        query=request.query,
+                        query=body.query,
                         intent="unknown",
                         confidence=0,
                         routing="llm",
@@ -117,7 +119,7 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
                 )
         else:
             # Use standard routing
-            result = query_router.route(request.query, context)
+            result = query_router.route(body.query, context)
             
             execution_time = (time.time() - start_time) * 1000
             
@@ -131,7 +133,7 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
                     data=formatted.data,
                     summary=KGQuerySummary(**formatted.summary),
                     metadata=KGQueryMetadata(
-                        query=request.query,
+                        query=body.query,
                         intent=result.get("intent", "unknown"),
                         confidence=result.get("confidence", 0),
                         routing=result.get("routing", "template"),
@@ -144,7 +146,7 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
                     success=False,
                     error=result.get("error"),
                     metadata=KGQueryMetadata(
-                        query=request.query,
+                        query=body.query,
                         intent=result.get("intent", "unknown"),
                         confidence=result.get("confidence", 0),
                         routing=result.get("routing", "unknown"),
@@ -157,7 +159,7 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
             success=False,
             error=str(e),
             metadata=KGQueryMetadata(
-                query=request.query,
+                query=body.query,
                 intent="error",
                 confidence=0,
                 routing="error",
@@ -166,7 +168,8 @@ async def query_knowledge_graph(request: KGQueryRequest) -> KGQueryResponse:
 
 
 @router.get("/health", response_model=KGHealthResponse)
-async def kg_health_check() -> KGHealthResponse:
+@limiter.limit("50/minute")
+async def kg_health_check(request: Request) -> KGHealthResponse:
     """Check Knowledge Graph health."""
     try:
         conn = get_neo4j_connection()
@@ -206,7 +209,8 @@ async def kg_health_check() -> KGHealthResponse:
 
 
 @router.get("/summary")
-async def get_performance_summary():
+@limiter.limit("20/minute")
+async def get_performance_summary(request: Request):
     """
     Get comprehensive auto-generated performance summary.
     
@@ -223,7 +227,8 @@ async def get_performance_summary():
 
 
 @router.get("/schema", response_model=KGSchemaResponse)
-async def get_schema() -> KGSchemaResponse:
+@limiter.limit("20/minute")
+async def get_schema(request: Request) -> KGSchemaResponse:
     """Get Knowledge Graph schema information."""
     try:
         builder = ContextBuilder()
@@ -246,7 +251,8 @@ async def get_schema() -> KGSchemaResponse:
 
 
 @router.get("/templates", response_model=TemplateListResponse)
-async def list_templates() -> TemplateListResponse:
+@limiter.limit("50/minute")
+async def list_templates(request: Request) -> TemplateListResponse:
     """List available query templates."""
     query_router = get_router()
     templates = query_router.get_available_templates()
@@ -258,7 +264,8 @@ async def list_templates() -> TemplateListResponse:
 
 
 @router.post("/execute", response_model=CypherExecuteResponse)
-async def execute_cypher(request: CypherExecuteRequest) -> CypherExecuteResponse:
+@limiter.limit("20/minute")
+async def execute_cypher(request: Request, body: CypherExecuteRequest) -> CypherExecuteResponse:
     """
     Execute raw Cypher query (for advanced users).
     
@@ -267,7 +274,7 @@ async def execute_cypher(request: CypherExecuteRequest) -> CypherExecuteResponse
     start_time = time.time()
     
     # Security check - no write operations
-    cypher_upper = request.cypher.upper()
+    cypher_upper = body.cypher.upper()
     dangerous = ["CREATE", "DELETE", "REMOVE", "DROP", "MERGE", "SET"]
     
     for keyword in dangerous:
@@ -279,7 +286,7 @@ async def execute_cypher(request: CypherExecuteRequest) -> CypherExecuteResponse
     
     try:
         conn = get_neo4j_connection()
-        results = conn.execute_query(request.cypher, request.params)
+        results = conn.execute_query(body.cypher, body.params)
         
         execution_time = (time.time() - start_time) * 1000
         
@@ -298,7 +305,9 @@ async def execute_cypher(request: CypherExecuteRequest) -> CypherExecuteResponse
 
 
 @router.get("/context")
+@limiter.limit("50/minute")
 async def get_query_context(
+    request: Request,
     query: str = Query(..., description="Natural language query")
 ) -> dict:
     """Get the context that would be used for a query."""

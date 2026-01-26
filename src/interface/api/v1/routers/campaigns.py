@@ -22,6 +22,7 @@ from src.core.database.repositories import (
     CampaignContextRepository
 )
 from src.core.database.duckdb_repository import get_duckdb_repository, CAMPAIGNS_PARQUET
+from src.core.database.duckdb_manager import get_duckdb_manager
 from src.platform.query_engine.nl_to_sql import NaturalLanguageQueryEngine
 from src.interface.api.v1.models import ChatRequest, GlobalAnalysisRequest, KPIComparisonRequest, VisualizationsQuery
 from src.interface.api.v1.response_models import (
@@ -415,9 +416,8 @@ async def get_kpi_comparison(
         start_date = comparison_req.start_date
         end_date = comparison_req.end_date
         
-        campaign_repo = CampaignRepository(db)
-        
-
+        duckdb_mgr = get_duckdb_manager()
+        df = duckdb_mgr.get_campaigns()
         
         if df.empty:
             return {"data": [], "summary": {}}

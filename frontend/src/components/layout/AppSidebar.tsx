@@ -13,7 +13,6 @@ import {
     Settings,
     List,
     Activity,
-    TrendingUp,
     FileSpreadsheet,
     Globe,
     Sparkles
@@ -66,11 +65,7 @@ export function AppSidebar({ className }: SidebarProps) {
             icon: Activity,
         },
 
-        {
-            title: "Regression",
-            href: "/regression",
-            icon: TrendingUp,
-        },
+
         {
             title: "Q&A",
             href: "/chat",

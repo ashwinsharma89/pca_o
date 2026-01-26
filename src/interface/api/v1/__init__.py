@@ -20,7 +20,7 @@ from .connectors import router as connectors_router
 from .health_check import router as health_check_router
 
 # Import new domain-specific routers
-# from .routers.ingestion import router as ingestion_router
+from .routers.ingestion import router as ingestion_router
 from .routers.analytics import router as analytics_router
 from .routers.chat import router as chat_router
 from .routers.reports import router as reports_router
@@ -39,7 +39,7 @@ router_v1.include_router(connectors_router)
 router_v1.include_router(health_check_router)
 
 # New domain routers (Phase 2 refactoring)
-# router_v1.include_router(ingestion_router)
+router_v1.include_router(ingestion_router)
 router_v1.include_router(reports_router)  # MUST be before analytics_router to handle x_axis/y_axis params
 router_v1.include_router(analytics_router)
 router_v1.include_router(chat_router)

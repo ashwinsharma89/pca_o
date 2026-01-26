@@ -284,10 +284,13 @@ class QueryRouter:
         date_from = context.get("date_from") or "2024-01-01"
         
         # Route based on intent
+        # Route based on intent
         if intent == QueryIntent.CROSS_CHANNEL:
             channels = entities.get("channel", [])
             if isinstance(channels, list) and len(channels) >= 2:
-                return cross_channel.get_compare_channels_query(channels[0], channels[1])
+                c1 = self._normalize_channel(channels[0])
+                c2 = self._normalize_channel(channels[1])
+                return cross_channel.get_compare_channels_query(c1, c2)
             return cross_channel.get_all_channels_breakdown()
         
         elif intent == QueryIntent.PLATFORM_PERFORMANCE:
@@ -381,6 +384,25 @@ class QueryRouter:
         }
         
         return mappings.get(platform.lower(), platform.lower())
+
+    def _normalize_channel(self, channel: str) -> str:
+        """Normalize channel name to DB code."""
+        if not channel:
+            return channel
+        
+        mappings = {
+            "social": "SOC",
+            "display": "DIS",
+            "search": "Search",
+            "programmatic": "DIS",
+            "connected tv": "CTV",
+            "ctv": "CTV",
+            "video": "Video",
+            "ooh": "OOH",
+            "retail media": "Retail Media",
+            "email": "Email",
+        }
+        return mappings.get(channel.lower(), channel)
     
     def get_available_templates(self) -> List[Dict[str, Any]]:
         """Get list of available query templates."""

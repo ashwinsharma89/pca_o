@@ -26,36 +26,35 @@ class BulletproofQueries:
     TABLE: all_campaigns
     
     DIMENSION COLUMNS (for GROUP BY):
-    - "Date" (datetime) - Campaign date, use CAST("Date" AS DATE)
-    - Platform (varchar) - Meta, Google, TikTok, etc.
-    - Channel (varchar) - SOC, DIS, SEARCH, EMAIL
+    - date (datetime) - Campaign date, use CAST(date AS DATE)
+    - platform (varchar) - Meta, Google, TikTok, etc.
+    - channel (varchar) - SOC, DIS, SEARCH, EMAIL
     - Campaign_Name_Full (varchar) - Full campaign name
-    - Device_Type (varchar) - Mobile, Desktop, Smart_TV, etc.
-    - Campaign_Objective (varchar) - Lead_Generation, Brand_Awareness, etc.
-    - Funnel (varchar) - Upper, Middle, Lower
-    - Geographic_Region (varchar) - Florida, California, etc.
+    - device (varchar) - Mobile, Desktop, Smart_TV, etc.
+    - objective (varchar) - Lead_Generation, Brand_Awareness, etc.
+    - funnel (varchar) - Upper, Middle, Lower
+    - region (varchar) - Florida, California, etc.
     
     METRIC COLUMNS (for SUM/aggregation):
-    - "Total Spent" (float) - Ad spend in dollars
-    - "Site Visit" (float) - Conversions count
-    - Impressions (float) - Total impressions
-    - Clicks (float) - Total clicks
-    - Revenue_2024 (float) - Revenue for 2024 data
-    - Revenue_2025 (float) - Revenue for 2025 data
+    - spend (float) - Ad spend in dollars
+    - conversions (float) - Conversions count
+    - impressions (float) - Total impressions
+    - clicks (float) - Total clicks
+    - revenue (float) - Total revenue
     
     CALCULATED KPIs:
-    - CTR = SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0)
-    - CPC = SUM("Total Spent") / NULLIF(SUM(Clicks), 0)
-    - CPA = SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0)
-    - ROAS = (COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0)
-    - CVR = SUM("Site Visit") * 100.0 / NULLIF(SUM(Clicks), 0)
+    - CTR = SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0)
+    - CPC = SUM(spend) / NULLIF(SUM(clicks), 0)
+    - CPA = SUM(spend) / NULLIF(SUM(conversions), 0)
+    - ROAS = SUM(revenue) / NULLIF(SUM(spend), 0)
+    - CVR = SUM(conversions) * 100.0 / NULLIF(SUM(clicks), 0)
     """
     
     @staticmethod
     def get_date_bounds_cte() -> str:
         """Get max date from data for anchoring queries."""
         return """WITH date_bounds AS (
-    SELECT CAST(MAX("Date") AS DATE) AS max_date FROM all_campaigns
+    SELECT CAST(MAX(date) AS DATE) AS max_date FROM all_campaigns
 )"""
     
     # ============================================================
@@ -98,10 +97,10 @@ class BulletproofQueries:
     
     @classmethod
     def week_over_week_comparison(cls) -> str:
-        """Compare last 2 weeks: Dec 25-31 vs Dec 18-24"""
+        """Compare last 2 weeks."""
         return """
 WITH date_bounds AS (
-    SELECT CAST(MAX("Date") AS DATE) AS max_date FROM all_campaigns
+    SELECT CAST(MAX(date) AS DATE) AS max_date FROM all_campaigns
 ),
 date_ranges AS (
     SELECT 
@@ -113,23 +112,23 @@ date_ranges AS (
 ),
 current_week AS (
     SELECT 
-        SUM("Total Spent") AS spend,
-        SUM("Site Visit") AS conversions,
-        SUM(Impressions) AS impressions,
-        SUM(Clicks) AS clicks,
-        COALESCE(SUM(Revenue_2024), 0) + COALESCE(SUM(Revenue_2025), 0) AS revenue
+        SUM(COALESCE(spend, "Total Spent", 0)) AS spend,
+        SUM(COALESCE(conversions, "Site Visit", 0)) AS conversions,
+        SUM(impressions) AS impressions,
+        SUM(clicks) AS clicks,
+        SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) AS revenue
     FROM all_campaigns, date_ranges
-    WHERE CAST("Date" AS DATE) >= current_start AND CAST("Date" AS DATE) <= max_date
+    WHERE CAST(date AS DATE) >= current_start AND CAST(date AS DATE) <= max_date
 ),
 previous_week AS (
     SELECT 
-        SUM("Total Spent") AS spend,
-        SUM("Site Visit") AS conversions,
-        SUM(Impressions) AS impressions,
-        SUM(Clicks) AS clicks,
-        COALESCE(SUM(Revenue_2024), 0) + COALESCE(SUM(Revenue_2025), 0) AS revenue
+        SUM(COALESCE(spend, "Total Spent", 0)) AS spend,
+        SUM(COALESCE(conversions, "Site Visit", 0)) AS conversions,
+        SUM(impressions) AS impressions,
+        SUM(clicks) AS clicks,
+        SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) AS revenue
     FROM all_campaigns, date_ranges
-    WHERE CAST("Date" AS DATE) >= previous_start AND CAST("Date" AS DATE) <= previous_end
+    WHERE CAST(date AS DATE) >= previous_start AND CAST(date AS DATE) <= previous_end
 )
 SELECT 
     (SELECT STRFTIME(current_start, '%b %d') || ' - ' || STRFTIME(max_date, '%b %d') FROM date_ranges) AS current_period,
@@ -161,20 +160,20 @@ FROM current_week c, previous_week p
         interval = "30 days" if time_filter == "last_30_days" else "7 days"
         return f"""
 WITH date_bounds AS (
-    SELECT CAST(MAX("Date") AS DATE) AS max_date FROM all_campaigns
+    SELECT CAST(MAX(date) AS DATE) AS max_date FROM all_campaigns
 )
 SELECT 
-    Platform,
-    ROUND(SUM("Total Spent"), 0) AS spend,
-    ROUND(SUM("Site Visit"), 0) AS conversions,
-    ROUND(SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0), 2) AS cpa,
-    ROUND(SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0), 2) AS ctr,
-    ROUND((COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0), 2) AS roas,
-    ROUND(SUM(Impressions), 0) AS impressions,
-    ROUND(SUM(Clicks), 0) AS clicks
+    platform,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)), 0) AS spend,
+    ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS conversions,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(COALESCE(conversions, "Site Visit", 0)), 0), 2) AS cpa,
+    ROUND(SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0), 2) AS ctr,
+    ROUND(SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, "Total Spent", 0)), 0), 2) AS roas,
+    ROUND(SUM(impressions), 0) AS impressions,
+    ROUND(SUM(clicks), 0) AS clicks
 FROM all_campaigns, date_bounds
-WHERE CAST("Date" AS DATE) >= max_date - INTERVAL '{interval}'
-GROUP BY Platform
+WHERE CAST(date AS DATE) >= max_date - INTERVAL '{interval}'
+GROUP BY platform
 ORDER BY spend DESC
 """
 
@@ -184,18 +183,18 @@ ORDER BY spend DESC
         interval = "30 days" if time_filter == "last_30_days" else "7 days"
         return f"""
 WITH date_bounds AS (
-    SELECT CAST(MAX("Date") AS DATE) AS max_date FROM all_campaigns
+    SELECT CAST(MAX(date) AS DATE) AS max_date FROM all_campaigns
 )
 SELECT 
-    Channel,
-    ROUND(SUM("Total Spent"), 0) AS spend,
-    ROUND(SUM("Site Visit"), 0) AS conversions,
-    ROUND(SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0), 2) AS cpa,
-    ROUND(SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0), 2) AS ctr,
-    ROUND((COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0), 2) AS roas
+    channel,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)), 0) AS spend,
+    ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS conversions,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(COALESCE(conversions, "Site Visit", 0)), 0), 2) AS cpa,
+    ROUND(SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0), 2) AS ctr,
+    ROUND(SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, "Total Spent", 0)), 0), 2) AS roas
 FROM all_campaigns, date_bounds
-WHERE CAST("Date" AS DATE) >= max_date - INTERVAL '{interval}'
-GROUP BY Channel
+WHERE CAST(date AS DATE) >= max_date - INTERVAL '{interval}'
+GROUP BY channel
 ORDER BY spend DESC
 """
 
@@ -203,29 +202,29 @@ ORDER BY spend DESC
     def top_campaigns_by_metric(cls, metric: str = "roas", limit: int = 10) -> str:
         """Get top performing campaigns."""
         metric_sql = {
-            "roas": "(COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM(\"Total Spent\"), 0)",
-            "cpa": "SUM(\"Total Spent\") / NULLIF(SUM(\"Site Visit\"), 0)",
-            "ctr": "SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0)",
-            "conversions": "SUM(\"Site Visit\")",
-            "spend": "SUM(\"Total Spent\")"
+            "roas": "SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, \"Total Spent\", 0)), 0)",
+            "cpa": "SUM(COALESCE(spend, \"Total Spent\", 0)) / NULLIF(SUM(COALESCE(conversions, \"Site Visit\", 0)), 0)",
+            "ctr": "SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0)",
+            "conversions": "SUM(COALESCE(conversions, \"Site Visit\", 0))",
+            "spend": "SUM(COALESCE(spend, \"Total Spent\", 0))"
         }
         order = "DESC" if metric in ["roas", "ctr", "conversions", "spend"] else "ASC"
         
         return f"""
 WITH date_bounds AS (
-    SELECT CAST(MAX("Date") AS DATE) AS max_date FROM all_campaigns
+    SELECT CAST(MAX(date) AS DATE) AS max_date FROM all_campaigns
 )
 SELECT 
-    Campaign AS campaign,
-    ROUND(SUM("Total Spent"), 0) AS spend,
-    ROUND(SUM("Site Visit"), 0) AS conversions,
-    ROUND(SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0), 2) AS cpa,
-    ROUND(SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0), 2) AS ctr,
-    ROUND((COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0), 2) AS roas
+    COALESCE(Campaign, Campaign_Name_Full) AS campaign,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)), 0) AS spend,
+    ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS conversions,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(COALESCE(conversions, "Site Visit", 0)), 0), 2) AS cpa,
+    ROUND(SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0), 2) AS ctr,
+    ROUND(SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, "Total Spent", 0)), 0), 2) AS roas
 FROM all_campaigns, date_bounds
-WHERE CAST("Date" AS DATE) >= max_date - INTERVAL '30 days'
-GROUP BY Campaign
-HAVING SUM("Site Visit") >= 1
+WHERE CAST(date AS DATE) >= max_date - INTERVAL '30 days'
+GROUP BY campaign
+HAVING SUM(COALESCE(conversions, "Site Visit", 0)) >= 1
 ORDER BY {metric_sql.get(metric, metric_sql["roas"])} {order}
 LIMIT {limit}
 """
@@ -234,26 +233,26 @@ LIMIT {limit}
     def daily_trend(cls, metric: str = "spend", days: int = 30) -> str:
         """Daily trend for a metric."""
         metric_sql = {
-            "spend": 'ROUND(SUM("Total Spent"), 0) AS spend',
-            "conversions": 'ROUND(SUM("Site Visit"), 0) AS conversions',
-            "ctr": 'ROUND(SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0), 2) AS ctr',
-            "cpa": 'ROUND(SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0), 2) AS cpa',
-            "roas": 'ROUND((COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0), 2) AS roas'
+            "spend": 'ROUND(SUM(COALESCE(spend, "Total Spent", 0)), 0) AS spend',
+            "conversions": 'ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS conversions',
+            "ctr": 'ROUND(SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0), 2) AS ctr',
+            "cpa": 'ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(COALESCE(conversions, "Site Visit", 0)), 0), 2) AS cpa',
+            "roas": 'ROUND(SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, "Total Spent", 0)), 0), 2) AS roas'
         }
         
         return f"""
 WITH date_bounds AS (
-    SELECT CAST(MAX("Date") AS DATE) AS max_date FROM all_campaigns
+    SELECT CAST(MAX(date) AS DATE) AS max_date FROM all_campaigns
 )
 SELECT 
-    CAST("Date" AS DATE) AS date,
+    CAST(date AS DATE) AS date,
     {metric_sql.get(metric, metric_sql["spend"])},
-    ROUND(SUM("Site Visit"), 0) AS conversions,
-    ROUND(SUM(Impressions), 0) AS impressions,
-    ROUND(SUM(Clicks), 0) AS clicks
+    ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS conversions,
+    ROUND(SUM(impressions), 0) AS impressions,
+    ROUND(SUM(clicks), 0) AS clicks
 FROM all_campaigns, date_bounds
-WHERE CAST("Date" AS DATE) >= max_date - INTERVAL '{days} days'
-GROUP BY CAST("Date" AS DATE)
+WHERE CAST(date AS DATE) >= max_date - INTERVAL '{days} days'
+GROUP BY CAST(date AS DATE)
 ORDER BY date
 """
 
@@ -262,18 +261,18 @@ ORDER BY date
         """Weekly aggregated trend."""
         return f"""
 WITH date_bounds AS (
-    SELECT CAST(MAX("Date") AS DATE) AS max_date FROM all_campaigns
+    SELECT CAST(MAX(date) AS DATE) AS max_date FROM all_campaigns
 )
 SELECT 
-    DATE_TRUNC('week', CAST("Date" AS DATE)) AS week_start,
-    ROUND(SUM("Total Spent"), 0) AS spend,
-    ROUND(SUM("Site Visit"), 0) AS conversions,
-    ROUND(SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0), 2) AS cpa,
-    ROUND(SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0), 2) AS ctr,
-    ROUND((COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0), 2) AS roas
+    DATE_TRUNC('week', CAST(date AS DATE)) AS week_start,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)), 0) AS spend,
+    ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS conversions,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(COALESCE(conversions, "Site Visit", 0)), 0), 2) AS cpa,
+    ROUND(SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0), 2) AS ctr,
+    ROUND(SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, "Total Spent", 0)), 0), 2) AS roas
 FROM all_campaigns, date_bounds
-WHERE CAST("Date" AS DATE) >= max_date - INTERVAL '{weeks * 7} days'
-GROUP BY DATE_TRUNC('week', CAST("Date" AS DATE))
+WHERE CAST(date AS DATE) >= max_date - INTERVAL '{weeks * 7} days'
+GROUP BY DATE_TRUNC('week', CAST(date AS DATE))
 ORDER BY week_start
 """
 
@@ -282,15 +281,15 @@ ORDER BY week_start
         """Monthly aggregated trend."""
         return f"""
 SELECT 
-    DATE_TRUNC('month', CAST("Date" AS DATE)) AS month,
-    STRFTIME(DATE_TRUNC('month', CAST("Date" AS DATE)), '%b %Y') AS month_label,
-    ROUND(SUM("Total Spent"), 0) AS spend,
-    ROUND(SUM("Site Visit"), 0) AS conversions,
-    ROUND(SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0), 2) AS cpa,
-    ROUND(SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0), 2) AS ctr,
-    ROUND((COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0), 2) AS roas
+    DATE_TRUNC('month', CAST(date AS DATE)) AS month,
+    STRFTIME(DATE_TRUNC('month', CAST(date AS DATE)), '%b %Y') AS month_label,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)), 0) AS spend,
+    ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS conversions,
+    ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(COALESCE(conversions, "Site Visit", 0)), 0), 2) AS cpa,
+    ROUND(SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0), 2) AS ctr,
+    ROUND(SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, "Total Spent", 0)), 0), 2) AS roas
 FROM all_campaigns
-GROUP BY DATE_TRUNC('month', CAST("Date" AS DATE))
+GROUP BY date_trunc('month', CAST(date AS DATE))
 ORDER BY month DESC
 LIMIT {months}
 """
@@ -302,28 +301,28 @@ LIMIT {months}
         range_expr = "'All Time'"
         
         if time_filter == "last_7_days":
-            where_clause = "WHERE CAST(\"Date\" AS DATE) >= (SELECT max_date - INTERVAL '7 days' FROM date_bounds)"
+            where_clause = "WHERE CAST(date AS DATE) >= (SELECT max_date - INTERVAL '7 days' FROM date_bounds)"
             range_expr = "STRFTIME(max_date - INTERVAL '7 days', '%b %d, %Y') || ' - ' || STRFTIME(max_date, '%b %d, %Y')"
         elif time_filter == "last_30_days":
-            where_clause = "WHERE CAST(\"Date\" AS DATE) >= (SELECT max_date - INTERVAL '30 days' FROM date_bounds)"
+            where_clause = "WHERE CAST(date AS DATE) >= (SELECT max_date - INTERVAL '30 days' FROM date_bounds)"
             range_expr = "STRFTIME(max_date - INTERVAL '30 days', '%b %d, %Y') || ' - ' || STRFTIME(max_date, '%b %d, %Y')"
         elif time_filter == "mtd":
-            where_clause = "WHERE CAST(\"Date\" AS DATE) >= (SELECT DATE_TRUNC('month', max_date) FROM date_bounds)"
+            where_clause = "WHERE CAST(date AS DATE) >= (SELECT DATE_TRUNC('month', max_date) FROM date_bounds)"
             range_expr = "STRFTIME(DATE_TRUNC('month', max_date), '%b %d, %Y') || ' - ' || STRFTIME(max_date, '%b %d, %Y')"
         elif time_filter == "ytd":
-            where_clause = "WHERE CAST(\"Date\" AS DATE) >= (SELECT DATE_TRUNC('year', max_date) FROM date_bounds)"
+            where_clause = "WHERE CAST(date AS DATE) >= (SELECT DATE_TRUNC('year', max_date) FROM date_bounds)"
             range_expr = "STRFTIME(DATE_TRUNC('year', max_date), '%b %d, %Y') || ' - ' || STRFTIME(max_date, '%b %d, %Y')"
 
         # Define KPI columns
         kpi_cols = {
-            'total_spend': 'ROUND(SUM("Total Spent"), 0) AS total_spend',
-            'total_conversions': 'ROUND(SUM("Site Visit"), 0) AS total_conversions',
-            'total_impressions': 'ROUND(SUM(Impressions), 0) AS total_impressions',
-            'total_clicks': 'ROUND(SUM(Clicks), 0) AS total_clicks',
-            'cpa': 'ROUND(SUM("Total Spent") / NULLIF(SUM("Site Visit"), 0), 2) AS overall_cpa',
-            'ctr': 'ROUND(SUM(Clicks) * 100.0 / NULLIF(SUM(Impressions), 0), 2) AS overall_ctr',
-            'cpc': 'ROUND(SUM("Total Spent") / NULLIF(SUM(Clicks), 0), 2) AS overall_cpc',
-            'roas': 'ROUND((COALESCE(SUM(Revenue_2024),0) + COALESCE(SUM(Revenue_2025),0)) / NULLIF(SUM("Total Spent"), 0), 2) AS overall_roas'
+            'total_spend': 'ROUND(SUM(COALESCE(spend, "Total Spent", 0)), 0) AS total_spend',
+            'total_conversions': 'ROUND(SUM(COALESCE(conversions, "Site Visit", 0)), 0) AS total_conversions',
+            'total_impressions': 'ROUND(SUM(impressions), 0) AS total_impressions',
+            'total_clicks': 'ROUND(SUM(clicks), 0) AS total_clicks',
+            'cpa': 'ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(COALESCE(conversions, "Site Visit", 0)), 0), 2) AS overall_cpa',
+            'ctr': 'ROUND(SUM(clicks) * 100.0 / NULLIF(SUM(impressions), 0), 2) AS overall_ctr',
+            'cpc': 'ROUND(SUM(COALESCE(spend, "Total Spent", 0)) / NULLIF(SUM(clicks), 0), 2) AS overall_cpc',
+            'roas': 'ROUND(SUM(COALESCE(revenue, Revenue_2024, Revenue_2025, 0)) / NULLIF(SUM(COALESCE(spend, "Total Spent", 0)), 0), 2) AS overall_roas'
         }
 
         # Order KPIs: focused first, then others

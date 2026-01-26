@@ -59,6 +59,8 @@ scikit-learn
 pyjwt
 bcrypt
 psutil
+qrcode>=7.0.0
+bleach>=6.0.0
 
 # Visualization - NO VERSION PINS
 plotly
