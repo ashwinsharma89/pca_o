@@ -12,8 +12,14 @@ import shutil
 from pathlib import Path
 from unittest.mock import Mock, patch
 import numpy as np
-from src.engine.intelligence.semantic_cache import SemanticCache, get_semantic_cache
-from src.engine.intelligence.lancedb_manager import LanceDBManager
+try:
+    from src.engine.intelligence.semantic_cache import SemanticCache, get_semantic_cache
+    from src.engine.intelligence.lancedb_manager import LanceDBManager
+    SEMANTIC_CACHE_AVAILABLE = True
+except ImportError:
+    SEMANTIC_CACHE_AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(not SEMANTIC_CACHE_AVAILABLE, reason="Semantic cache dependencies not available")
 
 TEST_DB_PATH = Path("data/test_semantic_cache_db")
 

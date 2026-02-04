@@ -1,7 +1,7 @@
 const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
         // Client-side: Use configured public URL or localhost default
-        return process.env.NEXT_PUBLIC_API_URL || '/api/v1';
+        return process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1';
     }
     // Server-side (SSR):
     // 1. Prefer explicit internal URL if set
@@ -9,13 +9,14 @@ const getBaseUrl = () => {
 
     // 2. Intelligent Fallback:
     // If public URL is relative (e.g. "/api/v1" behind Nginx), we MUST use the internal Docker service URL
-    if (process.env.NEXT_PUBLIC_API_URL?.startsWith('/')) {
+    const backendDomain = process.env.NEXT_PUBLIC_BACKEND_DOMAIN;
+    if (backendDomain?.startsWith('/')) {
         return 'http://api:8000/api/v1';
     }
 
     // 3. Default for local dev
     // 3. Default for local dev - use relative path to leverage Next.js proxy (which points to mock server 8001)
-    return process.env.NEXT_PUBLIC_API_URL || '/api/v1';
+    return backendDomain ? `${backendDomain}/api/v1` : '/api/v1';
 };
 
 const API_URL = getBaseUrl();

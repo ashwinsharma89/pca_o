@@ -12,6 +12,7 @@ from typing import Dict, Any, Optional, List
 import logging
 import pandas as pd
 import numpy as np
+import time
 from datetime import datetime
 from loguru import logger as loguru_logger
 
@@ -21,7 +22,6 @@ from src.core.database.connection import get_db
 from src.core.database.duckdb_manager import get_duckdb_manager
 from src.platform.models.campaign import ReportTemplate
 from src.engine.reports.dynamic_aggregator import DynamicAggregator
-# from src.engine.analytics.regression import RegressionPipeline as RegressionPipelineV3, RegressionResult, RecommendationEngineV2
 from src.core.schema.columns import Columns
 from src.core.utils.column_mapping import find_column
 
@@ -35,7 +35,6 @@ tracer = get_tracer(__name__)
 
 
 # New modular regression module (V3)
-# from src.engine.analytics.regression import RegressionPipeline as RegressionPipelineV3
 
 
 
@@ -496,6 +495,4 @@ async def get_dimension_importance(
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
-# =============================================================================
-# ENHANCED REGRESSION V3 ENDPOINT - Production ML
-# =============================================================================
+

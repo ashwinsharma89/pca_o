@@ -331,12 +331,12 @@ class QueryRouter:
             
             # Detect granularity from query
             query_lower = query.lower()
-            if "week" in query_lower:
+            if "day of week" in query_lower or "dayofweek" in query_lower:
+                return temporal.get_day_of_week_analysis(date_from, date_to)
+            elif "week" in query_lower:
                 return temporal.get_weekly_trend(date_from, date_to)
             elif "month" in query_lower:
                 return temporal.get_month_comparison(date_from, date_to)
-            elif "day of week" in query_lower or "dayofweek" in query_lower:
-                return temporal.get_day_of_week_analysis(date_from, date_to)
             
             platform_id = self._normalize_platform(entities.get("platform"))
             if platform_id:

@@ -85,9 +85,12 @@ class ValidatedReasoningAgent:
             
         except Exception as e:
             logger.error(f"Failed to validate output: {e}")
-            # Return with minimal validation
+            # Return with minimal validation and a placeholder insight to satisfy Pydantic
             return AgentOutput(
-                insights=[],
+                insights=[AgentInsight(
+                    text="Analysis failed during validation. Please check warnings for details.",
+                    confidence=0.5
+                )],
                 recommendations=[],
                 metadata=AgentMetadata(
                     agent_name="EnhancedReasoningAgent",

@@ -14,7 +14,7 @@ import gzip
 import json
 import re
 
-from src.core.database.connection import get_db_url, get_db_manager
+from src.core.database.connection import get_db_manager, DatabaseConfig
 
 logger = logging.getLogger(__name__)
 

@@ -11,10 +11,14 @@ Verifies:
 import pytest
 import shutil
 from pathlib import Path
-import lancedb
-import pandas as pd
-from unittest.mock import Mock, patch
-from src.engine.intelligence.lancedb_manager import LanceDBManager, get_lancedb_manager, DB_PATH
+try:
+    import lancedb
+    from src.engine.intelligence.lancedb_manager import LanceDBManager, get_lancedb_manager, DB_PATH
+    LANCEDB_AVAILABLE = True
+except ImportError:
+    LANCEDB_AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(not LANCEDB_AVAILABLE, reason="lancedb or dependencies not available")
 
 TEST_DB_PATH = Path("data/test_lancedb")
 

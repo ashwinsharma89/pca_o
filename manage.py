@@ -40,13 +40,15 @@ def kill_port(port: int):
     if os.name == "nt":
         # Windows approach using netstat and taskkill
         try:
-            cmd = f'netstat -ano | findstr :{port}'
+            # -a: all connections, -n: addresses as numbers, -o: owning process ID
+            cmd = f'netstat -ano | findstr LISTENING | findstr :{port}'
             output = subprocess.check_output(cmd, shell=True).decode()
             for line in output.splitlines():
-                if "LISTENING" in line:
-                    pid = line.strip().split()[-1]
+                parts = line.strip().split()
+                if len(parts) >= 5:
+                    pid = parts[-1]
                     log(f"Killing process {pid} on port {port}", Colors.WARNING)
-                    subprocess.run(['taskkill', '/F', '/PID', pid], check=False)
+                    subprocess.run(['taskkill', '/F', '/PID', pid], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception:
             pass
     else:
@@ -76,13 +78,18 @@ def start_backend():
     env["PYTHONPATH"] = str(PROJECT_ROOT)
 
     with open(BACKEND_LOG, "w") as log_file:
+        creationflags = 0
+        if os.name == "nt":
+            creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
+        
         proc = subprocess.Popen(
             [str(python_exe), "-m", "src.interface.api.main"],
             cwd=PROJECT_ROOT,
             env=env,
             stdout=log_file,
             stderr=subprocess.STDOUT,
-            preexec_fn=None if os.name == "nt" else os.setpgrp
+            preexec_fn=None if os.name == "nt" else os.setpgrp,
+            creationflags=creationflags
         )
     log(f"Backend started (PID: {proc.pid})", Colors.OKGREEN)
     return proc
@@ -96,6 +103,10 @@ def start_frontend():
     env["PORT"] = "3000"
 
     with open(FRONTEND_LOG, "w") as log_file:
+        creationflags = 0
+        if os.name == "nt":
+            creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
+
         # Use shell=True for npm to handle PATH issues on Windows
         proc = subprocess.Popen(
             "npm run dev",
@@ -104,21 +115,32 @@ def start_frontend():
             shell=True,
             stdout=log_file,
             stderr=subprocess.STDOUT,
-            preexec_fn=None if os.name == "nt" else os.setpgrp
+            preexec_fn=None if os.name == "nt" else os.setpgrp,
+            creationflags=creationflags
         )
     log(f"Frontend started (PID: {proc.pid})", Colors.OKGREEN)
     return proc
 
 def cleanup_and_exit(signum, frame):
     log("\n🛑 Stopping services...", Colors.WARNING)
-    # This script kills its own children because they are in the same process group (on Unix)
-    if os.name != "nt":
-        os.killpg(0, signal.SIGTERM)
+    if os.name == "nt":
+        # Windows: taskkill the current process tree might be too aggressive, 
+        # so we rely on port killing in the next start or manual stop.
+        # But we can try to kill children if we have their PIDs.
+        log("Please wait, cleaning up ports...", Colors.OKCYAN)
+        kill_port(3000)
+        kill_port(8001)
+    else:
+        # Unix: kill the entire process group
+        try:
+            os.killpg(0, signal.SIGTERM)
+        except Exception:
+            pass
     sys.exit(0)
 
 def main():
     parser = argparse.ArgumentParser(description="PCA Agent Management Tool")
-    parser.add_argument("command", choices=["start", "stop", "setup"], help="Action to perform")
+    parser.add_argument("command", choices=["start", "stop", "setup", "test"], help="Action to perform")
     args = parser.parse_args()
 
     if args.command == "start":
@@ -142,9 +164,30 @@ def main():
         kill_port(8001)
         log("Services stopped.", Colors.OKGREEN)
 
+    elif args.command == "test":
+        log("🧪 Running Tests...", Colors.BOLD)
+        python_exe = get_venv_python()
+        if not python_exe.exists():
+            log(f"Error: Virtual environment not found at {VENV_DIR}", Colors.FAIL)
+            return
+
+        # Run pytest
+        subprocess.run([str(python_exe), "-m", "pytest", "tests/unit/", "-v"], cwd=PROJECT_ROOT)
+
     elif args.command == "setup":
         log("📦 Setting up environment...", Colors.BOLD)
         
+        # 0. Environment variables
+        env_file = PROJECT_ROOT / ".env"
+        if not env_file.exists():
+            example_env = PROJECT_ROOT / ".env.example"
+            if example_env.exists():
+                log(f"Creating .env from .env.example...", Colors.OKBLUE)
+                import shutil
+                shutil.copy(str(example_env), str(env_file))
+            else:
+                log("Warning: .env.example not found. Please create .env manually.", Colors.WARNING)
+
         # 1. Backend setup
         log("\n--- Backend Setup ---", Colors.OKCYAN)
         python_exe = get_venv_python()

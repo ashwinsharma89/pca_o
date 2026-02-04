@@ -1,0 +1,74 @@
+[
+  {
+    "request_id": "9b8bbb29",
+    "model": "gpt-4o-mini",
+    "provider": "openai",
+    "input_tokens": 100,
+    "output_tokens": 50,
+    "cost_usd": 4.5e-05,
+    "timestamp": "2026-01-26T19:47:08.616015",
+    "operation": "test",
+    "success": true,
+    "latency_ms": 100
+  },
+  {
+    "request_id": "767e8df4",
+    "model": "gpt-4o",
+    "provider": "openai",
+    "input_tokens": 10000,
+    "output_tokens": 5000,
+    "cost_usd": 0.125,
+    "timestamp": "2026-01-26T19:47:08.618600",
+    "operation": "test",
+    "success": true,
+    "latency_ms": 1000
+  },
+  {
+    "request_id": "ed07f135",
+    "model": "gpt-4o-mini",
+    "provider": "openai",
+    "input_tokens": 100,
+    "output_tokens": 50,
+    "cost_usd": 4.5e-05,
+    "timestamp": "2026-01-26T19:47:08.619975",
+    "operation": "test",
+    "success": true,
+    "latency_ms": 100
+  },
+  {
+    "request_id": "1b5e2c79",
+    "model": "claude-3-haiku-20240307",
+    "provider": "anthropic",
+    "input_tokens": 200,
+    "output_tokens": 100,
+    "cost_usd": 0.000175,
+    "timestamp": "2026-01-26T19:47:08.620105",
+    "operation": "test",
+    "success": true,
+    "latency_ms": 150
+  },
+  {
+    "request_id": "8796b2b0",
+    "model": "gpt-4o-mini",
+    "provider": "openai",
+    "input_tokens": 100,
+    "output_tokens": 50,
+    "cost_usd": 4.5e-05,
+    "timestamp": "2026-01-26T19:47:08.621353",
+    "operation": "test",
+    "success": true,
+    "latency_ms": 100
+  },
+  {
+    "request_id": "643d5f0d",
+    "model": "gpt-4o-mini",
+    "provider": "openai",
+    "input_tokens": 1000,
+    "output_tokens": 500,
+    "cost_usd": 0.00045,
+    "timestamp": "2026-01-26T19:47:08.629081",
+    "operation": "test",
+    "success": true,
+    "latency_ms": 500
+  }
+]

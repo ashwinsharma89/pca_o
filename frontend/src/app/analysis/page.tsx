@@ -558,7 +558,7 @@ export default function GlobalAnalysisPage() {
                         </Card>
                     )}
 
-                    {/* Insights & Recommendations (Grid for Reflex Parity) */}
+                    {/* Insights & Recommendations */}
                     <div className="grid gap-8 lg:grid-cols-2">
                         {/* Key Insights (Grid Layout) */}
                         {analysisResult.insights && analysisResult.insights.length > 0 && (
