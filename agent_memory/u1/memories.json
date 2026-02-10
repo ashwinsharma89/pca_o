@@ -1,0 +1,26 @@
+[
+  {
+    "id": "5389ec498115f07e",
+    "user_id": "u1",
+    "session_id": "cb535d2a565b223a",
+    "memory_type": "preference",
+    "content": {
+      "k": "v"
+    },
+    "timestamp": "2026-01-27T06:43:58.159676",
+    "ttl_hours": 720,
+    "importance": 0.8
+  },
+  {
+    "id": "2a70fd13a85327f9",
+    "user_id": "u1",
+    "session_id": "33e52fa6d3f7ff86",
+    "memory_type": "preference",
+    "content": {
+      "k": "v"
+    },
+    "timestamp": "2026-01-27T06:45:54.779503",
+    "ttl_hours": 720,
+    "importance": 0.8
+  }
+]

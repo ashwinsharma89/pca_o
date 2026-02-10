@@ -168,7 +168,7 @@ export default function UploadPage() {
             }
             headers['X-CSRF-Token'] = 'v2-token-generation-pca';
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/upload/preview-sheets`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/upload/preview-sheets`, {
                 method: 'POST',
                 headers,
                 body: formData,
@@ -219,7 +219,7 @@ export default function UploadPage() {
             }
             headers['X-CSRF-Token'] = 'v2-token-generation-pca';
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/upload/stream`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/upload/stream`, {
                 method: 'POST',
                 headers,
                 body: formData,
@@ -278,7 +278,7 @@ export default function UploadPage() {
                     const headers: HeadersInit = {};
                     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/upload/status/${jobId}`, {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/upload/status/${jobId}`, {
                         headers
                     });
 
@@ -459,7 +459,7 @@ export default function UploadPage() {
                 ...formData
             };
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/databases/test-connection`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/databases/test-connection`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(payload),
@@ -486,7 +486,7 @@ export default function UploadPage() {
             const headers: HeadersInit = { 'Content-Type': 'application/json' };
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/databases/tables`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/databases/tables`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(connectionPayload),
@@ -524,7 +524,7 @@ export default function UploadPage() {
             };
 
             // Call import endpoint
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/databases/import?table_name=${selectedTable}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/databases/import?table_name=${selectedTable}`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(payload),
@@ -569,7 +569,7 @@ export default function UploadPage() {
                 ...formData
             };
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/databases/save-connection`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/databases/save-connection`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(payload),
@@ -606,7 +606,7 @@ export default function UploadPage() {
             const headers: HeadersInit = { 'Content-Type': 'application/json' };
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/system/reset`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : '/api/v1'}/system/reset`, {
                 method: 'POST',
                 headers
             });

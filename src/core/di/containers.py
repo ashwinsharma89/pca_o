@@ -12,11 +12,13 @@ Provides comprehensive DI coverage for:
 
 import os
 from dependency_injector import containers, providers
-from src.core.database.connection import DatabaseManager
+from src.core.database.connection import DatabaseManager, DatabaseConfig, get_db_session
 from src.core.database.repositories import (
     CampaignRepository, 
     AnalysisRepository, 
-    CampaignContextRepository
+    CampaignContextRepository,
+    QueryHistoryRepository,
+    LLMUsageRepository
 )
 
 

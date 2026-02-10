@@ -236,10 +236,9 @@ class EnhancedVisualizationAgent:
         Returns:
             Plotly figure object
         """
-        
-        chart_type_str = chart_type.value if hasattr(chart_type, 'value') else str(chart_type)
-        
         try:
+            chart_type_str = chart_type.value if hasattr(chart_type, 'value') else str(chart_type)
+            
             # Channel comparison / Grouped bar
             if chart_type in [VisualizationType.GROUPED_BAR, VisualizationType.BAR_CHART]:
                 return self.chart_gen.create_channel_comparison_chart(
@@ -262,25 +261,29 @@ class EnhancedVisualizationAgent:
             
             # Performance gauge
             elif chart_type == VisualizationType.GAUGE:
+                actual = data.get('value', data.get('actual', 0)) if isinstance(data, dict) else 0
                 return self.chart_gen.create_performance_gauge(
-                    actual=data.get('value', data.get('actual', 0)),
-                    target=data.get('target', 100),
-                    metric_name=data.get('metric_name', title or 'Performance'),
+                    actual=actual,
+                    target=data.get('target', 100) if isinstance(data, dict) else 100,
+                    metric_name=data.get('metric_name', title or 'Performance') if isinstance(data, dict) else (title or 'Performance'),
                     benchmarks=benchmarks
                 )
             
             # Heatmap (hourly or general)
             elif chart_type == VisualizationType.HEATMAP:
                 if 'hour' in str(data).lower() or styling.get('x_axis') == 'hour_of_day':
-                    return self.chart_gen.create_hourly_heatmap(data.get('values', data))
+                    heatmap_values = data.get('values', data) if isinstance(data, dict) else data
+                    return self.chart_gen.create_hourly_heatmap(heatmap_values)
                 else:
                     # Generic heatmap - use hourly as fallback
-                    return self.chart_gen.create_hourly_heatmap(data.get('values', data))
+                    heatmap_values = data.get('values', data) if isinstance(data, dict) else data
+                    return self.chart_gen.create_hourly_heatmap(heatmap_values)
             
             # Scatter / Bubble (keyword efficiency)
             elif chart_type in [VisualizationType.SCATTER_PLOT, VisualizationType.BUBBLE_CHART]:
+                keywords = data.get('keywords', data if isinstance(data, list) else []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
                 return self.chart_gen.create_keyword_opportunity_scatter(
-                    keyword_data=data.get('keywords', data if isinstance(data, list) else []),
+                    keyword_data=keywords,
                     benchmarks=benchmarks
                 )
             
@@ -301,17 +304,20 @@ class EnhancedVisualizationAgent:
             
             # Histogram (frequency analysis)
             elif chart_type == VisualizationType.HISTOGRAM:
+                freq_data = data.get('values', data if isinstance(data, list) else []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
                 return self.chart_gen.create_frequency_histogram(
-                    frequency_data=data.get('values', data if isinstance(data, list) else []),
+                    frequency_data=freq_data,
                     optimal_range=styling.get('highlight_optimal_range')
                 )
             
             # Bullet chart (benchmark comparison)
             elif chart_type == VisualizationType.BULLET_CHART:
                 # Use gauge as fallback for bullet chart
+                actual = data.get('actual', 0) if isinstance(data, dict) else 0
+                target = data.get('target', 100) if isinstance(data, dict) else 100
                 return self.chart_gen.create_performance_gauge(
-                    actual=data.get('actual', 0),
-                    target=data.get('target', 100),
+                    actual=actual,
+                    target=target,
                     metric_name=title or 'Performance',
                     benchmarks=benchmarks
                 )
@@ -323,6 +329,14 @@ class EnhancedVisualizationAgent:
                     data=data,
                     metrics=['spend']
                 )
+                
+        except Exception as e:
+            logger.error(f"Error generating {chart_type_str} chart: {e}")
+            # Return a simple fallback chart
+            return self.chart_gen.create_channel_comparison_chart(
+                data=data if isinstance(data, dict) else {},
+                metrics=['spend']
+            )
         
         except Exception as e:
             logger.error(f"Error generating {chart_type_str} chart: {e}")

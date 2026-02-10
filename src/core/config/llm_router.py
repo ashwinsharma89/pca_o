@@ -23,7 +23,6 @@ class TaskType(Enum):
     CODE_GENERATION = "code_generation"
     DATA_PROCESSING = "data_processing"
     REPORT_GENERATION = "report_generation"
-    PREDICTIVE_ANALYTICS = "predictive_analytics"
 
 
 class LLMRouter:
@@ -92,13 +91,6 @@ class LLMRouter:
             "reason": "Natural language generation with reasoning",
             "max_tokens": 4096,
             "temperature": 0.7
-        },
-        TaskType.PREDICTIVE_ANALYTICS: {
-            "provider": "openai",
-            "model": "gpt-4",  # Will be gpt-5.1-high-reasoning when available
-            "reason": "Statistical reasoning and predictions",
-            "max_tokens": 3000,
-            "temperature": 0.5
         }
     }
     

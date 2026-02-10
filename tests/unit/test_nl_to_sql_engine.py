@@ -108,10 +108,13 @@ class TestSQLGeneration:
             mock_response.choices = [Mock(message=Mock(content='SELECT * FROM campaigns'))]
             mock_engine.openai_client.chat.completions.create.return_value = mock_response
             
-            with patch('src.platform.query_engine.nl_to_sql.duckdb') as mock_duckdb:
-                mock_conn = Mock()
+            with patch('duckdb.connect') as mock_connect:
+                mock_conn = MagicMock()
                 mock_conn.execute.return_value.fetchdf.return_value = pd.DataFrame({'id': [1]})
-                mock_duckdb.connect.return_value = mock_conn
+                mock_conn.execute.return_value.df.return_value = pd.DataFrame({'id': [1]})
+                mock_connect.return_value = mock_conn
+                # Handle context manager
+                mock_connect.return_value.__enter__.return_value = mock_conn
                 
                 try:
                     result = mock_engine.ask("Show campaigns")

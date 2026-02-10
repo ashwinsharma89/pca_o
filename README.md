@@ -69,49 +69,39 @@ Storage (PostgreSQL + Redis + S3)
 
 ## Quick Start
 
-### 1. Installation
+### 1. Installation & Setup
+The system includes a unified management tool that works on both macOS and Windows.
 
+**Standard (macOS / Linux / Windows):**
 ```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
+python manage.py setup
 ```
 
+**Windows (Alternative):**
+You can also simply double-click **`setup.bat`** in the project root to initialize the environment.
+
+This command will:
+- Create a virtual environment (if missing)
+- Install all Python backend dependencies
+- Create a default `.env` from the template
+- Install all NPM frontend dependencies
+
 ### 2. Configuration
-
-```bash
-# Copy environment template
-cp .env.example .env
-
-# Add your API keys
+Open the newly created `.env` and add your API keys:
+```env
 OPENAI_API_KEY=your_key_here
 ANTHROPIC_API_KEY=your_key_here
 ```
 
-### 3. Run API Server
+### 3. Start the Application
+Launch both the backend and frontend simultaneously with one command:
 
 ```bash
-# Start FastAPI server
-uvicorn src.api.main:app --reload --port 8000
-```
-
-### 4. Run Frontend (Next.js)
-
-```bash
-# Go to frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
+python manage.py start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to access the dashboard.
+To stop the services, press **Ctrl+C** in the terminal or run `python manage.py stop`.
 
 ## Knowledge Base & Advanced RAG
 
@@ -182,7 +172,7 @@ builder.build_from_documents(docs)
 import requests
 
 # 1. Create campaign analysis job
-response = requests.post("http://localhost:8000/api/campaigns", json={
+response = requests.post("http://localhost:8001/api/campaigns", json={
     "campaign_name": "Q4 2024 Holiday Campaign",
     "objectives": ["awareness", "conversion"],
     "date_range": {"start": "2024-10-01", "end": "2024-12-31"}
@@ -195,14 +185,14 @@ files = [
     ("files", open("meta_ads_dashboard.png", "rb")),
     ("files", open("linkedin_ads_dashboard.png", "rb"))
 ]
-requests.post(f"http://localhost:8000/api/campaigns/{campaign_id}/snapshots", files=files)
+requests.post(f"http://localhost:8001/api/campaigns/{campaign_id}/snapshots", files=files)
 
 # 3. Check status
-status = requests.get(f"http://localhost:8000/api/campaigns/{campaign_id}/status")
+status = requests.get(f"http://localhost:8001/api/campaigns/{campaign_id}/status")
 print(status.json())
 
 # 4. Download report
-report = requests.get(f"http://localhost:8000/api/campaigns/{campaign_id}/report")
+report = requests.get(f"http://localhost:8001/api/campaigns/{campaign_id}/report")
 with open("campaign_report.pptx", "wb") as f:
     f.write(report.content)
 ```

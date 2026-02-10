@@ -63,8 +63,8 @@ class ComponentContribution:
     actionability: str  # "high", "medium", "low"
     
     def __str__(self):
-        sign = "+" if self.absolute_change >= 0 else ""
-        return f"{self.component}: {sign}${self.absolute_change:.2f} ({self.percentage_contribution:.1f}%)"
+        sign = "+" if self.absolute_change >= 0 else "-"
+        return f"{self.component}: {sign}${abs(self.absolute_change):.2f} ({self.percentage_contribution:.1f}%)"
 
 
 @dataclass
@@ -122,8 +122,8 @@ class CausalAnalysisEngine:
         split_date: Optional[str] = None,
         lookback_days: int = 30,
         method: DecompositionMethod = DecompositionMethod.HYBRID,
-        include_ml: bool = True,
-        include_attribution: bool = True
+        include_ml: bool = False,
+        include_attribution: bool = False
     ) -> CausalAnalysisResult:
         """
         Comprehensive causal analysis of metric change.

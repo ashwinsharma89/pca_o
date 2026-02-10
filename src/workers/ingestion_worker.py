@@ -12,6 +12,8 @@ Usage:
 
 from celery import Celery
 from pathlib import Path
+from typing import Optional
+from datetime import datetime
 from src.core.database.connection import get_db
 from src.core.database.repositories import CampaignRepository
 import pandas as pd

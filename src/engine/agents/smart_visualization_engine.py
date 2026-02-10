@@ -157,6 +157,11 @@ class SmartVisualizationEngine:
         }
         
         creator = viz_creators.get(viz_type, self._create_bar_chart)
+        # Ensure data is valid for the creator
+        if not isinstance(data, (pd.DataFrame, dict, list, np.ndarray)):
+            logger.warning(f"Invalid data type for visualization: {type(data)}")
+            data = {}
+            
         fig = creator(data, title, **kwargs)
         
         return fig
@@ -194,9 +199,9 @@ class SmartVisualizationEngine:
         
         # Handle dictionary
         elif isinstance(data, dict):
-            if 'values' in data:
+            if 'values' in data and isinstance(data['values'], (list, np.ndarray, pd.Series)):
                 profile['cardinality'] = len(data['values'])
-            elif 'categories' in data:
+            elif 'categories' in data and isinstance(data['categories'], (list, np.ndarray, pd.Series)):
                 profile['cardinality'] = len(data['categories'])
             
             profile['has_time_series'] = self._detect_time_series(data)
@@ -429,13 +434,14 @@ class SmartVisualizationEngine:
         """Check if data has categorical dimensions"""
         return 'categories' in data or 'labels' in data or 'names' in data
     
-    def _count_metrics(self, data: Dict) -> int:
+    def _count_metrics(self, data: Any) -> int:
         """Count number of metrics being visualized"""
-        if 'metrics' in data:
-            return len(data['metrics'])
-        elif 'values' in data and isinstance(data['values'], list):
-            if data['values'] and isinstance(data['values'][0], dict):
-                return len(data['values'][0])
+        if isinstance(data, dict):
+            if 'metrics' in data and isinstance(data['metrics'], (dict, list)):
+                return len(data['metrics'])
+            elif 'values' in data and isinstance(data['values'], list):
+                if data['values'] and isinstance(data['values'][0], dict):
+                    return len(data['values'][0])
         return 1
     
     def _detect_hierarchy(self, data: Dict) -> bool:
@@ -659,9 +665,11 @@ class SmartVisualizationEngine:
                 x=data.iloc[:, 1]
             ))
         else:
+            stages = data.get('stages', []) if isinstance(data, dict) else []
+            values = data.get('values', []) if isinstance(data, dict) else []
             fig = go.Figure(go.Funnel(
-                y=data.get('stages', []),
-                x=data.get('values', [])
+                y=stages,
+                x=values
             ))
         
         fig.update_layout(title=title)

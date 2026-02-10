@@ -632,10 +632,9 @@ class NaturalLanguageQueryEngine:
         
         # Rule 2: Check for division without NULLIF
         # Look for patterns like "spend/conversions" without NULLIF
-        division_pattern = r'/\s*(?!NULLIF)[a-zA-Z_]+\s*[,\n\)]'
+        division_pattern = r'/\s*(?!NULLIF)[a-zA-Z0-9_]+'
         if re.search(division_pattern, sql_upper):
-            # More specific check - find actual divisions
-            if '/' in sql and 'NULLIF' not in sql_upper:
+            if 'NULLIF' not in sql_upper:
                 checks['has_nullif_for_division'] = False
                 failed_rules.append("Rule 2: Division without NULLIF - wrap denominator in NULLIF(x, 0)")
         

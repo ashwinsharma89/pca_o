@@ -220,10 +220,10 @@ class CampaignTransformer:
         if value is None:
             return None
         
-        if isinstance(value, date):
-            return value.isoformat()
         if isinstance(value, datetime):
             return value.date().isoformat()
+        if isinstance(value, date):
+            return value.isoformat()
         if isinstance(value, str):
             # Try parsing common formats
             for fmt in ["%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d"]:

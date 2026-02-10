@@ -34,7 +34,10 @@ class TestV1ApiIntegration:
             data={"sub": "testuser", "role": "admin", "tier": "enterprise"},
             expires_delta=timedelta(hours=1)
         )
-        return {"Authorization": f"Bearer {token}"}
+        return {
+            "Authorization": f"Bearer {token}",
+            "X-CSRF-Token": "test-token"
+        }
 
     def test_root(self, client):
         response = client.get("/")
