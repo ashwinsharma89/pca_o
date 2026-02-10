@@ -17,12 +17,13 @@ WITH avg(cpc) AS avg_cpc, stdev(cpc) AS std_cpc, collect({campaign_id: campaign_
 UNWIND campaigns AS item
 WITH item.campaign_id AS campaign_id, item.cpc AS cpc, avg_cpc, std_cpc
 WHERE cpc > avg_cpc + ($threshold * std_cpc)
-MATCH (c:Campaign {id: campaign_id})
+MATCH (c:Campaign {id: campaign_id})-[:HAS_PERFORMANCE]->(m2:Metric)
+WITH c, cpc, avg_cpc, std_cpc, SUM(m2.spend) as spend, SUM(m2.clicks) as clicks
 RETURN c.id AS campaign_id,
        c.name AS campaign_name,
        c.platform_id AS platform,
-       c.spend_total AS spend,
-       c.clicks_total AS clicks,
+       spend,
+       clicks,
        cpc,
        avg_cpc,
        (cpc - avg_cpc) / std_cpc AS z_score
@@ -40,12 +41,13 @@ WITH avg(roas) AS avg_roas, stdev(roas) AS std_roas, collect({campaign_id: campa
 UNWIND campaigns AS item
 WITH item.campaign_id AS campaign_id, item.roas AS roas, avg_roas, std_roas
 WHERE roas < avg_roas - ($threshold * std_roas) OR roas < $min_roas
-MATCH (c:Campaign {id: campaign_id})
+MATCH (c:Campaign {id: campaign_id})-[:HAS_PERFORMANCE]->(m2:Metric)
+WITH c, roas, avg_roas, std_roas, SUM(m2.spend) as spend, SUM(coalesce(m2.revenue, 0)) as revenue
 RETURN c.id AS campaign_id,
        c.name AS campaign_name,
        c.platform_id AS platform,
-       c.spend_total AS spend,
-       c.revenue_total AS revenue,
+       spend,
+       revenue,
        roas,
        avg_roas,
        CASE WHEN std_roas > 0 THEN (avg_roas - roas) / std_roas ELSE 0 END AS z_score
@@ -74,36 +76,37 @@ LIMIT $limit
 
 # Template: Zero performance campaigns
 ZERO_PERFORMANCE = """
-MATCH (c:Campaign)
-WHERE c.status = 'active' AND c.spend_total > $min_spend
-AND (c.clicks_total = 0 OR c.impressions_total = 0)
+MATCH (c:Campaign {status: 'active'})-[:HAS_PERFORMANCE]->(m:Metric)
+WITH c, SUM(m.spend) as spend, SUM(m.clicks) as clicks, SUM(m.impressions) as impressions
+WHERE spend > $min_spend AND (clicks = 0 OR impressions = 0)
 RETURN c.id AS campaign_id,
        c.name AS campaign_name,
        c.platform_id AS platform,
-       c.spend_total AS spend,
-       c.impressions_total AS impressions,
-       c.clicks_total AS clicks,
+       spend,
+       impressions,
+       clicks,
        'Zero clicks or impressions despite spend' AS issue
-ORDER BY c.spend_total DESC
+ORDER BY spend DESC
 LIMIT $limit
 """
 
 # Template: Poor CTR campaigns
 POOR_CTR_CAMPAIGNS = """
-MATCH (c:Campaign)
-WHERE c.impressions_total > $min_impressions
-WITH c,
-     CASE WHEN c.impressions_total > 0 
-          THEN c.clicks_total * 100.0 / c.impressions_total ELSE 0 END AS ctr
-WITH percentileDisc(ctr, 0.1) AS p10_ctr, collect({campaign: c, ctr: ctr}) AS campaigns
+MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)
+WITH c, SUM(m.impressions) as impressions, SUM(m.clicks) as clicks
+WHERE impressions > $min_impressions
+WITH c, impressions, clicks,
+     CASE WHEN impressions > 0 
+          THEN clicks * 100.0 / impressions ELSE 0 END AS ctr
+WITH percentileDisc(ctr, 0.1) AS p10_ctr, collect({campaign: c, ctr: ctr, impressions: impressions, clicks: clicks}) AS campaigns
 UNWIND campaigns AS item
-WITH item.campaign AS c, item.ctr AS ctr, p10_ctr
+WITH item.campaign AS c, item.ctr AS ctr, item.impressions AS impressions, item.clicks AS clicks, p10_ctr
 WHERE ctr <= p10_ctr
 RETURN c.id AS campaign_id,
        c.name AS campaign_name,
        c.platform_id AS platform,
-       c.impressions_total AS impressions,
-       c.clicks_total AS clicks,
+       impressions,
+       clicks,
        ctr,
        p10_ctr AS threshold_ctr,
        'Bottom 10% CTR' AS issue

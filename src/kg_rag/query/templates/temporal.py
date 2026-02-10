@@ -214,6 +214,33 @@ RETURN period,
 ORDER BY period DESC
 """
 
+# Template: Year-over-Year Seasonal Comparison (Specific Month across years)
+SEASONAL_COMPARISON = """
+MATCH (m:Metric)
+WHERE m.date.month = $month_num
+WITH m.date.year AS year,
+     SUM(m.impressions) AS impressions,
+     SUM(m.clicks) AS clicks,
+     SUM(m.spend) AS spend,
+     SUM(coalesce(m.conversions, 0)) AS conversions,
+     SUM(coalesce(m.revenue, 0)) AS revenue
+RETURN 'July' + ' ' + toString(year) AS period,
+       year,
+       impressions,
+       clicks,
+       spend,
+       conversions,
+       revenue,
+       CASE WHEN impressions > 0 THEN clicks * 100.0 / impressions ELSE 0 END AS ctr,
+       CASE WHEN spend > 0 THEN revenue / spend ELSE 0 END AS roas
+ORDER BY year DESC
+"""
+
+def get_seasonal_comparison(month_num: int, month_name: str) -> tuple[str, Dict[str, Any]]:
+    """Get seasonal comparison across years."""
+    query = SEASONAL_COMPARISON.replace("'July'", f"'{month_name}'")
+    return query, {"month_num": month_num}
+
 
 def get_month_comparison(
     date_from: str,

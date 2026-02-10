@@ -10,16 +10,22 @@ from typing import Dict, Any, List, Optional
 # Template: Device type breakdown
 DEVICE_BREAKDOWN = """
 MATCH (c:Campaign)-[:HAS_TARGETING]->(t:Targeting)
+MATCH (c)-[:HAS_PERFORMANCE]->(m:Metric)
 WHERE t.device_types IS NOT NULL
-WITH c, t, size(t.device_types) as device_count
+WITH c, t, size(t.device_types) as device_count, 
+     SUM(m.spend) as v_spend, 
+     SUM(m.impressions) as v_impressions, 
+     SUM(m.clicks) as v_clicks, 
+     SUM(coalesce(m.conversions, 0)) as v_conversions, 
+     SUM(coalesce(m.revenue, 0)) as v_revenue
 UNWIND t.device_types AS device
 WITH device,
-     count(c) AS campaigns,
-     SUM(c.spend_total / device_count) AS spend,
-     SUM(c.impressions_total / device_count) AS impressions,
-     SUM(c.clicks_total / device_count) AS clicks,
-     SUM(c.conversions_total / device_count) AS conversions,
-     SUM(c.revenue_total / device_count) AS revenue
+     count(DISTINCT c) AS campaigns,
+     SUM(v_spend / device_count) AS spend,
+     SUM(v_impressions / device_count) AS impressions,
+     SUM(v_clicks / device_count) AS clicks,
+     SUM(v_conversions / device_count) AS conversions,
+     SUM(v_revenue / device_count) AS revenue
 RETURN device,
        campaigns,
        spend,
@@ -33,16 +39,22 @@ ORDER BY spend DESC
 # Template: Age range breakdown
 AGE_BREAKDOWN = """
 MATCH (c:Campaign)-[:HAS_TARGETING]->(t:Targeting)
+MATCH (c)-[:HAS_PERFORMANCE]->(m:Metric)
 WHERE t.age_range IS NOT NULL
-WITH c, t, size(t.age_range) as age_count
+WITH c, t, size(t.age_range) as age_count,
+     SUM(m.spend) as v_spend, 
+     SUM(m.impressions) as v_impressions, 
+     SUM(m.clicks) as v_clicks, 
+     SUM(coalesce(m.conversions, 0)) as v_conversions, 
+     SUM(coalesce(m.revenue, 0)) as v_revenue
 UNWIND t.age_range AS age_range
 WITH age_range,
-     count(c) AS campaigns,
-     SUM(c.spend_total / age_count) AS spend,
-     SUM(c.impressions_total / age_count) AS impressions,
-     SUM(c.clicks_total / age_count) AS clicks,
-     SUM(c.conversions_total / age_count) AS conversions,
-     SUM(c.revenue_total / age_count) AS revenue
+     count(DISTINCT c) AS campaigns,
+     SUM(v_spend / age_count) AS spend,
+     SUM(v_impressions / age_count) AS impressions,
+     SUM(v_clicks / age_count) AS clicks,
+     SUM(v_conversions / age_count) AS conversions,
+     SUM(v_revenue / age_count) AS revenue
 RETURN age_range,
        campaigns,
        spend,
@@ -146,14 +158,18 @@ ORDER BY
 # Template: Interest/Affinity breakdown
 INTERESTS_BREAKDOWN = """
 MATCH (c:Campaign)-[:HAS_TARGETING]->(t:Targeting)
+MATCH (c)-[:HAS_PERFORMANCE]->(m:Metric)
 WHERE t.interests IS NOT NULL
-WITH c, t, size(t.interests) as interest_count
+WITH c, t, size(t.interests) as interest_count,
+     SUM(m.spend) as v_spend, 
+     SUM(coalesce(m.conversions, 0)) as v_conversions, 
+     SUM(coalesce(m.revenue, 0)) as v_revenue
 UNWIND t.interests AS interest
 WITH interest,
-     count(c) AS campaigns,
-     SUM(c.spend_total / interest_count) AS spend,
-     SUM(c.conversions_total / interest_count) AS conversions,
-     SUM(c.revenue_total / interest_count) AS revenue
+     count(DISTINCT c) AS campaigns,
+     SUM(v_spend / interest_count) AS spend,
+     SUM(v_conversions / interest_count) AS conversions,
+     SUM(v_revenue / interest_count) AS revenue
 WHERE spend > $min_spend
 RETURN interest,
        campaigns,

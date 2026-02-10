@@ -82,9 +82,10 @@ class IntentClassifier:
         
         # Temporal trends
         (r"(trend|trends|over\s+time|daily|weekly|monthly)", QueryIntent.TEMPORAL_TREND, 0.9),
-        (r"(last|past)\s+(\d+)\s+(days?|weeks?|months?)", QueryIntent.TEMPORAL_TREND, 0.85),
+        (r"(week\s+on\s+week|month\s+on\s+month|year\s+on\s+year|wow|mom|yoy|each\s+year|every\s+year|year\s+over\s+year)", QueryIntent.TEMPORAL_TREND, 0.95),
+        (r"(last|past)\s+(\d+)\s+(?:days?|weeks?|months?)", QueryIntent.TEMPORAL_TREND, 0.85),
         (r"(q[1-4]|quarter|ytd|mtd|this\s+month|this\s+week)", QueryIntent.TEMPORAL_TREND, 0.85),
-        (r"(january|february|march|april|may|june|july|august|september|october|november|december)", QueryIntent.TEMPORAL_TREND, 0.7),
+        (r"(january|february|march|april|may|june|july|august|september|october|november|december)", QueryIntent.TEMPORAL_TREND, 0.9),
         
         # Placement analysis
         (r"placement(s)?\s+(performance|analysis|breakdown)", QueryIntent.PLACEMENT_ANALYSIS, 0.95),
@@ -123,6 +124,7 @@ class IntentClassifier:
         
         # Top/Bottom ranking
         (r"(top|bottom|best|worst)\s+(\d+)", QueryIntent.TOP_BOTTOM, 0.9),
+        (r"(top|bottom|best|worst)\s+.*(campaign|platform|ad|channel|funnel|performance)", QueryIntent.TOP_BOTTOM, 0.8),
         (r"(highest|lowest|most|least)\s+\w+\s+(campaigns?|platforms?)", QueryIntent.TOP_BOTTOM, 0.85),
         (r"(rank|ranking|ranked)", QueryIntent.TOP_BOTTOM, 0.8),
         
@@ -138,7 +140,8 @@ class IntentClassifier:
         "metric": r"(ctr|cpc|cpm|cpa|roas|spend|impressions|clicks|conversions|revenue|reach)",
         "device": r"(mobile|desktop|tablet|all\s+devices)",
         "dimension": r"(age|gender|geo|location|placement|device|funnel|demographic|creative|audience)",
-        "time_period": r"(today|yesterday|last\s+\d+\s+days?|this\s+week|last\s+week|this\s+month|last\s+month|q[1-4]|ytd)",
+        "month": r"(january|february|march|april|may|june|july|august|september|october|november|december)",
+        "time_period": r"(today|yesterday|last\s+\d+\s+(?:days?|weeks?|months?)|this\s+week|last\s+week|this\s+month|last\s+month|q[1-4]|ytd)",
         "number": r"(\d+)",
         "comparison": r"(vs|versus|compared\s+to|against)",
     }

@@ -174,6 +174,15 @@ class QueryRouter:
                                    geo_countries, audience_segment, creative_format, targeting_type
             Targeting Node Properties: id, campaign_id, audience_segment, device_types, age_range, geo_countries
             
+            Channel Mapping Reference:
+            - Social -> SOC
+            - Search -> Search
+            - Display -> DIS
+            - Programmatic -> DIS
+            - Connected TV -> CTV
+            - Video -> Video
+            - Retail Media -> Retail Media
+            
             Question: {query}
             
             Rules:
@@ -184,11 +193,33 @@ class QueryRouter:
             5. To aggregate metrics, use SUM(m.spend), SUM(m.impressions), etc.
             6. Always LIMIT results to avoid large responses.
             7. For performance queries, include calculated metrics:
-               - ROAS = revenue / spend (Return on Ad Spend)
-               - CPA = spend / conversions (Cost per Acquisition)
-               - CTR = clicks / impressions * 100 (Click-Through Rate %)
-               - CPM = spend / impressions * 1000 (Cost per Mille)
+               - ROAS = revenue / spend
+               - CPA = spend / conversions
+               - CTR = clicks / impressions * 100
             8. Handle division by zero with CASE WHEN statements.
+            9. Prefer filtering on Metric node properties (m.channel, m.platform, m.funnel) rather than Campaign node properties.
+            10. Date Handling (Neo4j 5.x):
+                - Use `m.date` (of type Date) for temporal filtering.
+                - To get calendar year, use `m.date.year` (e.g., `m.date.year = 2025`).
+                - Only use `m.date.weekYear` if specifically doing week-based analysis.
+                - To get week, use `m.date.week`.
+                - To truncate to week/month, use `date.truncate('week', m.date)` or `date.truncate('month', m.date)`.
+                - DO NOT use non-existent fields like `weekOfYear`.
+            
+            Example - Week on Week Comparison:
+            MATCH (m:Metric)
+            WHERE m.date >= date($p1_start) AND m.date <= date($p2_end)
+            WITH m, 
+                 CASE WHEN m.date.week % 2 = 0 THEN 'Week B' ELSE 'Week A' END AS period,
+                 SUM(m.spend) AS spend, SUM(m.revenue) AS revenue
+            RETURN period, spend, revenue, 
+                   CASE WHEN spend > 0 THEN revenue / spend ELSE 0 END AS roas
+            ORDER BY period
+            
+            Example - Monthly Trend:
+            MATCH (m:Metric)
+            WITH date.truncate('month', m.date) AS month, SUM(m.spend) AS spend
+            RETURN month, spend ORDER BY month
             
             Example - High performance campaigns with calculated metrics:
             MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)
@@ -307,17 +338,50 @@ class QueryRouter:
         
         elif intent == QueryIntent.TEMPORAL_TREND:
             # Check for generic temporal comparison (period over period)
-            if "compare" in query.lower() or "comparison" in query.lower() or " vs " in query.lower():
+            query_lower = query.lower()
+            
+            # 1. Seasonal / YoY Check (Multi-year same month)
+            if any(x in query_lower for x in ["yoy", "each year", "every year", "year over year"]):
+                month_name = entities.get("month")
+                if month_name:
+                    month_num = {
+                        "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
+                        "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12
+                    }.get(month_name.lower())
+                    if month_num:
+                        return temporal.get_seasonal_comparison(month_num, month_name.capitalize())
+
+            # 2. Period over Period Comparison
+            if any(x in query_lower for x in ["compare", "comparison", " vs ", "wow", "mom", "week on week", "month on month"]):
                 try:
                     # Calculate duration and previous period
                     # date_from and date_to are ISO strings (YYYY-MM-DD)
                     d_current_start = datetime.fromisoformat(date_from).date()
                     d_current_end = datetime.fromisoformat(date_to).date()
                     
-                    duration = d_current_end - d_current_start + timedelta(days=1) # inclusive
+                    # If specific WoW/MoM phrases exist, default to last 7/30 days comparison
+                    if any(x in query_lower for x in ["wow", "week on week"]):
+                        d_current_start = d_current_end - timedelta(days=6)
+                    elif any(x in query_lower for x in ["mom", "month on month"]):
+                        d_current_start = d_current_end - timedelta(days=29)
+                    elif "last" in query_lower and entities.get("number"):
+                        try:
+                            n = int(entities.get("number"))
+                            unit = 1 # days
+                            if "week" in query_lower:
+                                unit = 7
+                            elif "month" in query_lower:
+                                unit = 30
+                            
+                            total_days = n * unit
+                            # Split into two equal periods
+                            period_days = total_days // 2
+                            d_current_start = d_current_end - timedelta(days=period_days - 1)
+                        except:
+                            pass
                     
                     d_prev_end = d_current_start - timedelta(days=1)
-                    d_prev_start = d_prev_end - duration + timedelta(days=1)
+                    d_prev_start = d_prev_end - (d_current_end - d_current_start)
                     
                     return temporal.get_period_comparison(
                         d_prev_start.isoformat(),
@@ -351,10 +415,20 @@ class QueryRouter:
         
         elif intent == QueryIntent.TOP_BOTTOM:
             platform_id = self._normalize_platform(entities.get("platform"))
+            channel = entities.get("channel")
             limit = int(entities.get("number", 10))
+            
+            # Detect sorting preference
+            sort_by = "performance"
+            if "by spend" in query.lower():
+                sort_by = "spend"
+            
             if platform_id:
-                return platform.get_platform_top_campaigns(platform_id, limit)
-            return platform.get_global_top_campaigns(limit)
+                return platform.get_platform_top_campaigns(platform_id, limit, sort_by=sort_by)
+            elif channel:
+                normalized_channel = self._normalize_channel(channel)
+                return platform.get_channel_top_campaigns(normalized_channel, limit, sort_by=sort_by)
+            return platform.get_global_top_campaigns(limit, sort_by=sort_by)
         
         elif intent == QueryIntent.BUDGET_ANALYSIS:
             return cross_channel.get_all_channels_breakdown()
