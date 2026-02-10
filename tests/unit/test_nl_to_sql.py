@@ -272,21 +272,29 @@ class TestNLToSQLEngine:
     
     @pytest.mark.skipif(not NL_TO_SQL_AVAILABLE, reason="NL-to-SQL not available")
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key'})
-    def test_engine_initialization(self, sample_campaign_data):
+    @pytest.fixture
+    def engine(self):
+        with patch('src.platform.query_engine.nl_to_sql.OpenAI'):
+            with patch('src.platform.query_engine.nl_to_sql.SQLKnowledgeHelper'):
+                try:
+                    from src.platform.query_engine.nl_to_sql import NaturalLanguageQueryEngine
+                    return NaturalLanguageQueryEngine(api_key='test-key')
+                except Exception as e:
+                    pytest.skip(f"Engine initialization failed: {e}")
+
+    @pytest.mark.skipif(not NL_TO_SQL_AVAILABLE, reason="NL-to-SQL not available")
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key'})
+    def test_engine_initialization(self, engine):
         """Test engine initialization."""
-        try:
-            engine = NaturalLanguageQueryEngine(df=sample_campaign_data)
-            assert engine is not None
-        except Exception:
-            pytest.skip("Engine initialization failed")
+        assert engine is not None
     
     @pytest.mark.skipif(not NL_TO_SQL_AVAILABLE, reason="NL-to-SQL not available")
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test_key'})
-    def test_engine_has_dataframe(self, sample_campaign_data):
-        """Test that engine stores dataframe."""
+    def test_engine_has_connection(self, engine, sample_campaign_data):
+        """Test that engine can load data."""
         try:
-            engine = NaturalLanguageQueryEngine(df=sample_campaign_data)
-            assert engine.df is not None
-            assert len(engine.df) > 0
-        except Exception:
-            pytest.skip("Engine initialization failed")
+            engine = NaturalLanguageQueryEngine(api_key='test_key')
+            engine.load_data(sample_campaign_data)
+            assert engine.conn is not None
+        except Exception as e:
+            pytest.skip(f"Engine data load failed: {e}")

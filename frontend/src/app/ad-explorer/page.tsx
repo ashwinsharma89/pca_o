@@ -108,7 +108,7 @@ export default function AdExplorerPage() {
     async function fetchData() {
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : "http://localhost:8001/api/v1";
+            const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1`;
             const res = await fetch(
                 `${apiUrl}/connectors/${platform}/hierarchy?mock_mode=true&start_date=${startDate}&end_date=${endDate}`
             );

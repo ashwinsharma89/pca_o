@@ -86,28 +86,3 @@ body {
   transition-duration: 0.2s;
   transition-timing-function: ease-in-out;
 }
-
-/* Custom Scrollbar for better Windows visual parity */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary);
-}
-
-/* Firefox support */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) var(--background);
-}

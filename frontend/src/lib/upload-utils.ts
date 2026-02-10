@@ -73,7 +73,7 @@ export async function uploadFileWithProgress(
     file: File,
     sheetName?: string,
     onProgress?: (progress: UploadProgress) => void,
-    apiUrl: string = process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : 'http://localhost:8001/api/v1'
+    apiUrl: string = `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1`
 ): Promise<StreamUploadResult> {
     try {
         // Phase 1: Hash computation (for deduplication)
@@ -221,7 +221,7 @@ export async function uploadFileWithProgress(
  */
 export async function checkDuplicate(
     file: File,
-    apiUrl: string = process.env.NEXT_PUBLIC_BACKEND_DOMAIN ? `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1` : 'http://localhost:8001/api/v1'
+    apiUrl: string = `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/v1`
 ): Promise<{ isDuplicate: boolean; hash: string }> {
     const hash = file.size > LARGE_FILE_THRESHOLD
         ? await computeFileHashStreaming(file)

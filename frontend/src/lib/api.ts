@@ -11,7 +11,7 @@ const getBaseUrl = () => {
     // If public URL is relative (e.g. "/api/v1" behind Nginx), we MUST use the internal Docker service URL
     const backendDomain = process.env.NEXT_PUBLIC_BACKEND_DOMAIN;
     if (backendDomain?.startsWith('/')) {
-        return 'http://api:8000/api/v1';
+        return process.env.INTERNAL_API_URL || 'http://api:8000/api/v1';
     }
 
     // 3. Default for local dev
