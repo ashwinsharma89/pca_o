@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: `${backend}/:path*`, // IMPORTANT
+        destination: `${backend}/api/:path*`, // Preserve /api prefix when proxying to backend
       },
     ];
   },
