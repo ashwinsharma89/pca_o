@@ -15,6 +15,12 @@ lsof -ti :8001 | xargs kill -9 2>/dev/null || true
 echo "Starting Backend API (Port 8001)..."
 export API_PORT=8001
 export PORT=3000 # For frontend
+
+if [ ! -d ".venv312" ]; then
+    echo "❌ Error: .venv312 directory not found. Please create it first."
+    exit 1
+fi
+
 source .venv312/bin/activate
 mkdir -p logs
 python3 -m src.interface.api.main > logs/backend.log 2>&1 &

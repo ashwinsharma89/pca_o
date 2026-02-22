@@ -40,7 +40,7 @@ class Neo4jConnection:
         """Initialize connection (only once due to singleton)."""
         if self._driver is None:
             self._settings = get_kg_rag_settings()
-            self._connect()
+            # connection is lazy, will connect on first access
     
     def _connect(self) -> None:
         """Establish connection to Neo4j."""

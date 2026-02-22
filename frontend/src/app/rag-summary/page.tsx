@@ -170,12 +170,19 @@ export default function RAGSummaryPage() {
         );
     }
 
-    if (error || !data) {
+    if (error || !data || (data as any).success === false) {
+        const displayError = error || (data as any).error || "No data available";
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Card className="bg-red-900/20 border-red-700 p-6">
-                    <p className="text-red-400">{error || "No data available"}</p>
-                    <Button onClick={loadSummary} className="mt-4" variant="outline">Retry</Button>
+                <Card className="bg-red-900/20 border-red-700 p-6 max-w-md">
+                    <div className="flex items-center gap-3 text-red-400 mb-4">
+                        <AlertTriangle className="h-6 w-6" />
+                        <h3 className="font-bold">Performance Summary Unavailable</h3>
+                    </div>
+                    <p className="text-red-400/80 text-sm">{displayError}</p>
+                    <Button onClick={loadSummary} className="mt-6 w-full" variant="outline">
+                        <RefreshCw className="h-4 w-4 mr-2" /> Retry
+                    </Button>
                 </Card>
             </div>
         );
@@ -209,13 +216,13 @@ export default function RAGSummaryPage() {
                 <Card className="bg-gradient-to-r from-blue-900/40 to-blue-800/20 border-blue-700/50">
                     <CardContent className="p-4 flex items-center justify-between">
                         <span className="text-slate-300">Avg ROAS</span>
-                        <span className="text-2xl font-bold text-blue-300">{data.averages.roas}x</span>
+                        <span className="text-2xl font-bold text-blue-300">{data.averages?.roas ?? '0.0'}x</span>
                     </CardContent>
                 </Card>
                 <Card className="bg-gradient-to-r from-purple-900/40 to-purple-800/20 border-purple-700/50">
                     <CardContent className="p-4 flex items-center justify-between">
                         <span className="text-slate-300">Avg CPA</span>
-                        <span className="text-2xl font-bold text-purple-300">${data.averages.cpa}</span>
+                        <span className="text-2xl font-bold text-purple-300">${data.averages?.cpa ?? '0.00'}</span>
                     </CardContent>
                 </Card>
             </div>

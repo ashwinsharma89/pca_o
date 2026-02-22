@@ -223,7 +223,11 @@ async def get_performance_summary(request: Request):
         return service.generate_summary()
     except Exception as e:
         logger.error(f"Summary generation failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        return {
+            "success": False,
+            "error": str(e),
+            "summary": "Service unavailable"
+        }
 
 
 @router.get("/schema", response_model=KGSchemaResponse)
@@ -247,7 +251,13 @@ async def get_schema(request: Request) -> KGSchemaResponse:
     
     except Exception as e:
         logger.error(f"Failed to get schema: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        return KGSchemaResponse(
+            nodes=[],
+            relationships=[],
+            platforms=[],
+            stats={},
+            error=str(e)
+        )
 
 
 @router.get("/templates", response_model=TemplateListResponse)

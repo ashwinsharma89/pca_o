@@ -100,6 +100,7 @@ class KGSchemaResponse(BaseModel):
     relationships: List[Dict[str, Any]]
     platforms: List[str]
     stats: Dict[str, Any]
+    error: Optional[str] = None
 
 
 class KGHealthResponse(BaseModel):
