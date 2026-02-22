@@ -1,196 +1,24 @@
-name: Deploy
+name: Deploy to EC2
 
 on:
   push:
-    branches: [v1]
-    tags: ['v*']
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy'
-        required: true
-        default: 'staging'
-        type: choice
-        options: [staging, production]
-      rollback_version:
-        description: 'Version to rollback to (optional)'
-        required: false
-        type: string
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+    branches:
+      - main
 
 jobs:
-  # ============================================
-  # Build Docker Images
-  # ============================================
-  build:
-    name: Build Images
+  deploy:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.meta.outputs.version }}
-    
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Login to Registry
-        uses: docker/login-action@v3
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,prefix=
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-      
-      - name: Build API image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api:${{ steps.meta.outputs.version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      
-      - name: Build Frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ steps.meta.outputs.version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # ============================================
-  # Deploy to Staging
-  # ============================================
-  deploy-staging:
-    name: Deploy Staging
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v1' || github.event.inputs.environment == 'staging'
-    environment:
-      name: staging
-      url: https://staging.pca-agent.example.com
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.STAGING_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to Staging
-        run: |
-          echo "Deploying version $DEPLOY_VERSION to staging"
-          ssh -i ~/.ssh/deploy_key ubuntu@${{ secrets.STAGING_HOST }} << 'DEPLOY_SCRIPT'
-            cd /home/ubuntu/pca_agent
-
-            # Login to GHCR
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            # Pull latest images
-            docker-compose -f docker/docker-compose.deploy.yml pull
-
-            # Stop and restart services
-            docker-compose -f docker/docker-compose.deploy.yml down
-            docker-compose -f docker/docker-compose.deploy.yml up -d
-
-            # Verify containers are running
-            docker-compose -f docker/docker-compose.deploy.yml ps
-          DEPLOY_SCRIPT
-        env:
-          DEPLOY_VERSION: ${{ needs.build.outputs.version }}
-
-      - name: Health Check
-        run: |
-          sleep 30
-          curl --fail --retry 5 --retry-delay 10 https://staging.pca-agent.example.com/health || exit 1
-
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-  # ============================================
-  # Deploy to Production
-  # ============================================
-  deploy-production:
-    name: Deploy Production
-    runs-on: ubuntu-latest
-    needs: [build, deploy-staging]
-    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.environment == 'production'
-    environment:
-      name: production
-      url: https://pca-agent.example.com
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Store current version for rollback
-        run: |
-          echo "PREVIOUS_VERSION=$(curl -s https://pca-agent.example.com/health | jq -r '.version')" >> $GITHUB_ENV
-      
-      - name: Deploy to Production
-        run: |
-          echo "Deploying version ${{ needs.build.outputs.version }} to production"
-          # Add your production deployment commands here
-        env:
-          DEPLOY_VERSION: ${{ needs.build.outputs.version }}
-      
-      - name: Health Check
-        id: health
-        run: |
-          sleep 30
-          curl --fail --retry 5 --retry-delay 10 https://pca-agent.example.com/health || exit 1
-      
-      - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-
-  # ============================================
-  # Rollback
-  # ============================================
-  rollback:
-    name: Rollback
-    runs-on: ubuntu-latest
-    if: github.event.inputs.rollback_version != ''
-    environment:
-      name: ${{ github.event.inputs.environment }}
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Rollback to version
-        run: |
-          echo "Rolling back to version ${{ github.event.inputs.rollback_version }}"
-          # Add rollback commands
-          # docker pull $REGISTRY/$IMAGE_NAME:$ROLLBACK_VERSION
-          # kubectl set image deployment/pca-agent ...
-        env:
-          ROLLBACK_VERSION: ${{ github.event.inputs.rollback_version }}
-      
-      - name: Verify Rollback
-        run: |
-          sleep 30
-          DEPLOYED_VERSION=$(curl -s https://pca-agent.example.com/health | jq -r '.version')
-          if [ "$DEPLOYED_VERSION" != "${{ github.event.inputs.rollback_version }}" ]; then
-            echo "Rollback verification failed"
-            exit 1
-          fi
-          echo "Rollback successful"
+          host: 65.0.30.213
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/pca_o
+            git pull origin main
+            cd docker
+            docker compose down
+            docker compose up -d --build
