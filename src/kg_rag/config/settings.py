@@ -1,7 +1,8 @@
 """
 KG-RAG Settings Configuration
 
-Manages Neo4j connection settings, feature flags, and module configuration.
+Manages KùzuDB path, feature flags, and module configuration.
+KùzuDB is an embedded graph database — no server URI or credentials required.
 """
 
 import os
@@ -12,41 +13,15 @@ from pydantic_settings import BaseSettings
 
 class KGRAGSettings(BaseSettings):
     """Configuration settings for KG-RAG module."""
-    
+
     # =====================
-    # Neo4j Connection
+    # KùzuDB Storage
     # =====================
-    neo4j_uri: str = Field(
-        default="bolt://127.0.0.1:7687",
-        description="Neo4j Bolt protocol URI"
+    kuzu_db_path: str = Field(
+        default="./kuzu_db",
+        description="Path to the KùzuDB database directory (created if absent)"
     )
-    neo4j_user: str = Field(
-        default="neo4j",
-        description="Neo4j username"
-    )
-    neo4j_password: str = Field(
-        default="pca_kg_rag_2026",
-        description="Neo4j password"
-    )
-    neo4j_database: str = Field(
-        default="neo4j",
-        description="Neo4j database name"
-    )
-    
-    # Connection Pool
-    neo4j_max_connection_lifetime: int = Field(
-        default=3600,
-        description="Max connection lifetime in seconds"
-    )
-    neo4j_max_connection_pool_size: int = Field(
-        default=50,
-        description="Max connections in pool"
-    )
-    neo4j_connection_acquisition_timeout: int = Field(
-        default=60,
-        description="Timeout for acquiring connection"
-    )
-    
+
     # =====================
     # Feature Flags
     # =====================
@@ -62,13 +37,13 @@ class KGRAGSettings(BaseSettings):
         default=True,
         description="Use LLM for queries not matching templates"
     )
-    
+
     # =====================
     # Query Settings
     # =====================
     query_timeout_seconds: int = Field(
         default=30,
-        description="Query execution timeout"
+        description="Query execution timeout in seconds"
     )
     max_results_per_query: int = Field(
         default=1000,
@@ -78,19 +53,19 @@ class KGRAGSettings(BaseSettings):
         default=0.85,
         description="Confidence threshold for template matching"
     )
-    
+
     # =====================
     # ETL Settings
     # =====================
     etl_batch_size: int = Field(
         default=1000,
-        description="Batch size for Neo4j UNWIND operations"
+        description="Batch size for UNWIND operations"
     )
     etl_parallel_workers: int = Field(
         default=4,
         description="Number of parallel ETL workers"
     )
-    
+
     # =====================
     # Context Settings
     # =====================
@@ -102,7 +77,7 @@ class KGRAGSettings(BaseSettings):
         default=10,
         description="Max sample campaigns in context"
     )
-    
+
     # =====================
     # Logging
     # =====================
@@ -114,12 +89,12 @@ class KGRAGSettings(BaseSettings):
         default=True,
         description="Log query execution latency"
     )
-    
+
     class Config:
         env_prefix = "KG_RAG_"
         env_file = ".env"
         case_sensitive = False
-        extra = "ignore"  # Ignore extra fields from .env
+        extra = "ignore"
 
 
 # Singleton instance

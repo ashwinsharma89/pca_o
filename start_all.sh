@@ -15,6 +15,8 @@ lsof -ti :8001 | xargs kill -9 2>/dev/null || true
 echo "Starting Backend API (Port 8001)..."
 export API_PORT=8001
 export PORT=3000 # For frontend
+# Disable fork safety check on macOS to prevent crashes with native libraries during uvicorn reload/fork
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
 if [ ! -d ".venv312" ]; then
     echo "❌ Error: .venv312 directory not found. Please create it first."
@@ -26,6 +28,26 @@ mkdir -p logs
 python3 -m src.interface.api.main > logs/backend.log 2>&1 &
 BACKEND_PID=$!
 echo "Backend started (PID: $BACKEND_PID)"
+
+# Wait for backend to be healthy
+echo "Waiting for backend to respond..."
+MAX_RETRIES=30
+RETRY_COUNT=0
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if curl -s http://localhost:8001/health > /dev/null; then
+        echo "✅ Backend is healthy!"
+        break
+    fi
+    RETRY_COUNT=$((RETRY_COUNT+1))
+    sleep 1
+done
+
+if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+    echo "❌ Error: Backend failed to start within 30 seconds."
+    tail -n 20 logs/backend.log
+    kill $BACKEND_PID 2>/dev/null || true
+    exit 1
+fi
 
 # 2. Start Frontend in background
 echo "Starting Frontend (Port 3000)..."

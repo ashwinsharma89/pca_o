@@ -55,7 +55,7 @@ def main():
         
         logger.info("Knowledge Graph cleared.")
         
-        # 3. Ingest into Neo4j
+        # 3. Ingest into KùzuDB
         logger.info("Ingesting into Knowledge Graph...")
         summary = ingest_dataframe(df)
         

@@ -19,11 +19,7 @@ services:
 
   # Frontend (Next.js)
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: /api/v1
+    image: ${REGISTRY}/${IMAGE_NAME}-frontend:${VERSION}
     container_name: pca-frontend
     environment:
       - PORT=3000
@@ -44,9 +40,7 @@ services:
 
   # Main API
   api:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ${REGISTRY}/${IMAGE_NAME}-api:${VERSION}
     container_name: pca-api
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/1
@@ -69,9 +63,7 @@ services:
 
   # Celery Worker
   celery-worker:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ${REGISTRY}/${IMAGE_NAME}-api:${VERSION}
     container_name: pca-celery-worker
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -88,9 +80,7 @@ services:
 
   # Celery Beat
   celery-beat:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ${REGISTRY}/${IMAGE_NAME}-api:${VERSION}
     container_name: pca-celery-beat
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0

@@ -107,8 +107,8 @@ class KGHealthResponse(BaseModel):
     """Health check response."""
     
     status: str
-    neo4j_connected: bool
-    neo4j_uri: str
+    graph_db_connected: bool
+    db_path: str
     node_count: Optional[int] = None
     relationship_count: Optional[int] = None
 

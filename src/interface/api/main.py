@@ -44,7 +44,7 @@ from src.core.utils.opentelemetry_config import instrument_app
 from src.interface.gateway.api_gateway import APIGateway
 
 
-# Initialize database
+# Get database manager (will be initialized in lifespan)
 db_manager = get_db_manager()
 
 from contextlib import asynccontextmanager
@@ -58,8 +58,8 @@ async def lifespan(app: FastAPI):
         db_manager.initialize()
         logger.info("Lifespan: DB Connection Initialized")
     except Exception as e:
-        logger.error(f"Lifespan: DB Initialization Failed: {e}")
-    
+        logger.warning(f"Lifespan: PostgreSQL unavailable: {e}")
+        logger.warning("Lifespan: App will continue - DuckDB/Parquet features work without SQL database")
     yield
     
     # Shutdown

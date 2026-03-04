@@ -32,8 +32,8 @@ async def main():
         logger.info(f"Retrieved {len(df)} records from DuckDB")
         logger.info(f"Sample Record:\n{df.iloc[0].to_dict()}")
         
-        # 2. Ingest into Neo4j
-        logger.info("Ingesting into Neo4j...")
+        # 2. Ingest into KùzuDB
+        logger.info("Ingesting into KùzuDB...")
         summary = ingest_dataframe(df) # Full Ingestion
         
         logger.info("KG Population Complete!")

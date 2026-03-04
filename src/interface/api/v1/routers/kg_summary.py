@@ -1,0 +1,560 @@
+"""
+KG Summary Router - Performance Summary endpoint
+
+Generates aggregated performance summaries from campaign data,
+powering the /rag-summary frontend page.
+"""
+
+from fastapi import APIRouter, Depends, HTTPException
+from typing import Dict, Any, List
+import logging
+from datetime import datetime
+
+from src.interface.api.middleware.auth import get_current_user
+from src.core.database.duckdb_manager import get_duckdb_manager
+from src.core.utils.column_mapping import find_column
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/kg", tags=["kg-summary"])
+
+
+def _build_breakdown(df, group_col: str, spend_col: str, conv_col: str, revenue_col: str) -> List[Dict[str, Any]]:
+    """Aggregate metrics by a dimension column."""
+    import pandas as pd
+
+    if not group_col or group_col not in df.columns:
+        return []
+
+    grouped = df.groupby(group_col, dropna=True).agg({
+        **(({spend_col: "sum"}) if spend_col else {}),
+        **(({conv_col: "sum"}) if conv_col else {}),
+        **(({revenue_col: "sum"}) if revenue_col else {}),
+    }).reset_index()
+
+    results = []
+    for _, row in grouped.iterrows():
+        name = str(row[group_col])
+        if not name or name == "nan":
+            continue
+        spend = float(row.get(spend_col, 0) or 0) if spend_col else 0
+        conversions = float(row.get(conv_col, 0) or 0) if conv_col else 0
+        revenue = float(row.get(revenue_col, 0) or 0) if revenue_col else 0
+        roas = round(revenue / spend, 2) if spend > 0 else 0
+        cpa = round(spend / conversions, 2) if conversions > 0 else 0
+
+        results.append({
+            "name": name,
+            "spend": round(spend, 2),
+            "revenue": round(revenue, 2),
+            "roas": roas,
+            "cpa": cpa,
+            "conversions": int(conversions),
+        })
+
+    results.sort(key=lambda x: x["spend"], reverse=True)
+    return results
+
+
+def _find_insights(breakdowns: Dict[str, List[Dict]], avg_roas: float, avg_cpa: float):
+    """Identify top performers and underperformers across all dimensions."""
+    worked = []
+    didnt_work = []
+
+    for dimension, items in breakdowns.items():
+        for item in items:
+            if item["spend"] < 100:  # skip very small segments
+                continue
+
+            # Check ROAS
+            if avg_roas > 0 and item["roas"] > 0:
+                roas_ratio = item["roas"] / avg_roas
+                if roas_ratio >= 1.3:
+                    worked.append({
+                        "segment": item["name"],
+                        "dimension": dimension,
+                        "metric": "ROAS",
+                        "value": item["roas"],
+                        "vs_avg": f"+{round((roas_ratio - 1) * 100)}% vs avg",
+                        "spend": item["spend"],
+                        "reason": f"{item['name']} delivers {item['roas']}x ROAS on ${item['spend']:,.0f} spend — significantly above the {avg_roas:.1f}x average.",
+                    })
+                elif roas_ratio <= 0.6:
+                    didnt_work.append({
+                        "segment": item["name"],
+                        "dimension": dimension,
+                        "metric": "ROAS",
+                        "value": item["roas"],
+                        "vs_avg": f"{round((roas_ratio - 1) * 100)}% vs avg",
+                        "spend": item["spend"],
+                        "reason": f"{item['name']} returns only {item['roas']}x ROAS on ${item['spend']:,.0f} spend — well below the {avg_roas:.1f}x average.",
+                    })
+
+            # Check CPA
+            if avg_cpa > 0 and item["cpa"] > 0:
+                cpa_ratio = item["cpa"] / avg_cpa
+                if cpa_ratio <= 0.7:
+                    worked.append({
+                        "segment": item["name"],
+                        "dimension": dimension,
+                        "metric": "CPA",
+                        "value": item["cpa"],
+                        "vs_avg": f"-{round((1 - cpa_ratio) * 100)}% vs avg",
+                        "spend": item["spend"],
+                        "reason": f"{item['name']} acquires customers at ${item['cpa']:.2f} — {round((1 - cpa_ratio) * 100)}% cheaper than the ${avg_cpa:.2f} average.",
+                    })
+                elif cpa_ratio >= 1.5:
+                    didnt_work.append({
+                        "segment": item["name"],
+                        "dimension": dimension,
+                        "metric": "CPA",
+                        "value": item["cpa"],
+                        "vs_avg": f"+{round((cpa_ratio - 1) * 100)}% vs avg",
+                        "spend": item["spend"],
+                        "reason": f"{item['name']} costs ${item['cpa']:.2f} per acquisition — {round((cpa_ratio - 1) * 100)}% more expensive than the ${avg_cpa:.2f} average.",
+                    })
+
+    # Sort by spend (most impactful first) and limit
+    worked.sort(key=lambda x: x["spend"], reverse=True)
+    didnt_work.sort(key=lambda x: x["spend"], reverse=True)
+    return worked[:8], didnt_work[:8]
+
+
+def _generate_optimizations(worked: List[Dict], didnt_work: List[Dict]) -> List[Dict]:
+    """Generate optimization recommendations from insights."""
+    optimizations = []
+
+    for item in worked[:4]:
+        optimizations.append({
+            "action": "SCALE",
+            "segment": item["segment"],
+            "dimension": item["dimension"],
+            "reason": f"Strong {item['metric']} performance ({item['vs_avg']}). Consider increasing budget allocation.",
+        })
+
+    for item in didnt_work[:4]:
+        optimizations.append({
+            "action": "CUT",
+            "segment": item["segment"],
+            "dimension": item["dimension"],
+            "reason": f"Weak {item['metric']} performance ({item['vs_avg']}). Review targeting or reduce spend.",
+        })
+
+    # Fill with HOLD for borderline items if we have few recommendations
+    if len(optimizations) < 3:
+        optimizations.append({
+            "action": "HOLD",
+            "segment": "Overall Portfolio",
+            "dimension": "general",
+            "reason": "Most segments are performing near average. Continue monitoring for emerging trends.",
+        })
+
+    return optimizations
+
+
+@router.get("/summary")
+async def get_performance_summary(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Generate a comprehensive performance summary from campaign data.
+    Returns breakdowns by platform, channel, funnel, device, and age,
+    along with insights and optimization recommendations.
+    """
+    try:
+        duckdb_mgr = get_duckdb_manager()
+
+        if not duckdb_mgr.has_data():
+            return {
+                "success": False,
+                "error": "No campaign data available. Please upload data first.",
+            }
+
+        df = duckdb_mgr.get_campaigns()
+
+        if df.empty:
+            return {
+                "success": False,
+                "error": "No campaign data available. Please upload data first.",
+            }
+
+        # Resolve column names
+        spend_col = find_column(df, "spend")
+        conv_col = find_column(df, "conversions")
+        revenue_col = find_column(df, "revenue")
+        platform_col = find_column(df, "platform")
+        channel_col = find_column(df, "channel")
+        funnel_col = find_column(df, "funnel")
+        device_col = find_column(df, "device")
+        age_col = find_column(df, "age")
+
+        # Compute averages
+        total_spend = float(df[spend_col].sum()) if spend_col else 0
+        total_conv = float(df[conv_col].sum()) if conv_col else 0
+        total_revenue = float(df[revenue_col].sum()) if revenue_col else 0
+
+        avg_roas = round(total_revenue / total_spend, 2) if total_spend > 0 else 0
+        avg_cpa = round(total_spend / total_conv, 2) if total_conv > 0 else 0
+
+        # Build breakdowns
+        breakdown_map = {
+            "Platform": (platform_col, "platform_breakdown"),
+            "Channel": (channel_col, "channel_breakdown"),
+            "Funnel": (funnel_col, "funnel_breakdown"),
+            "Device": (device_col, "device_breakdown"),
+            "Age": (age_col, "age_breakdown"),
+        }
+
+        breakdowns = {}
+        result_breakdowns = {}
+        for dim_label, (col, key) in breakdown_map.items():
+            bd = _build_breakdown(df, col, spend_col, conv_col, revenue_col)
+            breakdowns[dim_label] = bd
+            result_breakdowns[key] = bd
+
+        # Generate insights
+        what_worked, what_didnt_work = _find_insights(breakdowns, avg_roas, avg_cpa)
+
+        # Generate optimizations
+        optimizations = _generate_optimizations(what_worked, what_didnt_work)
+
+        return {
+            "generated_at": datetime.utcnow().isoformat(),
+            **result_breakdowns,
+            "what_worked": what_worked,
+            "what_didnt_work": what_didnt_work,
+            "optimizations": optimizations,
+            "averages": {
+                "roas": avg_roas,
+                "cpa": avg_cpa,
+            },
+        }
+
+    except Exception as e:
+        logger.error(f"Performance summary generation failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# Endpoints for the /rag page
+# ============================================================================
+
+@router.get("/health")
+async def kg_health(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """KG health status — reports DuckDB data availability."""
+    try:
+        duckdb_mgr = get_duckdb_manager()
+        has_data = duckdb_mgr.has_data()
+        row_count = 0
+        if has_data:
+            df = duckdb_mgr.get_campaigns(limit=1)
+            # Get approximate row count
+            full_df = duckdb_mgr.get_campaigns()
+            row_count = len(full_df) if not full_df.empty else 0
+
+        return {
+            "status": "healthy" if has_data else "no_data",
+            "neo4j_connected": has_data,  # frontend expects this field name
+            "neo4j_uri": "duckdb://local",
+            "node_count": row_count,
+            "relationship_count": 0,
+        }
+    except Exception as e:
+        logger.error(f"KG health check failed: {e}")
+        return {
+            "status": "error",
+            "neo4j_connected": False,
+            "neo4j_uri": "duckdb://local",
+            "node_count": 0,
+            "relationship_count": 0,
+        }
+
+
+@router.get("/templates")
+async def kg_templates(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """Return available query intent templates."""
+    return {
+        "templates": [
+            {
+                "intent": "platform",
+                "examples": ["Meta ads performance", "Google Ads spend", "Platform comparison"],
+            },
+            {
+                "intent": "temporal",
+                "examples": ["Daily spend trend", "Weekly conversions", "Monthly ROAS"],
+            },
+            {
+                "intent": "ranking",
+                "examples": ["Top 5 campaigns by spend", "Best performing ads", "Worst ROAS campaigns"],
+            },
+            {
+                "intent": "cross_channel",
+                "examples": ["Compare Search vs Social", "Channel breakdown", "Search vs Display"],
+            },
+            {
+                "intent": "targeting",
+                "examples": ["Device breakdown", "Age group performance", "Audience segments"],
+            },
+            {
+                "intent": "optimization",
+                "examples": ["Budget recommendations", "Underperforming campaigns", "Scale opportunities"],
+            },
+        ]
+    }
+
+
+from pydantic import BaseModel, Field
+from typing import Optional
+
+
+class KGQueryRequest(BaseModel):
+    query: str = Field(..., min_length=1)
+    limit: int = Field(20, ge=1, le=1000)
+    date_from: Optional[str] = None
+    date_to: Optional[str] = None
+    platform: Optional[str] = None
+
+
+@router.post("/query")
+async def kg_query(
+    request: KGQueryRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Execute a natural language query against campaign data.
+    Uses DuckDB for data retrieval with keyword-based intent detection.
+    """
+    import time
+    import pandas as pd
+
+    start = time.time()
+    query_lower = request.query.lower()
+
+    try:
+        duckdb_mgr = get_duckdb_manager()
+        if not duckdb_mgr.has_data():
+            return {
+                "success": False,
+                "data": [],
+                "metadata": {
+                    "query": request.query,
+                    "intent": "error",
+                    "confidence": 0,
+                    "routing": "none",
+                },
+                "error": "No campaign data available. Please upload data first.",
+            }
+
+        df = duckdb_mgr.get_campaigns()
+        if df.empty:
+            return {
+                "success": False,
+                "data": [],
+                "metadata": {
+                    "query": request.query,
+                    "intent": "error",
+                    "confidence": 0,
+                    "routing": "none",
+                },
+                "error": "No data found.",
+            }
+
+        # Resolve columns
+        spend_col = find_column(df, "spend")
+        impr_col = find_column(df, "impressions")
+        clicks_col = find_column(df, "clicks")
+        conv_col = find_column(df, "conversions")
+        revenue_col = find_column(df, "revenue")
+        platform_col = find_column(df, "platform")
+        channel_col = find_column(df, "channel")
+        device_col = find_column(df, "device")
+        date_col = find_column(df, "date")
+        campaign_col = find_column(df, "campaign_name") or find_column(df, "campaign")
+        age_col = find_column(df, "age")
+        funnel_col = find_column(df, "funnel")
+
+        # Simple intent detection
+        intent = "general"
+        confidence = 0.7
+        group_col = None
+
+        if any(w in query_lower for w in ["platform", "google", "meta", "facebook", "tiktok", "snapchat"]):
+            intent = "platform"
+            group_col = platform_col
+            confidence = 0.9
+        elif any(w in query_lower for w in ["channel", "search", "social", "display", "video"]):
+            intent = "cross_channel"
+            group_col = channel_col
+            confidence = 0.85
+        elif any(w in query_lower for w in ["device", "mobile", "desktop", "tablet"]):
+            intent = "targeting"
+            group_col = device_col
+            confidence = 0.85
+        elif any(w in query_lower for w in ["age", "age group", "demographic"]):
+            intent = "targeting"
+            group_col = age_col
+            confidence = 0.8
+        elif any(w in query_lower for w in ["funnel", "upper", "lower", "middle"]):
+            intent = "targeting"
+            group_col = funnel_col
+            confidence = 0.8
+        elif any(w in query_lower for w in ["daily", "weekly", "monthly", "trend", "over time", "last", "week", "month"]):
+            intent = "temporal"
+            group_col = date_col
+            confidence = 0.9
+
+        # Handle explicit date filtering (e.g., "last 2 weeks")
+        date_filter_desc = ""
+        if intent == "temporal" or "last" in query_lower:
+            try:
+                # Ensure date column is datetime
+                df[date_col] = pd.to_datetime(df[date_col])
+                max_date = df[date_col].max()
+                
+                if "2 months" in query_lower or "60 days" in query_lower:
+                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=60))]
+                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=60)).date() }'"
+                elif "1 month" in query_lower or "30 days" in query_lower:
+                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=30))]
+                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=30)).date() }'"
+                elif "2 weeks" in query_lower or "14 days" in query_lower:
+                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=14))]
+                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=14)).date() }'"
+                elif "1 week" in query_lower or "7 days" in query_lower or ("week" in query_lower and "last" in query_lower):
+                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=7))]
+                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=7)).date() }'"
+
+                # Month-over-month comparison logic: if user mentions "month", group by month start
+                if "month" in query_lower:
+                    df[date_col] = df[date_col].dt.to_period('M').dt.to_timestamp()
+                    date_filter_desc += " [Grouped by Month]"
+            except Exception as e:
+                logger.warning(f"Temporal filtering failed: {e}")
+                pass
+
+        elif any(w in query_lower for w in ["top", "best", "worst", "rank", "highest", "lowest"]):
+            intent = "ranking"
+            group_col = campaign_col
+            confidence = 0.85
+
+        # Build aggregation
+        metric_cols = {}
+        if spend_col:
+            metric_cols[spend_col] = "sum"
+        if impr_col:
+            metric_cols[impr_col] = "sum"
+        if clicks_col:
+            metric_cols[clicks_col] = "sum"
+        if conv_col:
+            metric_cols[conv_col] = "sum"
+        if revenue_col:
+            metric_cols[revenue_col] = "sum"
+
+        if group_col and group_col in df.columns and metric_cols:
+            result_df = df.groupby(group_col, dropna=True).agg(metric_cols).reset_index()
+
+            # Compute derived metrics
+            if spend_col and clicks_col:
+                result_df["cpc"] = (result_df[spend_col] / result_df[clicks_col].replace(0, float("nan"))).round(2)
+            if clicks_col and impr_col:
+                result_df["ctr"] = ((result_df[clicks_col] / result_df[impr_col].replace(0, float("nan"))) * 100).round(2)
+            if revenue_col and spend_col:
+                result_df["roas"] = (result_df[revenue_col] / result_df[spend_col].replace(0, float("nan"))).round(2)
+            if spend_col and conv_col:
+                result_df["cpa"] = (result_df[spend_col] / result_df[conv_col].replace(0, float("nan"))).round(2)
+
+            # Sort
+            # For temporal intent, default to chronological order (Period ASC)
+            # For others, default to spend DESC
+            if intent == "temporal":
+                sort_col = group_col
+                ascending = True
+            else:
+                sort_col = spend_col or (list(metric_cols.keys())[0] if metric_cols else None)
+                ascending = "worst" in query_lower or "lowest" in query_lower
+
+            if sort_col:
+                result_df = result_df.sort_values(sort_col, ascending=ascending)
+
+            # Format Period column if it's a date
+            if intent == "temporal":
+                try:
+                    if "month" in query_lower:
+                        result_df[group_col] = pd.to_datetime(result_df[group_col]).dt.strftime('%Y-%m')
+                    else:
+                        result_df[group_col] = pd.to_datetime(result_df[group_col]).dt.strftime('%Y-%m-%d')
+                except:
+                    pass
+
+            # Rename group column to something user friendly for the frontend table
+            rename_label = "Period" if intent == "temporal" else "Dimension"
+            result_df = result_df.rename(columns={group_col: rename_label})
+
+            result_df = result_df.head(request.limit)
+            result_df = result_df.fillna(0)
+            data = result_df.to_dict(orient="records")
+
+            # Build pseudo-SQL for the frontend "View Cypher Query" display
+            metrics_sql = ", ".join([f"SUM({c}) AS {c}" for c in metric_cols.keys()])
+            pseudo_sql = f"SELECT {group_col}, {metrics_sql}\nFROM campaigns\n{date_filter_desc}\nGROUP BY {group_col}\nORDER BY {sort_col} {'ASC' if ascending else 'DESC'}\nLIMIT {request.limit}"
+        else:
+            # Fallback: return overall summary
+            summary_row = {}
+            for col, agg in metric_cols.items():
+                summary_row[col] = float(df[col].sum())
+            data = [summary_row] if summary_row else []
+            pseudo_sql = f"SELECT {', '.join([f'SUM({c})' for c in metric_cols.keys()])} FROM campaigns {date_filter_desc}"
+
+        # Build summary stats
+        summary = {"count": len(data)}
+        all_spend = sum(r.get(spend_col, 0) for r in data) if spend_col else None
+        all_impr = sum(r.get(impr_col, 0) for r in data) if impr_col else None
+        all_clicks = sum(r.get(clicks_col, 0) for r in data) if clicks_col else None
+        all_conv = sum(r.get(conv_col, 0) for r in data) if conv_col else None
+
+        if all_spend is not None:
+            summary["total_spend"] = round(all_spend, 2)
+        if all_impr is not None:
+            summary["total_impressions"] = int(all_impr)
+        if all_clicks is not None:
+            summary["total_clicks"] = int(all_clicks)
+        if all_conv is not None:
+            summary["total_conversions"] = int(all_conv)
+        if all_clicks and all_impr:
+            summary["avg_ctr"] = round(all_clicks / all_impr * 100, 2) if all_impr > 0 else 0
+        if all_spend and all_clicks:
+            summary["avg_cpc"] = round(all_spend / all_clicks, 2) if all_clicks > 0 else 0
+
+        elapsed = (time.time() - start) * 1000
+
+        return {
+            "success": True,
+            "data": data,
+            "summary": summary,
+            "metadata": {
+                "query": request.query,
+                "intent": intent,
+                "confidence": confidence,
+                "routing": "template",
+                "cypher": pseudo_sql,
+                "execution_time_ms": round(elapsed, 1),
+            },
+        }
+
+    except Exception as e:
+        logger.error(f"KG query failed: {e}", exc_info=True)
+        return {
+            "success": False,
+            "data": [],
+            "metadata": {
+                "query": request.query,
+                "intent": "error",
+                "confidence": 0,
+                "routing": "error",
+            },
+            "error": str(e),
+        }

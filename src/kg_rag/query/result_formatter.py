@@ -1,7 +1,7 @@
 """
 KG-RAG Result Formatter
 
-Formats Neo4j query results into structured JSON for API responses.
+Formats KùzuDB query results into structured JSON for API responses.
 """
 
 import logging
@@ -32,7 +32,7 @@ class FormattedResult:
 
 class ResultFormatter:
     """
-    Format Neo4j query results for API responses.
+    Format KùzuDB query results for API responses.
     
     Handles:
     - Numeric formatting (rounding, currency)
@@ -70,7 +70,7 @@ class ResultFormatter:
         Format query results.
         
         Args:
-            results: Raw Neo4j results
+            results: Raw KùzuDB results
             query_type: Type of query for context-specific formatting
             include_summary: Include summary statistics
             
@@ -124,8 +124,8 @@ class ResultFormatter:
             
             # ... continue with existing logic
             
-            # Convert Neo4j types to JSON-serializable
-            value = self._convert_neo4j_type(value)
+            # Convert KùzuDB types to JSON-serializable
+            value = self._convert_kuzu_type(value)
             
             # Format based on column type
             if key.lower() in self.CURRENCY_COLUMNS:
@@ -139,33 +139,30 @@ class ResultFormatter:
         
         return formatted
     
-    def _convert_neo4j_type(self, value: Any) -> Any:
-        """Convert Neo4j-specific types to JSON-serializable formats."""
-        # Handle Neo4j Date/Time types
+    def _convert_kuzu_type(self, value: Any) -> Any:
+        """Convert KùzuDB and Python types to JSON-serializable formats."""
+        # KùzuDB returns native Python types (date, datetime, etc.)
         type_name = type(value).__name__
         
-        if type_name == 'Date':
-            # neo4j.time.Date
-            return value.iso_format()
-        elif type_name == 'DateTime':
-            # neo4j.time.DateTime
-            return value.iso_format()
-        elif type_name == 'Time':
-            return value.iso_format()
-        elif type_name == 'Duration':
+        if type_name == 'date':
+            # Python date
+            return value.isoformat()
+        elif type_name == 'datetime':
+            # Python datetime
+            return value.isoformat()
+        elif type_name == 'time':
+            return value.isoformat()
+        elif type_name == 'timedelta':
             return str(value)
         elif type_name == 'Node':
-            # Neo4j Node - return properties dict
+            # KùzuDB Node - return properties dict
             return dict(value)
         elif type_name == 'Relationship':
             return dict(value)
         elif type_name == 'Path':
             return str(value)
-        elif hasattr(value, 'iso_format'):
-            # Generic date/time with iso_format method
-            return value.iso_format()
         elif hasattr(value, 'isoformat'):
-            # Python datetime types
+            # Generic date/time with isoformat method
             return value.isoformat()
         
         return value

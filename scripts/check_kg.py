@@ -12,7 +12,7 @@ logger = setup_logger("check_kg")
 def main():
     try:
         conn = get_neo4j_connection()
-        logger.info("Connected to Neo4j")
+        logger.info("Connected to KùzuDB")
         
         # Count nodes
         result = conn.execute_query("MATCH (n) RETURN count(n) as count")

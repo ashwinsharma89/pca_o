@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class CampaignTransformer:
     """
-    Transform campaign records for Neo4j ingestion.
+    Transform campaign records for KùzuDB ingestion.
     
     Creates Campaign nodes with proper ID generation and field mapping.
     """
@@ -38,7 +38,7 @@ class CampaignTransformer:
     
     def transform(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Transform campaign records for Neo4j.
+        Transform campaign records for KùzuDB.
         
         Args:
             records: Raw campaign records (with canonical column names)

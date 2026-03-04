@@ -54,6 +54,9 @@ router_v1.include_router(campaigns_router)
 # from .databases import router as databases_router
 # router_v1.include_router(databases_router)
 
+from .routers.kg_summary import router as kg_summary_router
+router_v1.include_router(kg_summary_router)
+
 from .upload import router as upload_router
 router_v1.include_router(upload_router)
 
