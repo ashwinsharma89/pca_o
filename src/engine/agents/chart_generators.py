@@ -102,7 +102,15 @@ class SmartChartGenerator:
         for idx, metric in enumerate(metrics[:num_metrics]):
             row, col = positions[idx]
             
-            values = [data[ch].get(metric, 0) for ch in channels]
+            # Defensive check for values
+            values = []
+            for ch in channels:
+                ch_data = data.get(ch, {})
+                if isinstance(ch_data, dict):
+                    values.append(ch_data.get(metric, 0))
+                else:
+                    values.append(0)
+                    
             colors = [self.brand_colors['channels'].get(ch.lower(), self.brand_colors['primary']) 
                      for ch in channels]
             
@@ -178,7 +186,7 @@ class SmartChartGenerator:
             values = data['metrics'][metric]
             
             # Calculate moving average
-            ma_window = min(7, len(values) // 3)  # Adaptive window
+            ma_window = max(1, min(7, len(values) // 3))  # Adaptive window, min 1
             if len(values) >= ma_window:
                 ma = np.convolve(values, np.ones(ma_window)/ma_window, mode='valid')
                 ma_dates = dates[ma_window-1:]
@@ -541,7 +549,7 @@ class SmartChartGenerator:
             title="Keyword Performance Matrix",
             xaxis_title="Impressions (Volume)",
             yaxis_title="Conversion Rate",
-            xaxis_type="log" if max(impressions) / min(impressions) > 100 else "linear",
+            xaxis_type="log" if (impressions and min(impressions) > 0 and max(impressions) / min(impressions) > 100) else "linear",
             height=600,
             hovermode='closest'
         )

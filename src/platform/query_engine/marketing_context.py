@@ -43,10 +43,9 @@ MARKETING_ANALYTICS_PRINCIPLES = """
    - "Show me corrupted rows"
    - For these, use: WHERE clicks <= impressions AND conversions <= clicks
 
-## Rule 6: SAMPLE SIZE - Include confidence indicators
+## Rule 6: SAMPLE SIZE - Include sample size indicator
 ✅ ALWAYS add to results:
    - SUM(conversions) AS sample_size
-   - CASE WHEN SUM(conversions) < 100 THEN 'Low Confidence' ELSE 'High Confidence' END AS confidence
 
 ## Rule 7: DATE HANDLING - Dates are stored as proper datetime type
 ✅ The Date column is stored as datetime64 (proper DATE type)
@@ -67,15 +66,15 @@ MARKETING_ANALYTICS_PRINCIPLES = """
 ⚠️ MANDATORY: When query involves time periods, ALWAYS include a date column in results:
    - For DAILY data: Show date as-is (YYYY-MM-DD)
    - For WEEKLY data: Show DATE_TRUNC('week', CAST("Date" AS DATE)) AS week_start
-   - For MONTHLY data: Use STRFTIME(CAST("Date" AS DATE), 'Mon-YY') AS month (e.g., 'Oct-25', 'Jan-24', 'Sep-23')
+   - For MONTHLY data: Show DATE_TRUNC('month', CAST("Date" AS DATE)) AS month
    
 Templates:
 ```sql
 -- Weekly aggregation with formatted date
 DATE_TRUNC('week', CAST("Date" AS DATE)) AS week_start
 
--- Monthly aggregation with readable format  
-STRFTIME(CAST("Date" AS DATE), 'Mon-YY') AS month
+-- Monthly aggregation
+DATE_TRUNC('month', CAST("Date" AS DATE)) AS month
 ```
 
 ## Rule 10: CONSISTENT PERFORMANCE KPIs - Standard metrics for all performance queries
@@ -88,7 +87,7 @@ STRFTIME(CAST("Date" AS DATE), 'Mon-YY') AS month
    6. Clicks (SUM(Clicks))
    7. ROAS (SUM(Revenue_2024) / NULLIF(SUM("Total Spent"), 0))
 
-This ensures consistent, comparable results across all aggregation levels (daily, weekly, monthly, by platform, by channel, etc.)
+This ensures consistent, comparable results across all aggregation levels (daily, weekly, monthly, by platform, by channel, and budget pacing).
 
 ## METRIC CALCULATION TEMPLATES (Copy-paste these EXACTLY)
 

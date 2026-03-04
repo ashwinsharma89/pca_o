@@ -21,10 +21,13 @@ class TestNaturalLanguageQueryEngine:
     @pytest.fixture
     def engine(self):
         """Create engine instance."""
-        try:
-            return NaturalLanguageQueryEngine()
-        except Exception:
-            pytest.skip("Engine initialization failed")
+        with patch('src.platform.query_engine.nl_to_sql.OpenAI'):
+            with patch('src.platform.query_engine.nl_to_sql.SQLKnowledgeHelper'):
+                try:
+                    from src.platform.query_engine.nl_to_sql import NaturalLanguageQueryEngine
+                    return NaturalLanguageQueryEngine(api_key='test-key')
+                except Exception as e:
+                    pytest.skip(f"Engine initialization failed: {e}")
     
     def test_initialization(self, engine):
         """Test engine initialization."""

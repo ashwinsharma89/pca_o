@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Initialize Neo4j Schema for KG-RAG
+Initialize KùzuDB Schema for KG-RAG
 
 This script:
 1. Creates all constraints
@@ -8,7 +8,7 @@ This script:
 3. Seeds Channel and Platform nodes
 
 Usage:
-    python scripts/kg_rag/init_neo4j.py [--reset]
+    python scripts/kg_rag/init_kuzu.py [--reset]
 """
 
 import argparse
@@ -200,7 +200,7 @@ def verify_schema(neo4j) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Initialize Neo4j schema for KG-RAG")
+    parser = argparse.ArgumentParser(description="Initialize KùzuDB schema for KG-RAG")
     parser.add_argument(
         "--reset",
         action="store_true",
@@ -208,7 +208,7 @@ def main():
     )
     args = parser.parse_args()
     
-    logger.info("Starting Neo4j schema initialization...")
+    logger.info("Starting KùzuDB schema initialization...")
     
     try:
         neo4j = get_neo4j_connection()
@@ -216,10 +216,10 @@ def main():
         # Health check
         health = neo4j.health_check()
         if not health["connected"]:
-            logger.error(f"Cannot connect to Neo4j: {health.get('error')}")
+            logger.error(f"Cannot connect to KùzuDB: {health.get('error')}")
             sys.exit(1)
         
-        logger.info(f"Connected to Neo4j at {health['uri']}")
+        logger.info(f"Connected to KùzuDB at {health['uri']}")
         
         # Reset if requested
         if args.reset:

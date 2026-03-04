@@ -44,8 +44,9 @@ class TextCleaner:
         for wrong, correct in common_fixes.items():
             text = text.replace(wrong, correct)
         
-        # PASS 5: Fix punctuation spacing
-        text = re.sub(r'([.,!?:;])([A-Za-z0-9])', r'\1 \2', text)
+        # PASS 5: Fix punctuation spacing (avoiding decimals)
+        text = re.sub(r'([,!?:;])([A-Za-z0-9])', r'\1 \2', text)
+        text = re.sub(r'\.([A-Za-z])', r'. \1', text)
         
         # PASS 6: Remove brackets from headers
         text = re.sub(r'\[OVERALL SUMMARY\]', 'OVERALL SUMMARY:', text)

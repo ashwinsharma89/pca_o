@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class MetricTransformer:
     """
-    Transform metric records for Neo4j ingestion.
+    Transform metric records for KùzuDB ingestion.
     
     Stores raw additive metrics only. Calculated metrics (CTR, CPC, ROAS, etc.)
     are computed at aggregate level during query time.
@@ -44,7 +44,7 @@ class MetricTransformer:
     
     def transform(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Transform metric records for Neo4j.
+        Transform metric records for KùzuDB.
         
         Args:
             records: Raw metric records (with canonical column names)
@@ -202,10 +202,10 @@ class MetricTransformer:
         if value is None:
             return None
         
-        if isinstance(value, date):
-            return value.isoformat()
         if isinstance(value, datetime):
             return value.date().isoformat()
+        if isinstance(value, date):
+            return value.isoformat()
         if isinstance(value, str):
             # Try parsing common formats
             for fmt in ["%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"]:

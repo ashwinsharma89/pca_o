@@ -1,0 +1,162 @@
+Neo4j to KùzuDB Migration - Complete File List
+================================================
+
+FILES CREATED/MODIFIED:
+=======================
+
+Configuration:
+  1. src/kg_rag/config/settings.py
+     - Changed kuzu_db_path from neo4j_uri
+     - Removed neo4j_user, neo4j_password
+     - Updated docstrings for KùzuDB
+
+Schema (DDL):
+  2. src/kg_rag/schema/nodes.py
+     - Changed docstring: "Neo4j" → "Knowledge Graph"
+     - Added KUZU_NODE_DDL: 11 CREATE NODE TABLE statements
+
+  3. src/kg_rag/schema/edges.py
+     - Changed docstring: "Neo4j" → "Knowledge Graph"
+     - Added KUZU_REL_DDL: 12 CREATE REL TABLE statements
+
+  4. src/kg_rag/schema/constraints.py
+     - Replaced entirely with documentation-only version
+     - Constraints enforced via PRIMARY KEY in DDL
+
+  5. src/kg_rag/schema/indexes.py
+     - Replaced entirely with documentation-only version
+     - Secondary indexes not supported via KùzuDB DDL
+
+Database Connection:
+  6. src/kg_rag/client/connection.py (NEW)
+     - KuzuConnection class (wraps kuzu.Database and kuzu.Connection)
+     - Methods: connect, disconnect, execute_query, execute_batch, show_tables
+     - Singleton get_neo4j_connection() for backward compatibility
+     - Neo4jConnection alias for compatibility
+
+ETL/Loading:
+  7. src/kg_rag/etl/loaders/neo4j_loader.py
+     - Replaced with KuzuLoader class
+     - All load_* methods use Cypher with $batch parameter
+     - Neo4jLoader alias for backward compatibility
+
+  8. src/kg_rag/etl/ingestion.py
+     - Updated import: KuzuLoader as Neo4jLoader
+     - ETLPipeline methods unchanged (delegate to loader)
+
+Query & Context:
+  9. src/kg_rag/query/cypher_generator.py
+     - Updated CYPHER_SYSTEM_PROMPT: "Neo4j" → "KùzuDB"
+     - Removed Neo4j-specific notes
+
+  10. src/kg_rag/query/query_router.py
+      - Updated import: KuzuConnection as Neo4jConnection
+      - Updated ROUTING_PROMPT_TEMPLATE: "Neo4j" → "KùzuDB"
+
+  11. src/kg_rag/query/summary_service.py
+      - No changes needed (uses get_neo4j_connection)
+
+  12. src/kg_rag/context/context_builder.py
+      - Updated import: KuzuConnection as Neo4jConnection
+      - Updated _get_node_info(): uses show_tables() instead of APOC
+      - Updated _get_relationship_info(): uses EDGE_DEFINITIONS from schema
+
+API:
+  13. src/kg_rag/api/router.py
+      - Updated health check: "neo4j_connected" → "graph_db_connected"
+      - Updated health check: "neo4j_uri" → "db_path"
+      - Updated stats endpoint for KùzuDB
+
+Dependencies:
+  14. requirements.txt
+      - Removed: neo4j>=5.0.0
+      - Added: kuzu>=0.4.0
+
+Configuration Files:
+  15. .env
+      - Removed: KG_RAG_NEO4J_URI, KG_RAG_NEO4J_USER, KG_RAG_NEO4J_PASSWORD
+      - Added: KG_RAG_KUZU_DB_PATH=./kuzu_db
+
+Utilities:
+  16. debug_kuzu.py (NEW)
+      - Interactive debugger for KùzuDB
+      - Commands: show_schema, show_nodes, show_rels, sample, exit
+      - Query execution loop
+
+  17. scripts/kg_rag/init_kuzu.py (NEW)
+      - Schema initialization script
+      - Creates all node and relationship tables
+      - Verifies schema after creation
+
+Documentation:
+  18. MIGRATION_NOTES.md (NEW)
+      - Migration overview and checklist
+      - Key changes and compatibility notes
+
+  19. MIGRATION_SUMMARY.txt (THIS FILE)
+
+FILES TO REMOVE:
+================
+  docker/docker-compose.neo4j.yml
+  (No longer needed for embedded database)
+
+DIRECTORY STRUCTURE:
+====================
+pca_agent_copy/
+  src/kg_rag/
+    config/
+      settings.py                    (MODIFIED)
+    schema/
+      nodes.py                       (MODIFIED - added KUZU_NODE_DDL)
+      edges.py                       (MODIFIED - added KUZU_REL_DDL)
+      constraints.py                 (REPLACED)
+      indexes.py                     (REPLACED)
+    client/
+      connection.py                  (NEW)
+    etl/
+      loaders/
+        neo4j_loader.py              (REPLACED - KuzuLoader class)
+      ingestion.py                   (MODIFIED - updated import)
+    query/
+      cypher_generator.py            (MODIFIED - updated prompt)
+      query_router.py                (MODIFIED - updated imports/prompt)
+      summary_service.py             (MODIFIED - uses get_neo4j_connection)
+    context/
+      context_builder.py             (MODIFIED - updated introspection)
+    api/
+      router.py                      (MODIFIED - updated health check)
+  scripts/kg_rag/
+    init_kuzu.py                     (NEW)
+  debug_kuzu.py                      (NEW)
+  requirements.txt                   (MODIFIED)
+  .env                               (MODIFIED)
+  MIGRATION_NOTES.md                 (NEW)
+  MIGRATION_SUMMARY.txt              (NEW)
+
+BACKWARD COMPATIBILITY:
+======================
+All existing code continues to work via:
+  - get_neo4j_connection() function (returns KuzuConnection)
+  - Neo4jConnection type alias (for type hints)
+  - Neo4jLoader alias (in neo4j_loader.py for KuzuLoader)
+  - Same Cypher syntax (KùzuDB supports Cypher)
+
+NEXT STEPS:
+===========
+1. Install dependencies:
+   pip install -r requirements.txt
+
+2. Initialize schema:
+   python scripts/kg_rag/init_kuzu.py
+
+3. Debug and verify:
+   python debug_kuzu.py
+
+4. Run ETL pipeline:
+   python -c "from src.kg_rag.etl.ingestion import ETLPipeline; p = ETLPipeline(); ..."
+
+5. Update tests and deployment docs
+
+6. Remove docker-compose.neo4j.yml
+
+Migration completed: 2026-03-03

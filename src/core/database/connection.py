@@ -182,13 +182,6 @@ def get_db_manager() -> DatabaseManager:
     global _db_manager
     if _db_manager is None:
         _db_manager = DatabaseManager()
-        try:
-            _db_manager.initialize()
-        except Exception as e:
-            logger.warning(f"⚠️ PostgreSQL unavailable: {e}")
-            logger.warning("App will continue - DuckDB/Parquet features work without SQL database")
-            # Don't raise - let app continue without SQL DB
-            # Features using SQL will fail gracefully
     return _db_manager
 
 

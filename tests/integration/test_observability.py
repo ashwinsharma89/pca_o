@@ -9,9 +9,9 @@ import os
 # Add src to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from src.interface.api.main import app
-from src.core.utils.observability import metrics
-from src.core.utils.opentelemetry_config import get_tracer
+from src.interface.api.main_v3 import app
+from src.core.utils.observability import MetricsCollector
+from src.core.utils.opentelemetry_config import setup_opentelemetry
 
 client = TestClient(app)
 
@@ -21,24 +21,32 @@ def test_observability_integration():
     os.environ["OPENTELEMETRY_ENABLED"] = "true"
     
     # 2. Get auth token
-    response = client.post("/api/v1/login/access-token", data={
+    response = client.post("/api/v1/auth/login", json={
         "username": "test@example.com",
         "password": "Password123!"
     })
     # If login fails, register first
     if response.status_code != 200:
-        client.post("/api/v1/register", json={
+        client.post("/api/v1/auth/register", json={
+            "username": "test@example.com",
             "email": "test@example.com",
-            "password": "Password123!",
-            "full_name": "Test User"
+            "password": "Password123!"
         })
-        response = client.post("/api/v1/login/access-token", data={
+        response = client.post("/api/v1/auth/login", json={
             "username": "test@example.com",
             "password": "Password123!"
         })
     
-    token = response.json()["access_token"]
-    headers = {"Authorization": f"Bearer {token}"}
+    token = response.json().get("access_token")
+    if not token:
+        # Check if mfa required
+        if response.json().get("mfa_required"):
+             token = response.json().get("mfa_session")
+             
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "X-CSRF-Token": "test-token"
+    }
     
     # 3. Upload synthetic data
     df = pd.DataFrame({

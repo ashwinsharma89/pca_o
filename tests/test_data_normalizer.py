@@ -24,7 +24,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import importlib.util
 spec = importlib.util.spec_from_file_location(
     "data_normalizer", 
-    PROJECT_ROOT / "src" / "utils" / "data_normalizer.py"
+    PROJECT_ROOT / "src" / "core" / "utils" / "data_normalizer.py"
 )
 data_normalizer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(data_normalizer)

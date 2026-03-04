@@ -107,10 +107,16 @@ class NaturalLanguageQueryEngine:
         
         # 5. Groq (ULTIMATE FREE FALLBACK)
         groq_key = os.getenv('GROQ_API_KEY')
-        if groq_key and GROQ_AVAILABLE:
-            self.groq_client = Groq(api_key=groq_key)
-            self.available_models.append(('groq', 'llama-3.3-70b-versatile'))
-            logger.info("Tier 5: Groq Llama 3.3 70B (FREE & SUPER FAST)")
+        if groq_key:
+            try:
+                from groq import Groq
+                self.groq_client = Groq(api_key=groq_key)
+                self.available_models.append(('groq', 'llama-3.3-70b-versatile'))
+                logger.info("Tier 5: Groq Llama 3.3 70B (FREE & SUPER FAST)")
+            except ImportError:
+                logger.warning("Groq SDK not installed. Skipping Groq tier.")
+            except Exception as e:
+                logger.warning(f"Groq initialization failed: {e}")
         
         logger.info(f"Available models: {[m[0] for m in self.available_models]}")
         
@@ -626,10 +632,9 @@ class NaturalLanguageQueryEngine:
         
         # Rule 2: Check for division without NULLIF
         # Look for patterns like "spend/conversions" without NULLIF
-        division_pattern = r'/\s*(?!NULLIF)[a-zA-Z_]+\s*[,\n\)]'
+        division_pattern = r'/\s*(?!NULLIF)[a-zA-Z0-9_]+'
         if re.search(division_pattern, sql_upper):
-            # More specific check - find actual divisions
-            if '/' in sql and 'NULLIF' not in sql_upper:
+            if 'NULLIF' not in sql_upper:
                 checks['has_nullif_for_division'] = False
                 failed_rules.append("Rule 2: Division without NULLIF - wrap denominator in NULLIF(x, 0)")
         
@@ -796,24 +801,40 @@ Return ONLY the corrected SQL, no explanations."""
             
             # If columns have spaces, we need to quote them in SQL
             has_spaces = any(' ' in col for col in columns)
+            patterns = []
             
+            # Unified Column Mapping (Standardize to current schema)
+            if 'spend' in columns:
+                patterns.append((r'\b"?(?:Total Spent|Total_Spent|Spend|Amount_Spent)"?\b', 'spend'))
+            if 'conversions' in columns:
+                patterns.append((r'\b"?(?:Site Visit|Site_Visit|Conversions|Total_Conversions)"?\b', 'conversions'))
+            if 'date' in columns:
+                patterns.append((r'\b"?Date"?\b', 'date'))
+            if 'revenue' in columns:
+                patterns.append((r'\b"?(?:Revenue_2024|Revenue_2025|Conversion_Value)"?\b', 'revenue'))
+            if 'platform' in columns:
+                patterns.append((r'\b"?Platform"?\b', 'platform'))
+            if 'channel' in columns:
+                patterns.append((r'\b"?Channel"?\b', 'channel'))
+            
+            # Legacy/Fallback patterns
             if has_spaces:
                 # Replace underscored versions with quoted space versions
                 # But only if not already quoted
-                patterns = [
+                patterns.extend([
                     (r'(?<!")Total_Spent(?!")', '"Total Spent"'),
                     (r'(?<!")Site_Visit(?!")', '"Site Visit"'),
                     (r'(?<!")Ad_Type(?!")', '"Ad Type"'),
                     (r'(?<!")Device_Type(?!")', '"Device Type"'),
-                ]
+                ])
             else:
                 # Replace space versions with underscored versions
-                patterns = [
+                patterns.extend([
                     (r'\bAd Type\b', 'Ad_Type'),
                     (r'\bDevice Type\b', 'Device_Type'),
                     (r'\bTotal Spent\b', 'Total_Spent'),
                     (r'\bSite Visit\b', 'Site_Visit'),
-                ]
+                ])
             
             for pattern, replacement in patterns:
                 sql_query = re.sub(pattern, replacement, sql_query, flags=re.IGNORECASE)
@@ -1286,6 +1307,9 @@ Return ONLY the corrected SQL, no explanations."""
         if results.is_empty():
             return "No results found for your question."
         
+        # Skip AI-generated text answers in data mode - just return results
+        return "Query executed successfully."
+        
         # Convert to Pandas for robust date inference and string formatting needed for LLM
         # Shadowing 'results' to minimize code changes downstream
         try:
@@ -1412,22 +1436,18 @@ Provide deep insights with context and business implications:"""
             system_prompt = """You are a marketing analytics expert (Rand Fishkin + Alex Freberg style).
 You provide answers with DATA → CONTEXT → HYPOTHESIS → ACTION framework.
 
-MANDATORY FORMAT - Always include these 3 sections:
+MANDATORY FORMAT - Always include these 2 sections:
 
-**1. DIRECT ANSWER** (Required)
-- Answer the literal question first
-- Use actual numbers from the data
-- Be specific: "Facebook has highest ROAS at 3.2x" not "Facebook performs well"
-- One clear sentence if possible
-
-**2. CONTEXT** (Required)
-- How does this compare to averages/benchmarks?
+**1. CONTEXT** (Required)
+- Start with the specific answer using actual numbers from the data
+- Example: "Facebook has highest ROAS at 3.2x"
+- Then provide comparison to averages/benchmarks
 - Sample size: How many conversions/rows support this conclusion?
 - Confidence level: High (>1000 conversions), Medium (100-1000), Low (<100)
 - Date range analyzed
 - Any caveats or data quality notes
 
-**3. INTERPRETATION** (Conditional - only if actionable)
+**2. INTERPRETATION** (Conditional - only if actionable)
 IF results show anomalies, trends, or actionable patterns:
 - WHY this might be happening (data-grounded hypotheses only)
 - WHAT to investigate next
@@ -1453,7 +1473,7 @@ CRITICAL RULES:
 **Query Results:**
 {results_text}
 
-Provide your answer in the 3-section format (Direct Answer → Context → Interpretation):"""
+Provide your answer in the 2-section format (Context → Interpretation):"""
             max_tokens = 450
         
         # Use same fallback system as SQL generation

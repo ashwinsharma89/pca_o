@@ -5,7 +5,7 @@ from loguru import logger
 def check_indexes():
     conn = get_neo4j_connection()
     try:
-        # Neo4j 5.x syntax
+        # KùzuDB syntax
         res = conn.execute_query("SHOW INDEXES")
         logger.info("Found Indexes:")
         for r in res:

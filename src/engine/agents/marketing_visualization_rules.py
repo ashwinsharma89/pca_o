@@ -504,9 +504,13 @@ class MarketingVisualizationRules:
             }
         }
     
-    def _adjust_for_data(self, config: Dict, data: Dict) -> Dict:
+    def _adjust_for_data(self, config: Dict, data: Any) -> Dict:
         """Adjust configuration based on data characteristics"""
         
+        # Ensure data is a dict before calling get()
+        if not isinstance(data, dict):
+            return config
+            
         # Adjust time granularity for trends
         if config.get("time_granularity") == "auto" and "date_range" in data:
             date_range_days = data.get("date_range_days", 30)

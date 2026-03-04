@@ -295,10 +295,6 @@ export default function GlobalChatPage() {
             if (dateMatch) {
                 const date = new Date(value);
                 if (!isNaN(date.getTime())) {
-                    // Check if it's a month-level date (first day of month, midnight)
-                    if (date.getDate() === 1) {
-                        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-                    }
                     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                 }
             }

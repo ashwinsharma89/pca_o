@@ -2,7 +2,7 @@ import logging
 import sys
 from pathlib import Path
 
-def setup_frontend_logger(name: str = "frontend_reflex"):
+def setup_frontend_logger(name: str = "frontend_app"):
     """
     Setup a logger for the frontend application.
     Logs to both console and a file 'frontend.log'.

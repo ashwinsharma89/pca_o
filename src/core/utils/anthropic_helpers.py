@@ -45,18 +45,16 @@ def create_anthropic_client(api_key: Optional[str] = None):
         return None
 
     try:
-        # Try without any proxy settings first
+        # Try primary initialization
         return Anthropic(api_key=key, max_retries=2)
-    except TypeError as exc:
-        # If proxies argument causes issues, try basic initialization
-        if "proxies" in str(exc).lower():
-            try:
-                return Anthropic(api_key=key)
-            except Exception as inner_exc:
-                _log_client_error(inner_exc)
-                return None
-        _log_client_error(exc)
-        return None
+    except Exception as exc:
+        # Fallback to absolute minimum configuration
+        try:
+            logger.debug(f"Retrying Anthropic initialization due to: {exc}")
+            return Anthropic(api_key=key)
+        except Exception as inner_exc:
+            _log_client_error(inner_exc)
+            return None
     except Exception as exc:  # pragma: no cover - environment specific
         _log_client_error(exc)
         return None

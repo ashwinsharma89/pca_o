@@ -1,13 +1,10 @@
-
 from src.kg_rag.client.connection import get_neo4j_connection
 from src.kg_rag.config.settings import get_kg_rag_settings
 import json
 
 def debug_kg():
     try:
-        # Try connecting with 127.0.0.1 to avoid IPv6 issues
         settings = get_kg_rag_settings()
-        settings.neo4j_uri = "bolt://127.0.0.1:7687"
         
         conn = get_neo4j_connection()
         

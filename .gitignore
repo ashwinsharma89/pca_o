@@ -61,7 +61,7 @@ data/sitevisit_fixed.csv
 data/*.db
 data/*.sqlite3
 data/*.csv
-data/*.parquet
+data/**/*.parquet
 data/chroma_db/
 data/llm_usage.json
 data/enterprise/

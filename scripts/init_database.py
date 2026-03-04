@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from dotenv import load_dotenv
 load_dotenv()
 
-from src.database.connection import DatabaseManager, DatabaseConfig
-from src.database.models import Base
+from src.core.database.connection import DatabaseManager, DatabaseConfig
+from src.core.database.models import Base
 import logging
 
 logging.basicConfig(level=logging.INFO)

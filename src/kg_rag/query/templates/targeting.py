@@ -11,14 +11,15 @@ from typing import Dict, Any, List, Optional
 DEVICE_BREAKDOWN = """
 MATCH (c:Campaign)-[:HAS_TARGETING]->(t:Targeting)
 WHERE t.device_types IS NOT NULL
+WITH c, t, size(t.device_types) as device_count
 UNWIND t.device_types AS device
 WITH device,
      count(c) AS campaigns,
-     SUM(c.spend_total) AS spend,
-     SUM(c.impressions_total) AS impressions,
-     SUM(c.clicks_total) AS clicks,
-     SUM(c.conversions_total) AS conversions,
-     SUM(c.revenue_total) AS revenue
+     SUM(c.spend_total / device_count) AS spend,
+     SUM(c.impressions_total / device_count) AS impressions,
+     SUM(c.clicks_total / device_count) AS clicks,
+     SUM(c.conversions_total / device_count) AS conversions,
+     SUM(c.revenue_total / device_count) AS revenue
 RETURN device,
        campaigns,
        spend,
@@ -31,15 +32,17 @@ ORDER BY spend DESC
 
 # Template: Age range breakdown
 AGE_BREAKDOWN = """
-MATCH (m:Metric)
-WHERE m.age_range IS NOT NULL
-WITH m.age_range AS age_range,
-     count(DISTINCT m.campaign_id) AS campaigns,
-     SUM(m.spend) AS spend,
-     SUM(m.impressions) AS impressions,
-     SUM(m.clicks) AS clicks,
-     SUM(coalesce(m.conversions, 0)) AS conversions,
-     SUM(coalesce(m.revenue, 0)) AS revenue
+MATCH (c:Campaign)-[:HAS_TARGETING]->(t:Targeting)
+WHERE t.age_range IS NOT NULL
+WITH c, t, size(t.age_range) as age_count
+UNWIND t.age_range AS age_range
+WITH age_range,
+     count(c) AS campaigns,
+     SUM(c.spend_total / age_count) AS spend,
+     SUM(c.impressions_total / age_count) AS impressions,
+     SUM(c.clicks_total / age_count) AS clicks,
+     SUM(c.conversions_total / age_count) AS conversions,
+     SUM(c.revenue_total / age_count) AS revenue
 RETURN age_range,
        campaigns,
        spend,
@@ -144,12 +147,13 @@ ORDER BY
 INTERESTS_BREAKDOWN = """
 MATCH (c:Campaign)-[:HAS_TARGETING]->(t:Targeting)
 WHERE t.interests IS NOT NULL
+WITH c, t, size(t.interests) as interest_count
 UNWIND t.interests AS interest
 WITH interest,
      count(c) AS campaigns,
-     SUM(c.spend_total) AS spend,
-     SUM(c.conversions_total) AS conversions,
-     SUM(c.revenue_total) AS revenue
+     SUM(c.spend_total / interest_count) AS spend,
+     SUM(c.conversions_total / interest_count) AS conversions,
+     SUM(c.revenue_total / interest_count) AS revenue
 WHERE spend > $min_spend
 RETURN interest,
        campaigns,

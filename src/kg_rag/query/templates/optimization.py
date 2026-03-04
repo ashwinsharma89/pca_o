@@ -1,5 +1,5 @@
 from typing import Dict, Any, List, Optional
-from src.kg_rag.client.connection import get_neo4j_connection
+from src.kg_rag.client.connection import get_kuzu_connection
 
 class OptimizationTemplate:
     """Template for performance optimization analysis."""
@@ -69,7 +69,7 @@ class OptimizationTemplate:
         ORDER BY roas DESC
         """
         
-        conn = get_neo4j_connection()
+        conn = get_kuzu_connection()
         results = conn.execute_query(query, params)
         
         recommendations = self._generate_recommendations(results, dimension)

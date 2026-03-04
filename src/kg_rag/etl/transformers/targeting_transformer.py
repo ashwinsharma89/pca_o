@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class TargetingTransformer:
     """
-    Transform targeting configuration for Neo4j ingestion.
+    Transform targeting configuration for KùzuDB ingestion.
     
     Handles dynamic targeting fields based on platform capabilities.
     Calculates completeness score for data quality tracking.
@@ -100,7 +100,7 @@ class TargetingTransformer:
     
     def transform(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Transform targeting records for Neo4j.
+        Transform targeting records for KùzuDB.
         
         Args:
             records: Campaign records with targeting data

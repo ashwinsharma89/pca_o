@@ -27,6 +27,7 @@ from .middleware.auth import SECRET_KEY
 from .middleware.rate_limit import limiter, RATE_LIMIT_ENABLED
 from .middleware.security_headers import SecurityHeadersMiddleware
 from .middleware.csrf import CSRFMiddleware
+from src.core.utils.observability import metrics
 from .v1 import router_v1
 from .error_handlers import setup_exception_handlers
 from .exceptions import RateLimitExceededError
@@ -254,6 +255,14 @@ async def audit_middleware(request: Request, call_next):
 
 # Include v1 router
 app.include_router(router_v1)
+
+
+@app.get("/metrics")
+@limiter.exempt
+async def get_metrics(request: Request):
+    """Export metrics in Prometheus format."""
+    from fastapi.responses import Response
+    return Response(content=metrics.to_prometheus_format(), media_type="text/plain")
 
 
 @app.get("/")

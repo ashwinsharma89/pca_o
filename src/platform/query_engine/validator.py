@@ -32,6 +32,8 @@ class SQLValidator:
         try:
             # Parse ALL statements (handle potential multi-statement injection)
             expressions = sqlglot.parse(sql, read=self.dialect)
+            # Filter out None values (sqlglot returns [None] for empty strings)
+            expressions = [exp for exp in expressions if exp is not None]
             
             if len(expressions) > 1:
                 return False, "Security Violation: Multiple SQL statements detected. Only single queries allowed."
@@ -45,7 +47,8 @@ class SQLValidator:
             if not isinstance(expression, exp.Select):
                 # Allow Union/Except/Intersect which are also read-only
                 if not isinstance(expression, (exp.Union, exp.Except, exp.Intersect)):
-                    return False, f"Security Violation: Root statement must be SELECT. Got: {expression.key}"
+                    got_type = type(expression).__name__
+                    return False, f"Security Violation: Root statement must be SELECT. Got: {got_type}"
 
             # 2. Deep Tree Traversal for Forbidden Nodes
             for node in expression.walk():

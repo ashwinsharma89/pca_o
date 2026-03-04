@@ -154,16 +154,18 @@ ORDER BY avg_roas DESC
         patterns=["monthly", "trend", "month", "over time", "by month"],
         sql="""
 SELECT 
-    DATE_TRUNC('month', CAST(date AS TIMESTAMP)) AS month,
+    DATE_TRUNC('month', CAST(date AS DATE)) AS month,
     SUM("Total Spent") as total_spend,
     SUM("Site Visit") as total_conversions,
+    ROUND(SUM("Clicks") * 100.0 / NULLIF(SUM("Impressions"), 0), 2) AS ctr,
+    ROUND((COALESCE(SUM(Revenue_2024), 0) + COALESCE(SUM(Revenue_2025), 0)) / NULLIF(SUM("Total Spent"), 0), 2) AS roas,
     SUM("Clicks") as total_clicks,
     SUM("Impressions") as total_impressions
 FROM all_campaigns
 WHERE date IS NOT NULL
-GROUP BY DATE_TRUNC('month', CAST(date AS TIMESTAMP))
+GROUP BY month
 ORDER BY month DESC
-LIMIT 12
+LIMIT 24
         """,
         description="Analyze campaign performance trends by month"
     ),
@@ -275,8 +277,28 @@ SELECT
     days_active,
     avg_daily_spend,
     ROUND(avg_daily_spend * 30, 2) AS projected_monthly_spend,
-    ROUND(total_spend / NULLIF(days_active, 0), 2) AS actual_daily_avg
-FROM spend_stats
+    ROUND(total_spend / NULLIF(days_active, 0), 2) AS actual_daily_avg,
+    ROUND(total_clicks * 100.0 / NULLIF(total_impressions, 0), 2) AS ctr,
+    ROUND(total_revenue / NULLIF(total_spend, 0), 2) AS roas
+FROM (
+    SELECT
+        SUM(daily_total) AS total_spend,
+        COUNT(DISTINCT date) AS days_active,
+        AVG(daily_total) AS avg_daily_spend,
+        SUM(total_clicks) AS total_clicks,
+        SUM(total_impressions) AS total_impressions,
+        SUM(total_revenue) AS total_revenue
+    FROM (
+        SELECT
+            date,
+            SUM("Total Spent") AS daily_total,
+            SUM("Clicks") AS total_clicks,
+            SUM("Impressions") AS total_impressions,
+            SUM(COALESCE(Revenue_2024, 0) + COALESCE(Revenue_2025, 0)) AS total_revenue
+        FROM all_campaigns
+        GROUP BY date
+    )
+)
         """,
         description="Budget pacing and spend rate analysis"
     ),
@@ -377,6 +399,26 @@ GROUP BY platform, channel
 ORDER BY total_spend DESC
         """,
         description="Performance matrix showing all platform-channel combinations"
+    ),
+    "general_performance": QueryTemplate(
+        name="General Performance Data",
+        patterns=["show", "all", "campaigns", "data", "list", "report", "performance", "details"],
+        sql="""
+SELECT
+    "Campaign_Name_Full",
+    platform,
+    channel,
+    "Total Spent" AS spend,
+    "Impressions" AS impressions,
+    "Clicks" AS clicks,
+    "Site Visit" AS conversions,
+    "ROAS" AS roas,
+    date
+FROM all_campaigns
+ORDER BY date DESC
+LIMIT 50
+        """,
+        description="General data export of recent campaign performance"
     ),
 }
 

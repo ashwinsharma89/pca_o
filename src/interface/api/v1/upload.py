@@ -179,7 +179,7 @@ def process_file_sync(job_id: str, temp_path: Path, file_hash: str, sheet_name: 
         duckdb_mgr = get_duckdb_manager()
         row_count = duckdb_mgr.save_campaigns(df)
         
-        # Sync to Knowledge Graph (Neo4j) - FIRE AND FORGET
+        # Sync to Knowledge Graph (KùzuDB) - FIRE AND FORGET
         try:
              # We do NOT await this or block the job completion
              # In a real production system, this would be a separate Celery task

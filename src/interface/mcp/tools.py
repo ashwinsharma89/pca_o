@@ -262,7 +262,7 @@ class PCATools:
                         "include_charts": {
                             "type": "boolean",
                             "description": "Include visualizations",
-                            "default": true
+                            "default": True
                         }
                     }
                 }

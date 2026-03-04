@@ -2,7 +2,7 @@
 """
 KG-RAG ETL Pipeline
 
-Orchestrates the full ETL process from DuckDB to Neo4j.
+Orchestrates the full ETL process from DuckDB to KùzuDB.
 
 Usage:
     python scripts/kg_rag/run_etl.py --source /path/to/campaigns.duckdb
@@ -197,16 +197,16 @@ def main():
         from datetime import datetime
         date_to = datetime.strptime(args.date_to, "%Y-%m-%d").date()
     
-    # Verify Neo4j connection
+    # Verify KùzuDB connection
     try:
         neo4j = get_neo4j_connection()
         health = neo4j.health_check()
         if not health["connected"]:
-            logger.error(f"Cannot connect to Neo4j: {health.get('error')}")
+            logger.error(f"Cannot connect to KùzuDB: {health.get('error')}")
             sys.exit(1)
-        logger.info(f"Connected to Neo4j at {health['uri']}")
+        logger.info(f"Connected to KùzuDB at {health['uri']}")
     except Exception as e:
-        logger.error(f"Neo4j connection failed: {e}")
+        logger.error(f"KùzuDB connection failed: {e}")
         sys.exit(1)
     
     # Run ETL

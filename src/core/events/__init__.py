@@ -33,16 +33,6 @@ from src.core.events.event_bus import (
     reset_event_bus
 )
 
-from src.core.events.event_driven_agent import EventDrivenAgent
-
-from src.core.events.event_listeners import (
-    LoggingListener,
-    MetricsListener,
-    PrometheusMetricsListener,
-    AlertListener,
-    EventHistoryListener
-)
-
 __all__ = [
     # Event types
     'BaseEvent',
@@ -66,14 +56,4 @@ __all__ = [
     'EventBus',
     'get_event_bus',
     'reset_event_bus',
-    
-    # Event-driven components
-    'EventDrivenAgent',
-    
-    # Listeners
-    'LoggingListener',
-    'MetricsListener',
-    'PrometheusMetricsListener',
-    'AlertListener',
-    'EventHistoryListener',
 ]

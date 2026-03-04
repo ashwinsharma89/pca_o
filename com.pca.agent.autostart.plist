@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.pca.agent.autostart</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ashwin/Desktop/pca_agent_copy/start_all.sh</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>WorkingDirectory</key>
+    <string>/Users/ashwin/Desktop/pca_agent_copy</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ashwin/Desktop/pca_agent_copy/logs/autostart_error.log</string>
+    <key>StandardOutPath</key>
+    <string>/Users/ashwin/Desktop/pca_agent_copy/logs/autostart_out.log</string>
+</dict>
+</plist>

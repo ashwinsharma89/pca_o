@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECT_DIR="/Users/ashwin/Desktop/pca_agent copy"
+PROJECT_DIR="/Users/ashwin/Desktop/pca_agent_copy"
 cd "$PROJECT_DIR"
 ./start_all.sh
 # Keep terminal open if there's an error, otherwise it can close

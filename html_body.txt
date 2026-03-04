@@ -1,0 +1,2841 @@
+
+        <div class="module-section">
+            <h2 class="module-title">Core</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/core/backup/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/backup/backup_manager.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.6%"></div>
+                            </div> 13.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/cache/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/cache/redis_cache.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.7%"></div>
+                            </div> 13.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/config/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/config/llm_router.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 25.2%"></div>
+                            </div> 25.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/config/settings.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 92.9%"></div>
+                            </div> 92.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/database/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/database/connection.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 51.6%"></div>
+                            </div> 51.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/database/duckdb_manager.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.4%"></div>
+                            </div> 7.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/database/duckdb_repository.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 10.1%"></div>
+                            </div> 10.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/database/models.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/database/repositories.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 26.3%"></div>
+                            </div> 26.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/database/user_models.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 82.9%"></div>
+                            </div> 82.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/di/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 50.0%"></div>
+                            </div> 50.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/di/containers.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 62.6%"></div>
+                            </div> 62.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/events/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/events/event_bus.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.8%"></div>
+                            </div> 15.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/events/event_types.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 77.4%"></div>
+                            </div> 77.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/exceptions.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 40.0%"></div>
+                            </div> 40.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/schema/columns.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 92.6%"></div>
+                            </div> 92.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/anthropic_helpers.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 42.2%"></div>
+                            </div> 42.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/circuit_breaker.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 39.0%"></div>
+                            </div> 39.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/column_mapping.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.1%"></div>
+                            </div> 9.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/data_loader.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.5%"></div>
+                            </div> 9.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/data_normalizer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 8.1%"></div>
+                            </div> 8.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/data_validator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.1%"></div>
+                            </div> 7.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/encryption.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 21.7%"></div>
+                            </div> 21.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/logger.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 56.5%"></div>
+                            </div> 56.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/metrics.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 23.0%"></div>
+                            </div> 23.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/observability.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 42.9%"></div>
+                            </div> 42.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/opentelemetry_config.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 33.1%"></div>
+                            </div> 33.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/performance.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 20.8%"></div>
+                            </div> 20.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/redis_rate_limiter.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.0%"></div>
+                            </div> 15.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/resilience.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 28.2%"></div>
+                            </div> 28.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/secrets_manager.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 43.0%"></div>
+                            </div> 43.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/core/utils/sql_security.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 17.6%"></div>
+                            </div> 17.6%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Engine</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/engine/agents/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 85.7%"></div>
+                            </div> 85.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/agent_chain.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 8.5%"></div>
+                            </div> 8.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/agent_registry.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 28.1%"></div>
+                            </div> 28.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/agent_resilience.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.9%"></div>
+                            </div> 18.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/b2b_specialist_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.8%"></div>
+                            </div> 7.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/channel_specialists/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/channel_specialists/base_specialist.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.7%"></div>
+                            </div> 14.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/channel_specialists/channel_router.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.0%"></div>
+                            </div> 7.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/channel_specialists/programmatic_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 5.8%"></div>
+                            </div> 5.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/channel_specialists/search_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.9%"></div>
+                            </div> 7.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/channel_specialists/social_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 5.7%"></div>
+                            </div> 5.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/chart_generators.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 10.6%"></div>
+                            </div> 10.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/enhanced_reasoning_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 5.1%"></div>
+                            </div> 5.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/enhanced_visualization_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 5.1%"></div>
+                            </div> 5.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/extraction_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.0%"></div>
+                            </div> 7.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/filter_presets.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 22.1%"></div>
+                            </div> 22.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/graph.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.3%"></div>
+                            </div> 13.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/marketing_visualization_rules.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 33.1%"></div>
+                            </div> 33.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/multi_agent_orchestrator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 36.3%"></div>
+                            </div> 36.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/nodes.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 5.6%"></div>
+                            </div> 5.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/prompt_templates.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 36.0%"></div>
+                            </div> 36.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/reasoning_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.4%"></div>
+                            </div> 13.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/resilient_orchestrator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 26.7%"></div>
+                            </div> 26.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/schemas.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 68.6%"></div>
+                            </div> 68.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/shared_context.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 25.7%"></div>
+                            </div> 25.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/smart_visualization_engine.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.7%"></div>
+                            </div> 18.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/state.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/validated_reasoning_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 10.1%"></div>
+                            </div> 10.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/vision_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.9%"></div>
+                            </div> 14.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/visualization_agent.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 10.3%"></div>
+                            </div> 10.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/agents/visualization_filters.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.9%"></div>
+                            </div> 13.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/auto_insights.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 52.9%"></div>
+                            </div> 52.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/business_rules.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 17.5%"></div>
+                            </div> 17.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/causal_analysis.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.2%"></div>
+                            </div> 15.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/feedback_loop.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.8%"></div>
+                            </div> 14.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/llm_service.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.0%"></div>
+                            </div> 18.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/metrics_calculator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 45.0%"></div>
+                            </div> 45.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/orchestrator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.7%"></div>
+                            </div> 9.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/performance_diagnostics.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.5%"></div>
+                            </div> 14.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/recommendations.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 31.8%"></div>
+                            </div> 31.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/coefficient_explainer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.8%"></div>
+                            </div> 18.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/feature_analyzer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 17.6%"></div>
+                            </div> 17.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/model_evaluator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 34.4%"></div>
+                            </div> 34.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/model_trainer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.6%"></div>
+                            </div> 14.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/pipeline.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 22.8%"></div>
+                            </div> 22.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/recommendation_engine.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 20.2%"></div>
+                            </div> 20.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/regression/shap_explainer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.9%"></div>
+                            </div> 12.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/text_cleaner.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.8%"></div>
+                            </div> 11.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/analytics/user_behavior.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 23.1%"></div>
+                            </div> 23.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/orchestration/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/orchestration/workflow.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.7%"></div>
+                            </div> 18.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/budget_optimizer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 8.6%"></div>
+                            </div> 8.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/campaign_success_predictor.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.7%"></div>
+                            </div> 9.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/early_performance_indicators.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.8%"></div>
+                            </div> 7.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/marketing_statistics.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 17.9%"></div>
+                            </div> 17.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/model_monitor.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.9%"></div>
+                            </div> 18.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/model_validation.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 25.6%"></div>
+                            </div> 25.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/predictive/predictive_qa_integration.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 8.7%"></div>
+                            </div> 8.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/ai_interpreter.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.5%"></div>
+                            </div> 18.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/date_handler.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.1%"></div>
+                            </div> 12.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/dynamic_aggregator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.9%"></div>
+                            </div> 13.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/error_detector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 16.5%"></div>
+                            </div> 16.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/intelligent_engine.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 23.3%"></div>
+                            </div> 23.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/smart_mapper.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.0%"></div>
+                            </div> 18.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/template_analyzer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.8%"></div>
+                            </div> 15.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/reports/universal_populator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.8%"></div>
+                            </div> 9.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/services/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/services/campaign_service.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 7.5%"></div>
+                            </div> 7.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/services/user_service.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.0%"></div>
+                            </div> 15.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/visualization/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/engine/visualization/chart_generator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 8.2%"></div>
+                            </div> 8.2%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Enterprise</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/enterprise/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/enterprise/audit.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 29.6%"></div>
+                            </div> 29.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/enterprise/auth.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 24.2%"></div>
+                            </div> 24.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/enterprise/mfa.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 46.9%"></div>
+                            </div> 46.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/enterprise/monitoring.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 22.7%"></div>
+                            </div> 22.7%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Interface</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/interface/api/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/error_handlers.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 47.2%"></div>
+                            </div> 47.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/exceptions.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 40.3%"></div>
+                            </div> 40.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/main.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 52.2%"></div>
+                            </div> 52.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/main_v3.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 45.0%"></div>
+                            </div> 45.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/auth.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.4%"></div>
+                            </div> 14.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/csrf.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 36.0%"></div>
+                            </div> 36.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/rate_limit.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 48.8%"></div>
+                            </div> 48.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/request_id.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 55.0%"></div>
+                            </div> 55.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/request_size_limit.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 35.0%"></div>
+                            </div> 35.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/secure_auth.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 37.5%"></div>
+                            </div> 37.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/middleware/security_headers.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 33.3%"></div>
+                            </div> 33.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 95.2%"></div>
+                            </div> 95.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/auth.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 39.1%"></div>
+                            </div> 39.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/connectors.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 24.7%"></div>
+                            </div> 24.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/dashboards.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 51.7%"></div>
+                            </div> 51.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/dependencies.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 87.5%"></div>
+                            </div> 87.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/health_check.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 47.8%"></div>
+                            </div> 47.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/intelligence.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 20.6%"></div>
+                            </div> 20.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/models.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 60.0%"></div>
+                            </div> 60.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/orchestrator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 17.9%"></div>
+                            </div> 17.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/response_models.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/analysis.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.2%"></div>
+                            </div> 11.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/analytics.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 4.6%"></div>
+                            </div> 4.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/campaigns.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 16.6%"></div>
+                            </div> 16.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/chat.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 5.4%"></div>
+                            </div> 5.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/feedback.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 31.8%"></div>
+                            </div> 31.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/ingestion.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 27.4%"></div>
+                            </div> 27.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/pacing.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 25.2%"></div>
+                            </div> 25.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/reports.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.0%"></div>
+                            </div> 9.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/routers/system.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 48.1%"></div>
+                            </div> 48.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/upload.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.6%"></div>
+                            </div> 15.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/v1/user_management.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 51.4%"></div>
+                            </div> 51.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/api/validation_handlers.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 69.2%"></div>
+                            </div> 69.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/gateway/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/gateway/api_gateway.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 20.0%"></div>
+                            </div> 20.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/mcp/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 20.0%"></div>
+                            </div> 20.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/interface/mcp/resource_server.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 3.3%"></div>
+                            </div> 3.3%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Kg_rag</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/kg_rag/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/api/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/api/models.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/api/router.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 27.1%"></div>
+                            </div> 27.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/client/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/client/connection.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 28.7%"></div>
+                            </div> 28.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/config/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/config/settings.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 86.1%"></div>
+                            </div> 86.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/context/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/context/context_builder.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.0%"></div>
+                            </div> 11.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/aggregators/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/aggregators/metric_aggregator.py</td>
+                        <td><span class="status-pill pill-todo">TODO</span></td>
+                        <td>0%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 0.0%"></div>
+                            </div> 0.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/column_resolver.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.0%"></div>
+                            </div> 18.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/extractors/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/extractors/duckdb_extractor.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.2%"></div>
+                            </div> 11.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/ingestion.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 8.2%"></div>
+                            </div> 8.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/loaders/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/loaders/neo4j_loader.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 22.2%"></div>
+                            </div> 22.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/transformers/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/transformers/campaign_transformer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.3%"></div>
+                            </div> 14.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/transformers/metric_transformer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.3%"></div>
+                            </div> 12.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/etl/transformers/targeting_transformer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 8.5%"></div>
+                            </div> 8.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/cypher_generator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.4%"></div>
+                            </div> 14.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/intent_classifier.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 44.4%"></div>
+                            </div> 44.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/query_router.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.0%"></div>
+                            </div> 12.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/result_formatter.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.4%"></div>
+                            </div> 12.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/summary_service.py</td>
+                        <td><span class="status-pill pill-todo">TODO</span></td>
+                        <td>0%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 0.0%"></div>
+                            </div> 0.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/anomaly.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 68.4%"></div>
+                            </div> 68.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/cross_channel.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 70.0%"></div>
+                            </div> 70.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/optimization.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 10.7%"></div>
+                            </div> 10.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/placement.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 68.4%"></div>
+                            </div> 68.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/platform.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 68.4%"></div>
+                            </div> 68.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/targeting.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 68.2%"></div>
+                            </div> 68.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/query/templates/temporal.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 69.6%"></div>
+                            </div> 69.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/schema/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/schema/constraints.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 19.5%"></div>
+                            </div> 19.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/schema/edges.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 57.4%"></div>
+                            </div> 57.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/schema/indexes.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 27.1%"></div>
+                            </div> 27.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/kg_rag/schema/nodes.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Ops</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/ops/monitoring/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/ops/monitoring/query_monitor.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.8%"></div>
+                            </div> 18.8%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Platform</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/platform/connectors/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/amazon_dsp_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 36.4%"></div>
+                            </div> 36.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/apple_search_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 64.3%"></div>
+                            </div> 64.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/base_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 53.0%"></div>
+                            </div> 53.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/campaign_manager_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.5%"></div>
+                            </div> 15.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/connector_manager.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 22.6%"></div>
+                            </div> 22.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/dv360_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.4%"></div>
+                            </div> 11.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/google_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.2%"></div>
+                            </div> 13.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/linkedin_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 26.0%"></div>
+                            </div> 26.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/meta_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.0%"></div>
+                            </div> 15.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/mock_responses.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 51.9%"></div>
+                            </div> 51.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/pinterest_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 47.4%"></div>
+                            </div> 47.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/snapchat_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 27.4%"></div>
+                            </div> 27.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/tiktok_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 26.0%"></div>
+                            </div> 26.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/tradedesk_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 47.4%"></div>
+                            </div> 47.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/connectors/twitter_ads_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 56.2%"></div>
+                            </div> 56.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/data/database_connector.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 6.3%"></div>
+                            </div> 6.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/ingestion/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/ingestion/adapters.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 23.1%"></div>
+                            </div> 23.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/ingestion/normalizer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.6%"></div>
+                            </div> 12.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/ingestion/pipeline.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 17.5%"></div>
+                            </div> 17.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/ingestion/validators.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 20.6%"></div>
+                            </div> 20.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/auto_refresh.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 18.5%"></div>
+                            </div> 18.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/benchmark_engine.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.4%"></div>
+                            </div> 9.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/causal_kb_rag.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.0%"></div>
+                            </div> 12.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/chunk_optimizer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.5%"></div>
+                            </div> 14.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/chunking_strategy.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.4%"></div>
+                            </div> 12.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/enhanced_auto_refresh.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 15.6%"></div>
+                            </div> 15.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/enhanced_reasoning.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 12.9%"></div>
+                            </div> 12.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/freshness_validator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 23.6%"></div>
+                            </div> 23.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/knowledge_ingestion.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.6%"></div>
+                            </div> 9.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/lancedb_manager.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 22.3%"></div>
+                            </div> 22.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/performance_benchmarks.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 30.3%"></div>
+                            </div> 30.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/persistent_vector_store.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.2%"></div>
+                            </div> 14.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/retrieval_metrics.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 30.5%"></div>
+                            </div> 30.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/semantic_cache.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 41.5%"></div>
+                            </div> 41.5%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/knowledge/vector_store.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 30.2%"></div>
+                            </div> 30.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/models/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/models/campaign.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 87.1%"></div>
+                            </div> 87.1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/models/common.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 64.7%"></div>
+                            </div> 64.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/models/platform.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/models/query_models.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/bulletproof_queries.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.4%"></div>
+                            </div> 14.4%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/column_resolver.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.6%"></div>
+                            </div> 14.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/executor.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 13.6%"></div>
+                            </div> 13.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/hybrid_retrieval.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 17.8%"></div>
+                            </div> 17.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/multi_table_manager.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.8%"></div>
+                            </div> 9.8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/nl_to_sql.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.3%"></div>
+                            </div> 11.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/prompt_builder.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 29.0%"></div>
+                            </div> 29.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/query_clarification.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 19.0%"></div>
+                            </div> 19.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/query_optimizer.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.3%"></div>
+                            </div> 11.3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/query_templates.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 50.0%"></div>
+                            </div> 50.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/safe_query.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 16.9%"></div>
+                            </div> 16.9%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/schema_manager.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.2%"></div>
+                            </div> 11.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/smart_interpretation.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 9.6%"></div>
+                            </div> 9.6%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/sql_knowledge.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 27.0%"></div>
+                            </div> 27.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/template_generator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 11.2%"></div>
+                            </div> 11.2%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/platform/query_engine/validator.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 14.5%"></div>
+                            </div> 14.5%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Quality</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/quality/evaluation/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/quality/evaluation/query_tracker.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 26.7%"></div>
+                            </div> 26.7%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/quality/feedback/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/quality/feedback/feedback_system.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 10.0%"></div>
+                            </div> 10.0%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Root</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="module-section">
+            <h2 class="module-title">Workers</h2>
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>File Path</th>
+                        <th>Status</th>
+                        <th>Pass Rate</th>
+                        <th>Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>src/workers/__init__.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 100.0%"></div>
+                            </div> 100.0%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>src/workers/ingestion_worker.py</td>
+                        <td><span class="status-pill pill-pass">PASS</span></td>
+                        <td>100%</td>
+                        <td>
+                            <div class="cov-bar">
+                                <div class="cov-fill" style="width: 21.4%"></div>
+                            </div> 21.4%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>

@@ -2,7 +2,7 @@ name: API CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, v1 ]
   workflow_dispatch:
 
 env:
@@ -45,7 +45,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

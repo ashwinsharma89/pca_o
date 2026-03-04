@@ -22,6 +22,7 @@ from src.core.database.repositories import (
     CampaignContextRepository
 )
 from src.core.database.duckdb_repository import get_duckdb_repository, CAMPAIGNS_PARQUET
+from src.core.database.duckdb_manager import get_duckdb_manager
 from src.platform.query_engine.nl_to_sql import NaturalLanguageQueryEngine
 from src.interface.api.v1.models import ChatRequest, GlobalAnalysisRequest, KPIComparisonRequest, VisualizationsQuery
 from src.interface.api.v1.response_models import (
@@ -415,9 +416,8 @@ async def get_kpi_comparison(
         start_date = comparison_req.start_date
         end_date = comparison_req.end_date
         
-        campaign_repo = CampaignRepository(db)
-        
-
+        duckdb_mgr = get_duckdb_manager()
+        df = duckdb_mgr.get_campaigns()
         
         if df.empty:
             return {"data": [], "summary": {}}
@@ -564,14 +564,34 @@ async def create_campaign(
     """Create a new campaign."""
     try:
         # Basic validation
-        if not campaign_data.get("campaign_name"):
+        name = campaign_data.get("campaign_name")
+        if not name:
             raise HTTPException(status_code=400, detail="campaign_name is required")
             
+        objective = campaign_data.get("objective")
+        if not objective:
+            raise HTTPException(status_code=400, detail="objective is required")
+            
+        start_date_str = campaign_data.get("start_date")
+        end_date_str = campaign_data.get("end_date")
+        
+        try:
+            start_date = pd.to_datetime(start_date_str or date.today()).date()
+            if end_date_str:
+                end_date = pd.to_datetime(end_date_str).date()
+            else:
+                end_date = start_date + pd.Timedelta(days=30)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid date format")
+            
+        if start_date > end_date:
+            raise HTTPException(status_code=400, detail="start_date cannot be after end_date")
+            
         campaign = campaign_service.create_campaign(
-            name=campaign_data["campaign_name"],
-            objective=campaign_data.get("objective", "Awareness"),
-            start_date=pd.to_datetime(campaign_data.get("start_date", date.today())).date(),
-            end_date=pd.to_datetime(campaign_data.get("end_date", date.today() + pd.Timedelta(days=30))).date(),
+            name=name,
+            objective=objective,
+            start_date=start_date,
+            end_date=end_date,
             created_by=current_user["username"]
         )
         return {"campaign_id": campaign.id, "campaign_name": campaign.campaign_name, "status": "active"}
