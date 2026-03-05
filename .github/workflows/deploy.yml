@@ -7,12 +7,11 @@ on:
 
 env:
   IMAGE_NAME: pca-agent
-  FRONTEND_IMAGE_NAME: pca-frontend
   REGISTRY: ghcr.io
 
 jobs:
   build-and-push:
-    name: Build Backend Docker Image
+    name: Build Docker Image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,43 +54,9 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.meta.outputs.digest }}
 
-  build-frontend:
-    name: Build Frontend Docker Image
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
-          build-args: |
-            NEXT_PUBLIC_API_URL=http://${{ secrets.EC2_HOST }}:8000
-            NEXT_PUBLIC_APP_NAME=PCA Agent
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE_NAME }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE_NAME }}:buildcache,mode=max
-
   deploy:
     name: Deploy to EC2
-    needs: [build-and-push, build-frontend]
+    needs: build-and-push
     runs-on: self-hosted
 
     steps:
@@ -101,7 +66,6 @@ jobs:
       - name: Pull and deploy
         env:
           GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-          GHCR_FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
@@ -111,13 +75,9 @@ jobs:
 
           echo "$GITHUB_TOKEN" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
-          echo "Pulling latest backend image..."
+          echo "Pulling latest image..."
           docker pull $GHCR_IMAGE
           docker tag $GHCR_IMAGE pca-agent:latest
-
-          echo "Pulling latest frontend image..."
-          docker pull $GHCR_FRONTEND_IMAGE
-          docker tag $GHCR_FRONTEND_IMAGE pca-frontend:latest
 
           # Sync latest compose file from repo
           cp $GITHUB_WORKSPACE/docker-compose.full.yml /home/ubuntu/pca_o/docker/docker-compose.full.yml
