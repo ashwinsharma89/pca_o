@@ -426,73 +426,14 @@ class DuckDBManager:
     ) -> pd.DataFrame:
         """
         Get campaigns with optional filters.
-        Uses DuckDB to query Parquet directly.
+        Uses Polars scan_parquet for crash-free, high-performance reads.
         """
         if not self.has_data():
             return pd.DataFrame()
-        
-        try:
-            with self.connection() as conn:
-                # Build WHERE clause from filters
-                where_clauses = []
-                params = []
-                
-                if filters:
-                    for key, value in filters.items():
-                        if value and key not in ['primary_metric', 'secondary_metric']:
-                            if isinstance(value, str) and ',' in value:
-                                # Multiple values - use IN clause
-                                values = [v.strip() for v in value.split(',')]
-                                placeholders = ', '.join(['?' for _ in values])
-                                where_clauses.append(f'"{key}" IN ({placeholders})')
-                                params.extend(values)
-                            elif isinstance(value, list):
-                                placeholders = ', '.join(['?' for _ in value])
-                                where_clauses.append(f'"{key}" IN ({placeholders})')
-                                params.extend(value)
-                            else:
-                                where_clauses.append(f'"{key}" = ?')
-                                params.append(value)
-                
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-                
-                query = f"""
-                    SELECT * 
-                    FROM {self.get_optimized_table()}
-                    WHERE {where_sql}
-                    LIMIT {limit if limit is not None else 'ALL'} OFFSET {offset}
-                """
-                
-                result = conn.execute(query, params).df()
-                
-                # Normalize and Coalesce Columns
-                # 1. Map variations to standard names
-                # 2. If standard name exists, fill NaNs with variation
-                column_map = {
-                    "Spend_USD": "Spend",
-                    "Revenue_USD": "Revenue", 
-                    "Campaign_Name": "Campaign",
-                    "campaign_name": "Campaign",
-                    "Cost": "Spend",
-                    "Amount_Spent": "Spend",
-                    "spend_usd": "Spend",
-                    "revenue_usd": "Revenue",
-                    "Ad_Group": "Ad Group",
-                    "ad_group": "Ad Group"
-                }
-                
-                for old_col, new_col in column_map.items():
-                    if old_col in result.columns:
-                        if new_col in result.columns and old_col != new_col:
-                            # Coalesce: Use existing, fill with new (old_col data)
-                            result[new_col] = result[new_col].fillna(result[old_col])
-                            result = result.drop(columns=[old_col])
-                        else:
-                            # Just rename
-                            result = result.rename(columns={old_col: new_col})
 
-                return result
-                
+        try:
+            import polars as pl
+            return self.get_campaigns_polars(filters=filters, limit=limit, offset=offset).to_pandas()
         except Exception as e:
             logger.error(f"Failed to get campaigns: {e}")
             return pd.DataFrame()
@@ -500,97 +441,74 @@ class DuckDBManager:
     def get_campaigns_polars(
         self,
         filters: Optional[Dict[str, Any]] = None,
-        limit: Optional[int] = None
+        limit: Optional[int] = None,
+        offset: int = 0
     ):
         """
-        Get campaigns as Polars DataFrame for high-performance analytics.
+        Get campaigns as Polars LazyFrame → DataFrame.
+        Uses scan_parquet for zero-DuckDB, crash-free reads.
+        Reads each parquet file individually then concatenates with diagonal_relaxed,
+        which handles schema evolution (missing columns → null) and type mismatches
+        (Int64 vs Float64 → Float64) without crashing.
         """
         import polars as pl
-        
+
         if not self.has_data():
             return pl.DataFrame()
-        
+
         try:
-            with self.connection() as conn:
-                # Build WHERE clause from filters
-                where_clauses = []
-                params = []
-                
-                if filters:
-                    for key, value in filters.items():
-                        if value and key not in ['primary_metric', 'secondary_metric']:
-                            # Handle standard keys that might need mapping to DB columns
-                            db_key = key
-                            if key == 'campaign_id': db_key = 'Campaign_ID'
-                            
-                            if isinstance(value, str) and ',' in value:
-                                values = [v.strip() for v in value.split(',')]
-                                placeholders = ', '.join(['?' for _ in values])
-                                where_clauses.append(f'"{db_key}" IN ({placeholders})')
-                                params.extend(values)
-                            elif isinstance(value, list):
-                                placeholders = ', '.join(['?' for _ in value])
-                                where_clauses.append(f'"{db_key}" IN ({placeholders})')
-                                params.extend(value)
-                            else:
-                                where_clauses.append(f'"{db_key}" = ?')
-                                params.append(value)
-                
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-                
-                query = f"""
-                    SELECT * 
-                    FROM {self.get_optimized_table()}
-                    WHERE {where_sql}
-                    LIMIT {limit if limit is not None else 'ALL'}
-                """
-                
-                # Use .pl() to get Polars DataFrame directly (Zero Copy if possible)
-                result = conn.execute(query, params).pl()
-                
-                # Column Normalization (Snake Case -> Title Case)
-                # Polars is case specific, so we use aliases
-                
-                # Standard mapping
-                column_map = {
-                    "Spend_USD": "Spend",
-                    "Revenue_USD": "Revenue", 
-                    "Campaign_Name": "Campaign",
-                    "campaign_name": "Campaign",
-                    "Cost": "Spend",
-                    "Amount_Spent": "Spend",
-                    "spend_usd": "Spend",
-                    "revenue_usd": "Revenue",
-                    "Ad_Group": "Ad Group",
-                    "ad_group": "Ad Group"
-                }
-                
-                # Rename columns if they exist
-                existing_cols = result.columns
-                rename_dict = {}
-                
-                for old_col, new_col in column_map.items():
-                    if old_col in existing_cols:
-                        if new_col not in existing_cols:
-                             rename_dict[old_col] = new_col
-                        elif old_col != new_col:
-                             # If both exist, we need to coalesce (fill nulls)
-                             # In Polars this is an expression: pl.col(new).fill_null(pl.col(old))
-                             # But for now let's just prioritize the existing new_col and drop old
-                             pass
+            parquet_files = list(CAMPAIGNS_DIR.glob("**/*.parquet"))
+            if not parquet_files:
+                return pl.DataFrame()
 
-                if rename_dict:
-                    result = result.rename(rename_dict)
-                    
-                # Fill nulls for critical metrics (Polars specific optimization)
-                fill_cols = [c for c in ['Spend', 'Impressions', 'Clicks', 'Conversions'] if c in result.columns]
-                if fill_cols:
-                    result = result.with_columns([
-                        pl.col(c).fill_null(0) for c in fill_cols
-                    ])
+            # Read each file individually to handle mixed schemas across uploads
+            frames: List[pl.DataFrame] = []
+            for f in parquet_files:
+                try:
+                    frames.append(pl.read_parquet(f))
+                except Exception as read_err:
+                    logger.warning(f"Could not read parquet {f}: {read_err}")
 
-                return result
-                
+            if not frames:
+                return pl.DataFrame()
+
+            # diagonal_relaxed: fills missing columns with null, casts type mismatches
+            # to a common supertype (e.g. Int64 + Float64 → Float64)
+            result = pl.concat(frames, how="diagonal_relaxed")
+
+            # Apply filters
+            skip_keys = {'primary_metric', 'secondary_metric'}
+            if filters:
+                for key, value in filters.items():
+                    if not value or key in skip_keys:
+                        continue
+                    if key == 'campaign_id':
+                        key = 'Campaign_ID'
+                    if key not in result.columns:
+                        continue
+
+                    if isinstance(value, str) and ',' in value:
+                        vals = [v.strip() for v in value.split(',')]
+                        result = result.filter(pl.col(key).is_in(vals))
+                    elif isinstance(value, list):
+                        result = result.filter(pl.col(key).is_in(value))
+                    else:
+                        result = result.filter(pl.col(key) == value)
+
+            # Apply offset / limit
+            if offset:
+                result = result.slice(offset, limit if limit is not None else result.height)
+            elif limit is not None:
+                result = result.head(limit)
+
+            # Fill nulls for core metrics
+            metric_cols = [c for c in ['spend', 'impressions', 'clicks', 'conversions', 'revenue']
+                           if c in result.columns]
+            if metric_cols:
+                result = result.with_columns([pl.col(c).fill_null(0) for c in metric_cols])
+
+            return result
+
         except Exception as e:
             logger.error(f"Failed to get campaigns (Polars): {e}")
             return pl.DataFrame()
@@ -598,57 +516,48 @@ class DuckDBManager:
     def get_filter_options(self) -> Dict[str, List[str]]:
         """
         Get unique values for all filterable columns.
-        Dynamically detects columns from the data.
+        Uses Polars for crash-free reads (no DuckDB glob pattern).
         """
         if not self.has_data():
             return {}
-        
+
         try:
-            with self.connection() as conn:
-                # Get column names
-                # Use read_parquet directly for describe if table not ready
-                table_ref = self.get_optimized_table()
-                columns_query = f"DESCRIBE SELECT * FROM {table_ref}"
-                columns_df = conn.execute(columns_query).df()
-                all_columns = columns_df['column_name'].tolist()
-                
-                # Define which columns should be filters (categorical/string columns)
-                # Exclude numeric and date columns
-                numeric_keywords = ['spend', 'impressions', 'clicks', 'conversions', 
-                                   'ctr', 'cpc', 'cpa', 'roas', 'cpm', 'id', 'count', 'total']
-                date_keywords = ['date', 'time', 'created', 'updated']
-                
-                filter_columns = []
-                for col in all_columns:
-                    col_lower = col.lower()
-                    if not any(kw in col_lower for kw in numeric_keywords + date_keywords):
-                        filter_columns.append(col)
-                
-                # Get unique values for each filter column
-                result = {}
-                for col in filter_columns:
-                    try:
-                        query = f"""
-                            SELECT DISTINCT CAST("{col}" AS VARCHAR) as val
-                            FROM {self.get_optimized_table()}
-                            WHERE "{col}" IS NOT NULL 
-                            AND CAST("{col}" AS VARCHAR) != 'Unknown'
-                            AND CAST("{col}" AS VARCHAR) != ''
-                            ORDER BY val
-                            LIMIT 100
-                        """
-                        values_df = conn.execute(query).df()
-                        values = values_df['val'].dropna().astype(str).tolist()
-                        
-                        if values:
-                            # Normalize column name for API
-                            api_key = col.lower().replace(' ', '_')
-                            result[api_key] = values
-                    except Exception as e:
-                        logger.warning(f"Could not get filter values for {col}: {e}")
-                
-                return result
-                
+            import polars as pl
+            df = self.get_campaigns_polars()
+
+            if df.is_empty():
+                return {}
+
+            # Exclude numeric and date/metadata columns
+            numeric_keywords = ['spend', 'impressions', 'clicks', 'conversions',
+                                 'ctr', 'cpc', 'cpa', 'roas', 'cpm', 'revenue', 'reach',
+                                 'id', 'count', 'total', 'hash', 'run_id']
+            date_keywords = ['date', 'time', 'created', 'updated', 'year', 'month']
+
+            # Only include string/categorical columns
+            numeric_types = {pl.Int8, pl.Int16, pl.Int32, pl.Int64,
+                             pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64,
+                             pl.Float32, pl.Float64}
+            date_types = {pl.Date, pl.Datetime, pl.Duration, pl.Time}
+
+            result = {}
+            for col in df.columns:
+                col_lower = col.lower()
+                if any(kw in col_lower for kw in numeric_keywords + date_keywords):
+                    continue
+                if df[col].dtype in numeric_types or df[col].dtype in date_types:
+                    continue
+                try:
+                    values = df[col].drop_nulls().unique().to_list()
+                    values = sorted([str(v) for v in values
+                                     if v and str(v) not in ('Unknown', '')])[:100]
+                    if values:
+                        result[col_lower.replace(' ', '_')] = values
+                except Exception as e:
+                    logger.warning(f"Could not get filter values for {col}: {e}")
+
+            return result
+
         except Exception as e:
             logger.error(f"Failed to get filter options: {e}")
             return {}
@@ -660,54 +569,61 @@ class DuckDBManager:
     ) -> pd.DataFrame:
         """
         Get aggregated metrics grouped by a column.
+        Uses Polars for crash-free reads (no DuckDB glob pattern).
         """
         if not self.has_data():
             return pd.DataFrame()
-        
+
         try:
-            with self.connection() as conn:
-                # Build WHERE clause
-                where_clauses = []
-                params = []
-                
-                if filters:
-                    for key, value in filters.items():
-                        if value and key not in ['primary_metric', 'secondary_metric']:
-                            if isinstance(value, str) and ',' in value:
-                                values = [v.strip() for v in value.split(',')]
-                                placeholders = ', '.join(['?' for _ in values])
-                                where_clauses.append(f'"{key}" IN ({placeholders})')
-                                params.extend(values)
-                            else:
-                                where_clauses.append(f'"{key}" = ?')
-                                params.append(value)
-                
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-                
-                query = f"""
-                    SELECT 
-                        "{group_by}" as name,
-                        SUM(COALESCE("Spend", 0)) as spend,
-                        SUM(COALESCE("Impressions", 0)) as impressions,
-                        SUM(COALESCE("Clicks", 0)) as clicks,
-                        SUM(COALESCE("Conversions", 0)) as conversions
-                    FROM {self.get_optimized_table()}
-                    WHERE {where_sql}
-                    AND "{group_by}" IS NOT NULL
-                    GROUP BY "{group_by}"
-                    ORDER BY spend DESC
-                """
-                
-                result = conn.execute(query, params).df()
-                
-                # Calculate derived metrics
-                if not result.empty:
-                    result['ctr'] = (result['clicks'] / result['impressions'] * 100).fillna(0).round(2)
-                    result['cpc'] = (result['spend'] / result['clicks']).fillna(0).round(2)
-                    result['cpa'] = (result['spend'] / result['conversions']).fillna(0).round(2)
-                
-                return result
-                
+            import polars as pl
+            df = self.get_campaigns_polars(filters=filters)
+
+            if df.is_empty():
+                return pd.DataFrame()
+
+            # Resolve group_by column (case-insensitive)
+            actual_group_by = None
+            for col in df.columns:
+                if col.lower() == group_by.lower():
+                    actual_group_by = col
+                    break
+            if not actual_group_by:
+                return pd.DataFrame()
+
+            # Resolve metric columns (case-insensitive)
+            def find_col(name):
+                for c in df.columns:
+                    if c.lower() == name.lower():
+                        return c
+                return None
+
+            spend_c = find_col('spend')
+            impr_c = find_col('impressions')
+            clicks_c = find_col('clicks')
+            conv_c = find_col('conversions')
+
+            agg_exprs = [
+                (pl.col(spend_c).fill_null(0).cast(pl.Float64).sum().alias("spend")
+                 if spend_c else pl.lit(0.0).alias("spend")),
+                (pl.col(impr_c).fill_null(0).cast(pl.Int64).sum().alias("impressions")
+                 if impr_c else pl.lit(0).alias("impressions")),
+                (pl.col(clicks_c).fill_null(0).cast(pl.Int64).sum().alias("clicks")
+                 if clicks_c else pl.lit(0).alias("clicks")),
+                (pl.col(conv_c).fill_null(0).cast(pl.Int64).sum().alias("conversions")
+                 if conv_c else pl.lit(0).alias("conversions")),
+            ]
+
+            result_pl = df.group_by(actual_group_by).agg(agg_exprs).sort("spend", descending=True)
+            result = result_pl.rename({actual_group_by: "name"}).to_pandas()
+
+            # Calculate derived metrics
+            if not result.empty:
+                result['ctr'] = (result['clicks'] / result['impressions'].replace(0, float('nan')) * 100).fillna(0).round(2)
+                result['cpc'] = (result['spend'] / result['clicks'].replace(0, float('nan'))).fillna(0).round(2)
+                result['cpa'] = (result['spend'] / result['conversions'].replace(0, float('nan'))).fillna(0).round(2)
+
+            return result
+
         except Exception as e:
             logger.error(f"Failed to get aggregated data: {e}")
             return pd.DataFrame()
@@ -719,167 +635,137 @@ class DuckDBManager:
     ) -> pd.DataFrame:
         """
         Get time-series trend data.
+        Uses Polars for crash-free reads (no DuckDB glob pattern).
         """
         if not self.has_data():
             return pd.DataFrame()
-        
+
         try:
-            with self.connection() as conn:
-                # Build WHERE clause
-                where_clauses = []
-                params = []
-                
-                if filters:
-                    for key, value in filters.items():
-                        if value and key not in ['primary_metric', 'secondary_metric', 'start_date', 'end_date']:
-                            if isinstance(value, str) and ',' in value:
-                                values = [v.strip() for v in value.split(',')]
-                                placeholders = ', '.join(['?' for _ in values])
-                                where_clauses.append(f'"{key}" IN ({placeholders})')
-                                params.extend(values)
-                            else:
-                                where_clauses.append(f'"{key}" = ?')
-                                params.append(value)
-                
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-                
-                query = f"""
-                    SELECT 
-                        "{date_column}" as date,
-                        SUM(COALESCE("Spend", 0)) as spend,
-                        SUM(COALESCE("Impressions", 0)) as impressions,
-                        SUM(COALESCE("Clicks", 0)) as clicks,
-                        SUM(COALESCE("Conversions", 0)) as conversions
-                    FROM {self.get_optimized_table()}
-                    WHERE {where_sql}
-                    AND "{date_column}" IS NOT NULL
-                    GROUP BY "{date_column}"
-                    ORDER BY "{date_column}"
-                """
-                
-                result = conn.execute(query, params).df()
-                
-                # Calculate derived metrics
-                if not result.empty:
-                    result['ctr'] = (result['clicks'] / result['impressions'] * 100).fillna(0).round(2)
-                    result['cpc'] = (result['spend'] / result['clicks']).fillna(0).round(2)
-                    result['cpa'] = (result['spend'] / result['conversions']).fillna(0).round(2)
-                    result['cpm'] = (result['spend'] / result['impressions'] * 1000).fillna(0).round(2)
-                
-                return result
-                
+            import polars as pl
+            df = self.get_campaigns_polars(filters=filters)
+
+            if df.is_empty():
+                return pd.DataFrame()
+
+            # Resolve date column (case-insensitive)
+            actual_date_col = None
+            for col in df.columns:
+                if col.lower() == date_column.lower():
+                    actual_date_col = col
+                    break
+            if not actual_date_col:
+                return pd.DataFrame()
+
+            # Resolve metric columns (case-insensitive)
+            def find_col(name):
+                for c in df.columns:
+                    if c.lower() == name.lower():
+                        return c
+                return None
+
+            spend_c = find_col('spend')
+            impr_c = find_col('impressions')
+            clicks_c = find_col('clicks')
+            conv_c = find_col('conversions')
+
+            agg_exprs = [
+                (pl.col(spend_c).fill_null(0).cast(pl.Float64).sum().alias("spend")
+                 if spend_c else pl.lit(0.0).alias("spend")),
+                (pl.col(impr_c).fill_null(0).cast(pl.Int64).sum().alias("impressions")
+                 if impr_c else pl.lit(0).alias("impressions")),
+                (pl.col(clicks_c).fill_null(0).cast(pl.Int64).sum().alias("clicks")
+                 if clicks_c else pl.lit(0).alias("clicks")),
+                (pl.col(conv_c).fill_null(0).cast(pl.Int64).sum().alias("conversions")
+                 if conv_c else pl.lit(0).alias("conversions")),
+            ]
+
+            result_pl = df.group_by(actual_date_col).agg(agg_exprs).sort(actual_date_col)
+            result = result_pl.rename({actual_date_col: "date"}).to_pandas()
+
+            # Calculate derived metrics
+            if not result.empty:
+                result['ctr'] = (result['clicks'] / result['impressions'].replace(0, float('nan')) * 100).fillna(0).round(2)
+                result['cpc'] = (result['spend'] / result['clicks'].replace(0, float('nan'))).fillna(0).round(2)
+                result['cpa'] = (result['spend'] / result['conversions'].replace(0, float('nan'))).fillna(0).round(2)
+                result['cpm'] = (result['spend'] / result['impressions'].replace(0, float('nan')) * 1000).fillna(0).round(2)
+
+            return result
+
         except Exception as e:
             logger.error(f"Failed to get trend data: {e}")
             return pd.DataFrame()
     
     def get_total_metrics(self, filters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Get aggregated metrics across ALL campaigns."""
+        """Get aggregated metrics across ALL campaigns.
+        Uses Polars for crash-free reads (no DuckDB glob pattern).
+        """
+        empty = {
+            'total_spend': 0, 'total_impressions': 0, 'total_clicks': 0,
+            'total_conversions': 0, 'avg_ctr': 0, 'avg_cpc': 0, 'avg_cpa': 0,
+            'campaign_count': 0
+        }
         if not self.has_data():
-            return {
-                'total_spend': 0,
-                'total_impressions': 0,
-                'total_clicks': 0,
-                'total_conversions': 0,
-                'avg_ctr': 0,
-                'avg_cpc': 0,
-                'avg_cpa': 0,
-                'campaign_count': 0
-            }
-        
+            return empty
+
         try:
-            with self.connection() as conn:
-                # Build WHERE clause
-                where_clauses = []
-                params = []
-                
-                if filters:
-                    for key, value in filters.items():
-                        if value and key not in ['primary_metric', 'secondary_metric', 'start_date', 'end_date']:
-                            where_clauses.append(f'"{key}" = ?')
-                            params.append(value)
-                
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-                
-                query = f"""
-                    SELECT 
-                        SUM(COALESCE("Spend", 0)) as total_spend,
-                        SUM(COALESCE("Impressions", 0)) as total_impressions,
-                        SUM(COALESCE("Clicks", 0)) as total_clicks,
-                        SUM(COALESCE("Conversions", 0)) as total_conversions,
-                        COUNT(*) as campaign_count
-                    FROM {self.get_optimized_table()}
-                    WHERE {where_sql}
-                """
-                
-                result_df = conn.execute(query, params).df()
-                
-                if result_df.empty:
-                    return {}
-                
-                row = result_df.iloc[0]
-                total_spend = float(row['total_spend'] or 0)
-                total_impressions = int(row['total_impressions'] or 0)
-                total_clicks = int(row['total_clicks'] or 0)
-                total_conversions = int(row['total_conversions'] or 0)
-                
-                return {
-                    'total_spend': total_spend,
-                    'total_impressions': total_impressions,
-                    'total_clicks': total_clicks,
-                    'total_conversions': total_conversions,
-                    'avg_ctr': (total_clicks / total_impressions * 100) if total_impressions > 0 else 0,
-                    'avg_cpc': (total_spend / total_clicks) if total_clicks > 0 else 0,
-                    'avg_cpa': (total_spend / total_conversions) if total_conversions > 0 else 0,
-                    'campaign_count': int(row['campaign_count'] or 0)
-                }
+            import polars as pl
+            df = self.get_campaigns_polars(filters=filters)
+
+            if df.is_empty():
+                return empty
+
+            def find_col(name):
+                for c in df.columns:
+                    if c.lower() == name.lower():
+                        return c
+                return None
+
+            spend_c = find_col('spend')
+            impr_c = find_col('impressions')
+            clicks_c = find_col('clicks')
+            conv_c = find_col('conversions')
+
+            total_spend = float(df[spend_c].fill_null(0).sum()) if spend_c else 0.0
+            total_impr = int(df[impr_c].fill_null(0).sum()) if impr_c else 0
+            total_clicks = int(df[clicks_c].fill_null(0).sum()) if clicks_c else 0
+            total_conv = int(df[conv_c].fill_null(0).sum()) if conv_c else 0
+
+            return {
+                'total_spend': total_spend,
+                'total_impressions': total_impr,
+                'total_clicks': total_clicks,
+                'total_conversions': total_conv,
+                'avg_ctr': (total_clicks / total_impr * 100) if total_impr > 0 else 0,
+                'avg_cpc': (total_spend / total_clicks) if total_clicks > 0 else 0,
+                'avg_cpa': (total_spend / total_conv) if total_conv > 0 else 0,
+                'campaign_count': df.height
+            }
         except Exception as e:
             logger.error(f"Failed to get total metrics: {e}")
-            return {}
+            return empty
 
     def get_total_count(self) -> int:
-        """Get total number of campaign records."""
+        """Get total number of campaign records.
+        Uses Polars for crash-free reads (no DuckDB glob pattern).
+        """
         if not self.has_data():
             return 0
-        
+
         try:
-            with self.connection() as conn:
-                result = conn.execute(f"SELECT COUNT(*) FROM {self.get_optimized_table()}").fetchone()
-                return result[0] if result else 0
+            return self.get_campaigns_polars().height
         except Exception as e:
             logger.error(f"Failed to get count: {e}")
             return 0
 
     def get_filtered_count(self, filters: Optional[Dict[str, Any]] = None) -> int:
-        """Get count of records matching filters."""
+        """Get count of records matching filters.
+        Uses Polars for crash-free reads (no DuckDB glob pattern).
+        """
         if not self.has_data():
             return 0
-            
+
         try:
-            with self.connection() as conn:
-                where_clauses = []
-                params = []
-                
-                if filters:
-                    for key, value in filters.items():
-                        if value and key not in ['primary_metric', 'secondary_metric']:
-                            if isinstance(value, str) and ',' in value:
-                                values = [v.strip() for v in value.split(',')]
-                                placeholders = ', '.join(['?' for _ in values])
-                                where_clauses.append(f'"{key}" IN ({placeholders})')
-                                params.extend(values)
-                            elif isinstance(value, list):
-                                placeholders = ', '.join(['?' for _ in value])
-                                where_clauses.append(f'"{key}" IN ({placeholders})')
-                                params.extend(value)
-                            else:
-                                where_clauses.append(f'"{key}" = ?')
-                                params.append(value)
-                
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
-                
-                query = f"SELECT COUNT(*) FROM {self.get_optimized_table()} WHERE {where_sql}"
-                result = conn.execute(query, params).fetchone()
-                return result[0] if result else 0
+            return self.get_campaigns_polars(filters=filters).height
         except Exception as e:
             logger.error(f"Failed to get filtered count: {e}")
             return 0
