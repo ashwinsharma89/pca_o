@@ -45,6 +45,12 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
     environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/pca_agent
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=pca_agent
       - POSTGRES_SERVER=db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -89,6 +95,12 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
     environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/pca_agent
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=pca_agent
       - POSTGRES_SERVER=db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -127,6 +139,12 @@ services:
     volumes:
       - ./data:/app/data
     environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/pca_agent
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=pca_agent
       - POSTGRES_SERVER=db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
