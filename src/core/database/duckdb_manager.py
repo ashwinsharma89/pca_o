@@ -183,7 +183,25 @@ class DuckDBManager:
         """Create indexes on the campaigns table for fast queries."""
         if self._indexed or not self.has_data():
             return
-        
+
+        try:
+            import signal
+            # Set a 30-second timeout for index creation to prevent hangs
+            def _timeout_handler(signum, frame):
+                raise TimeoutError("ensure_indexes timed out")
+            old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+            signal.alarm(30)
+            try:
+                self._do_ensure_indexes()
+            finally:
+                signal.alarm(0)
+                signal.signal(signal.SIGALRM, old_handler)
+        except Exception as e:
+            logger.warning(f"ensure_indexes failed (non-fatal): {e}")
+            self._indexed = True  # Mark as done to prevent retries
+
+    def _do_ensure_indexes(self):
+        """Internal index creation — called with timeout protection."""
         try:
             start = time.time()
             with self.connection() as conn:
@@ -343,9 +361,12 @@ class DuckDBManager:
                     existing_data_behavior='overwrite_or_ignore'
                 )
                 
-                # Invalidate and rebuild indexes
+                # Invalidate indexes (rebuild deferred to avoid crashes)
                 self._indexed = False
-                self.ensure_indexes()
+                try:
+                    self.ensure_indexes()
+                except Exception as idx_e:
+                    logger.warning(f"Index rebuild skipped (non-fatal): {idx_e}")
                 
                 logger.info(f"Saved {len(df)} campaigns to {campaigns_dir} (partitioned)")
                 return len(df)
