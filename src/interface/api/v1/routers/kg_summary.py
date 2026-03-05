@@ -377,12 +377,42 @@ async def kg_query(
         age_col = find_column(df, "age")
         funnel_col = find_column(df, "funnel")
 
-        # Simple intent detection
+        # Known platform aliases → canonical name as stored in data
+        PLATFORM_ALIASES = {
+            "meta": "Meta", "facebook": "Meta",
+            "google": "Google", "google ads": "Google",
+            "tiktok": "TikTok",
+            "snapchat": "Snapchat",
+            "linkedin": "LinkedIn",
+            "youtube": "YouTube",
+            "twitter": "Twitter", "x ads": "Twitter",
+            "bing": "Bing", "microsoft": "Bing",
+            "pinterest": "Pinterest",
+            "dv360": "DV360",
+        }
+
+        # Intent detection + optional single-entity filter
         intent = "general"
         confidence = 0.7
         group_col = None
+        entity_filter_col = None   # column to filter on
+        entity_filter_val = None   # value to filter for
 
-        if any(w in query_lower for w in ["platform", "google", "meta", "facebook", "tiktok", "snapchat"]):
+        # Check for a specific platform mention (e.g. "Meta ads performance")
+        specific_platform = None
+        for alias, canonical in PLATFORM_ALIASES.items():
+            if alias in query_lower:
+                specific_platform = canonical
+                break
+
+        if specific_platform:
+            # User asked about ONE platform → filter, don't just group
+            intent = "platform"
+            confidence = 0.95
+            entity_filter_col = platform_col
+            entity_filter_val = specific_platform
+            # group_col stays None so we return totals for that platform
+        elif any(w in query_lower for w in ["platform", "all platforms", "by platform", "platforms"]):
             intent = "platform"
             group_col = platform_col
             confidence = 0.9
@@ -406,6 +436,18 @@ async def kg_query(
             intent = "temporal"
             group_col = date_col
             confidence = 0.9
+
+        # Apply single-entity filter BEFORE aggregation
+        cypher_where_clause = ""
+        if entity_filter_col and entity_filter_val and entity_filter_col in df.columns:
+            # Try exact match first, then case-insensitive
+            mask = df[entity_filter_col].astype(str).str.lower() == entity_filter_val.lower()
+            if not mask.any():
+                mask = df[entity_filter_col].astype(str).str.lower().str.contains(
+                    entity_filter_val.lower(), na=False
+                )
+            df = df[mask]
+            cypher_where_clause = f"WHERE toLower(m.platform) = toLower('{entity_filter_val}')\n"
 
         # Handle explicit date filtering (e.g., "last 2 weeks")
         date_filter_desc = ""
@@ -498,16 +540,38 @@ async def kg_query(
             result_df = result_df.fillna(0)
             data = result_df.to_dict(orient="records")
 
-            # Build pseudo-SQL for the frontend "View Cypher Query" display
-            metrics_sql = ", ".join([f"SUM({c}) AS {c}" for c in metric_cols.keys()])
-            pseudo_sql = f"SELECT {group_col}, {metrics_sql}\nFROM campaigns\n{date_filter_desc}\nGROUP BY {group_col}\nORDER BY {sort_col} {'ASC' if ascending else 'DESC'}\nLIMIT {request.limit}"
+            # Build Cypher query for display (mirrors what a real KG query would look like)
+            metric_returns = "\n       ".join(
+                [f"SUM(m.{c}) AS {c}" for c in metric_cols.keys()]
+            )
+            if intent == "temporal":
+                cypher_display = (
+                    f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
+                    f"{cypher_where_clause}"
+                    f"RETURN m.date AS Period,\n       {metric_returns}\n"
+                    f"ORDER BY Period ASC\nLIMIT {request.limit}"
+                )
+            else:
+                dim_label = group_col or (entity_filter_col or "platform")
+                cypher_display = (
+                    f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
+                    f"{cypher_where_clause}"
+                    f"RETURN m.{dim_label} AS Dimension,\n       {metric_returns}\n"
+                    f"ORDER BY m.spend DESC\nLIMIT {request.limit}"
+                )
         else:
-            # Fallback: return overall summary
+            # Fallback: return overall summary (no grouping)
             summary_row = {}
             for col, agg in metric_cols.items():
-                summary_row[col] = float(df[col].sum())
+                if col in df.columns:
+                    summary_row[col] = float(df[col].sum())
             data = [summary_row] if summary_row else []
-            pseudo_sql = f"SELECT {', '.join([f'SUM({c})' for c in metric_cols.keys()])} FROM campaigns {date_filter_desc}"
+            metric_returns = "\n       ".join([f"SUM(m.{c}) AS {c}" for c in metric_cols.keys()])
+            cypher_display = (
+                f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
+                f"{cypher_where_clause}"
+                f"RETURN {metric_returns}"
+            )
 
         # Build summary stats
         summary = {"count": len(data)}
@@ -540,7 +604,7 @@ async def kg_query(
                 "intent": intent,
                 "confidence": confidence,
                 "routing": "template",
-                "cypher": pseudo_sql,
+                "cypher": cypher_display,
                 "execution_time_ms": round(elapsed, 1),
             },
         }
