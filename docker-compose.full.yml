@@ -175,6 +175,32 @@ services:
         limits:
           memory: 512M
 
+  # Frontend
+  frontend:
+    image: pca-frontend:latest
+    container_name: pca-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - INTERNAL_API_URL=http://pca-api:8000/api/v1
+      - NODE_ENV=production
+    depends_on:
+      pca-api:
+        condition: service_healthy
+    networks:
+      - pca-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
   # Jaeger (Distributed Tracing)
   jaeger:
     image: jaegertracing/all-in-one:latest
