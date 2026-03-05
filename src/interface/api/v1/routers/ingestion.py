@@ -112,6 +112,28 @@ async def upload_campaign_data(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.delete("/data")
+async def clear_campaign_data(
+    request: Request,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Delete all uploaded campaign parquet files.
+    Use this to wipe accumulated duplicate data before re-uploading a clean file.
+    Restricted to admin users.
+    """
+    if current_user.get("role") not in ("admin", "superadmin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    try:
+        from src.core.database.duckdb_manager import get_duckdb_manager
+        duckdb_mgr = get_duckdb_manager()
+        removed = duckdb_mgr.clear_campaigns()
+        return {"success": True, "files_removed": removed, "message": f"Cleared {removed} parquet files. Re-upload your data."}
+    except Exception as e:
+        logger.error(f"Failed to clear campaign data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/schema")
 async def get_data_schema(
     request: Request,

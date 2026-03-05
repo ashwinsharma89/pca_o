@@ -295,42 +295,68 @@ class DuckDBManager:
         # Check if directory exists and has at least one parquet file
         return CAMPAIGNS_DIR.exists() and any(CAMPAIGNS_DIR.glob("**/*.parquet"))
     
+    def clear_campaigns(self) -> int:
+        """
+        Delete all existing parquet files from the campaigns directory.
+        Returns the number of files removed.
+        """
+        campaigns_dir = self.data_dir / "campaigns"
+        if not campaigns_dir.exists():
+            return 0
+        existing = list(campaigns_dir.glob("**/*.parquet"))
+        for f in existing:
+            f.unlink(missing_ok=True)
+        # Remove now-empty partition subdirectories
+        for sub in sorted(campaigns_dir.rglob("*"), reverse=True):
+            if sub.is_dir():
+                try:
+                    sub.rmdir()
+                except OSError:
+                    pass
+        logger.info(f"Cleared {len(existing)} parquet files from {campaigns_dir}")
+        return len(existing)
+
     def save_campaigns(self, df: pd.DataFrame) -> int:
         """
         Save campaigns DataFrame to Partitioned Parquet (Hive Style).
-        Structure: data/campaigns/year=YYYY/month=MM/campaigns-uuid.parquet
+        Structure: data/campaigns/year=YYYY/month=MM/<uuid>.parquet
+
+        IMPORTANT: Clears ALL existing parquet files before writing.
+        pandas/pyarrow's existing_data_behavior='overwrite_or_ignore' appends
+        UUID-named files alongside existing ones — it does NOT replace them —
+        so every upload would multiply the stored data. Deleting upfront gives
+        clean replace-semantics: each upload is a full dataset replacement.
         Returns number of rows saved.
         """
-        # Serialize writes to prevent Race Conditions on Parquet/DuckDB
+        # Serialize writes to prevent race conditions
         with self._lock:
             try:
-                # Ensure base directory exists
                 campaigns_dir = self.data_dir / "campaigns"
                 campaigns_dir.mkdir(parents=True, exist_ok=True)
-                
-                # Parse Date column
+
+                # Delete all existing parquet files so uploads replace, not accumulate
+                self.clear_campaigns()
+
                 # Parse Date column ('date' is normalized name)
                 date_col = 'date' if 'date' in df.columns else 'Date'
-                
+
                 if date_col in df.columns:
                     df[date_col] = pd.to_datetime(df[date_col], errors='coerce')
-                    
-                    # drop rows with invalid dates
+
                     if df[date_col].isna().any():
-                         logger.warning(f"Dropping {df[date_col].isna().sum()} rows with invalid dates")
-                         df = df.dropna(subset=[date_col])
-                
+                        logger.warning(f"Dropping {df[date_col].isna().sum()} rows with invalid dates")
+                        df = df.dropna(subset=[date_col])
+
                     if len(df) == 0:
-                         raise ValueError("All rows have invalid or missing dates")
+                        raise ValueError("All rows have invalid or missing dates")
 
                     # Add partition columns
                     df['year'] = df[date_col].dt.year
                     df['month'] = df[date_col].dt.month
 
-                logger.info(f"Saving campaigns with columns: {list(df.columns)}")
-            
-                # Save as Partitioned Parquet
-                # compression='snappy' is default and good balance
+                logger.info(f"Saving {len(df)} campaigns with columns: {list(df.columns)}")
+
+                # Write fresh (directory is empty, so overwrite_or_ignore is harmless)
                 df.to_parquet(
                     campaigns_dir,
                     index=False,
@@ -338,10 +364,8 @@ class DuckDBManager:
                     partition_cols=['year', 'month'],
                     existing_data_behavior='overwrite_or_ignore'
                 )
-                
-                # Index rebuild disabled - queries use parquet directly (stable)
+
                 self._indexed = False
-                
                 logger.info(f"Saved {len(df)} campaigns to {campaigns_dir} (partitioned)")
                 return len(df)
             except Exception as e:
