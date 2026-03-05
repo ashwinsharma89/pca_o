@@ -248,18 +248,31 @@ async def kg_health(
         duckdb_mgr = get_duckdb_manager()
         has_data = duckdb_mgr.has_data()
         row_count = 0
+        full_df = None
         if has_data:
-            df = duckdb_mgr.get_campaigns(limit=1)
-            # Get approximate row count
             full_df = duckdb_mgr.get_campaigns()
             row_count = len(full_df) if not full_df.empty else 0
+
+        # Estimate relationship count from the graph structure:
+        #   HAS_PERFORMANCE  : 1 per row (Metric → Campaign)
+        #   BELONGS_TO       : 1 per unique campaign-platform pair
+        #   HAS_TARGETING    : 1 per unique campaign
+        rel_count = 0
+        if has_data and full_df is not None and not full_df.empty:
+            from src.core.utils.column_mapping import find_column
+            platform_col = find_column(full_df, "platform")
+            campaign_col = find_column(full_df, "campaign_name") or find_column(full_df, "campaign")
+            has_perf = row_count                                              # every row
+            belongs_to = int(full_df[[c for c in [campaign_col, platform_col] if c]].drop_duplicates().shape[0]) if campaign_col or platform_col else 0
+            has_targeting = int(full_df[campaign_col].nunique()) if campaign_col else 0
+            rel_count = has_perf + belongs_to + has_targeting
 
         return {
             "status": "healthy" if has_data else "no_data",
             "neo4j_connected": has_data,  # frontend expects this field name
             "neo4j_uri": "duckdb://local",
             "node_count": row_count,
-            "relationship_count": 0,
+            "relationship_count": rel_count,
         }
     except Exception as e:
         logger.error(f"KG health check failed: {e}")
