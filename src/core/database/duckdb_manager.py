@@ -371,7 +371,7 @@ class DuckDBManager:
             "total_conversions": 0
         }
         try:
-            import pandas as pd
+            import polars as pl
 
             # Find all parquet files
             if not CAMPAIGNS_DIR.exists():
@@ -381,15 +381,15 @@ class DuckDBManager:
             if not parquet_files:
                 return empty
 
-            # Read and filter by job_id using pandas (no DuckDB = no segfault risk)
+            # Read and filter by job_id using polars (no DuckDB = no segfault risk)
             job_col = Columns.JOB_ID.value  # "job_id"
             matching_frames = []
             for f in parquet_files:
                 try:
-                    df = pd.read_parquet(f)
+                    df = pl.read_parquet(f)
                     if job_col in df.columns:
-                        filtered = df[df[job_col] == job_id]
-                        if len(filtered) > 0:
+                        filtered = df.filter(pl.col(job_col) == job_id)
+                        if filtered.height > 0:
                             matching_frames.append(filtered)
                 except Exception as pq_err:
                     logger.warning(f"Could not read parquet {f}: {pq_err}")
@@ -397,16 +397,16 @@ class DuckDBManager:
             if not matching_frames:
                 return empty
 
-            combined = pd.concat(matching_frames, ignore_index=True)
+            combined = pl.concat(matching_frames, how="diagonal")
 
             def _safe_sum(col_name: str, as_int: bool = False):
                 if col_name in combined.columns:
-                    val = combined[col_name].fillna(0).sum()
+                    val = combined[col_name].fill_null(0).sum()
                     return int(val) if as_int else float(val)
                 return 0
 
             return {
-                "row_count": len(combined),
+                "row_count": combined.height,
                 "total_spend": _safe_sum(Columns.SPEND.value),
                 "total_impressions": _safe_sum(Columns.IMPRESSIONS.value, as_int=True),
                 "total_clicks": _safe_sum(Columns.CLICKS.value, as_int=True),
