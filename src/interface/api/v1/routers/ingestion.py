@@ -116,14 +116,68 @@ async def upload_campaign_data(
 async def get_data_schema(
     request: Request,
     current_user: Dict[str, Any] = Depends(get_current_user),
-    campaign_service: CampaignService = Depends(get_campaign_service)
 ):
     """
     Get schema metadata about available columns for dynamic UI.
     Returns which metrics and dimensions are available in the uploaded data.
+    Reads directly from parquet via DuckDBManager (avoids broken DuckDBRepository path).
     """
     try:
-        return campaign_service.get_schema_info()
+        from src.core.database.duckdb_manager import get_duckdb_manager
+        from src.core.utils.column_mapping import find_column
+        duckdb_mgr = get_duckdb_manager()
+
+        has_data = duckdb_mgr.has_data()
+        df_sample = duckdb_mgr.get_campaigns(limit=1) if has_data else pd.DataFrame()
+
+        if df_sample.empty and not has_data:
+            return {
+                "has_data": False,
+                "metrics": {},
+                "dimensions": {},
+                "extra_metrics": [],
+                "extra_dimensions": [],
+                "all_columns": []
+            }
+
+        cols = df_sample.columns.tolist()
+
+        std_metrics = ['spend', 'impressions', 'clicks', 'conversions', 'revenue', 'reach']
+        std_dims = ['platform', 'channel', 'funnel', 'objective', 'region', 'device',
+                    'ad_type', 'placement', 'campaign_name', 'ad_group_name', 'date']
+
+        metrics_avail = {m: bool(find_column(df_sample, m)) for m in std_metrics}
+        if metrics_avail.get('clicks') and metrics_avail.get('impressions'):
+            metrics_avail['ctr'] = True
+        if metrics_avail.get('spend') and metrics_avail.get('clicks'):
+            metrics_avail['cpc'] = True
+        if metrics_avail.get('spend') and metrics_avail.get('impressions'):
+            metrics_avail['cpm'] = True
+        if metrics_avail.get('spend') and metrics_avail.get('conversions'):
+            metrics_avail['cpa'] = True
+        if metrics_avail.get('revenue') and metrics_avail.get('spend'):
+            metrics_avail['roas'] = True
+
+        dims_avail = {d: bool(find_column(df_sample, d)) for d in std_dims}
+
+        known_cols = {find_column(df_sample, c) for c in std_metrics + std_dims if find_column(df_sample, c)}
+        extra_metrics, extra_dims = [], []
+        for col in cols:
+            if col in known_cols:
+                continue
+            if pd.api.types.is_numeric_dtype(df_sample[col]):
+                extra_metrics.append(col)
+            else:
+                extra_dims.append(col)
+
+        return {
+            "has_data": has_data,
+            "metrics": metrics_avail,
+            "dimensions": dims_avail,
+            "extra_metrics": extra_metrics,
+            "extra_dimensions": extra_dims,
+            "all_columns": cols
+        }
     except Exception as e:
         logger.error(f"Failed to get data schema: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -133,14 +187,15 @@ async def get_data_schema(
 async def get_filter_options(
     request: Request,
     current_user: Dict[str, Any] = Depends(get_current_user),
-    campaign_service: CampaignService = Depends(get_campaign_service)
 ):
     """
     Get all unique filter option values for dropdowns.
-    Uses DuckDB to dynamically detect all filterable columns.
+    Reads directly from parquet via DuckDBManager (avoids broken DuckDBRepository path).
     """
     try:
-        result = campaign_service.get_filter_options()
+        from src.core.database.duckdb_manager import get_duckdb_manager
+        duckdb_mgr = get_duckdb_manager()
+        result = duckdb_mgr.get_filter_options()
         logger.info(f"Returning {len(result)} filters with values: {list(result.keys())}")
         return result
     except Exception as e:

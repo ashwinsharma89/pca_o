@@ -268,38 +268,36 @@ async def get_dimension_metrics(
         if not duckdb_mgr.has_data():
             return {"trend": [], "device": [], "platform": [], "channel": []}
         
-        # Build filter parameters
+        # Build filter parameters — only do schema-detection read when filters are requested
+        requested_filters = {
+            'platform': params.platforms,
+            'funnel': params.funnel_stages,
+            'channel': params.channels,
+            'device': params.devices,
+            'placement': params.placements,
+            'region': params.regions,
+            'ad_type': params.adTypes,
+            'audience': params.audiences,
+            'age': params.ages,
+            'objective': params.objectives,
+            'targeting': params.targetings
+        }
+        has_filter_params = any(v for v in requested_filters.values())
+
         filter_params = {}
-        sample_df = duckdb_mgr.get_campaigns(limit=1)
-        
-        if not sample_df.empty:
-            mapping = {
-                'platform': params.platforms,
-                'funnel': params.funnel_stages,
-                'channel': params.channels,
-                'device': params.devices,
-                'placement': params.placements,
-                'region': params.regions,
-                'ad_type': params.adTypes,
-                'audience': params.audiences,
-                'age': params.ages,
-                'objective': params.objectives,
-                'targeting': params.targetings
-            }
-            
-            for key, val in mapping.items():
-                if val:
-                    actual_col = find_column(sample_df, key)
-                    if actual_col:
-                        filter_params[actual_col] = val
-                    else:
-                        fallback_map = {
-                            'platform': 'Platform', 'funnel': 'Funnel', 'channel': 'Channel',
-                            'device': 'Device_Type', 'placement': 'Placement',
-                            'region': 'Geographic_Region', 'ad_type': 'Ad Type'
-                        }
-                        filter_params[fallback_map.get(key, key)] = val
-        
+        if has_filter_params:
+            sample_df = duckdb_mgr.get_campaigns(limit=1)
+            if not sample_df.empty:
+                fallback_map = {
+                    'platform': 'Platform', 'funnel': 'Funnel', 'channel': 'Channel',
+                    'device': 'Device_Type', 'placement': 'Placement',
+                    'region': 'Geographic_Region', 'ad_type': 'Ad Type'
+                }
+                for key, val in requested_filters.items():
+                    if val:
+                        actual_col = find_column(sample_df, key)
+                        filter_params[actual_col if actual_col else fallback_map.get(key, key)] = val
+
         logger.info(f"DuckDB visualization filters: {filter_params}")
         df = duckdb_mgr.get_campaigns(filters=filter_params if filter_params else None)
         
@@ -506,34 +504,40 @@ async def get_dashboard_stats(
         if not duckdb_mgr.has_data():
             return {"summary_groups": {}, "monthly_performance": [], "platform_performance": []}
         
-        # Build filters
+        # Read all data once as Polars (avoids double read: limit=1 then full).
+        # If filters are requested, we need column names first — use a single-file
+        # fast-path read (limit=1) only when the user actually passed filter params.
+        requested_filters = {
+            'platform': params.platforms, 'funnel': params.funnel_stages,
+            'channel': params.channels, 'device': params.devices,
+            'placement': params.placements, 'region': params.regions,
+            'ad_type': params.adTypes, 'audience': params.audiences,
+            'age': params.ages, 'objective': params.objectives,
+            'targeting': params.targetings
+        }
+        has_filter_params = any(v for v in requested_filters.values())
+
         filter_params = {}
-        sample_df = duckdb_mgr.get_campaigns(limit=1)
-        
-        if not sample_df.empty:
-            mapping = {
-                'platform': params.platforms, 'funnel': params.funnel_stages,
-                'channel': params.channels, 'device': params.devices,
-                'placement': params.placements, 'region': params.regions,
-                'ad_type': params.adTypes, 'audience': params.audiences,
-                'age': params.ages, 'objective': params.objectives,
-                'targeting': params.targetings
-            }
-            
-            for key, val in mapping.items():
-                if val:
-                    actual_col = find_column(sample_df, key)
-                    if actual_col:
-                        filter_params[actual_col] = val
-                    else:
-                        fallback_map = {
-                            'platform': 'Platform', 'funnel': 'Funnel', 'channel': 'Channel',
-                            'device': 'Device_Type', 'placement': 'Placement',
-                            'region': 'Geographic_Region', 'ad_type': 'Ad Type'
-                        }
-                        filter_params[fallback_map.get(key, key)] = val
-        
-        total_df = duckdb_mgr.get_campaigns(filters=filter_params if filter_params else None)
+        if has_filter_params:
+            # Fast-path single-file read just for column name resolution
+            sample_df = duckdb_mgr.get_campaigns(limit=1)
+            if not sample_df.empty:
+                fallback_map = {
+                    'platform': 'Platform', 'funnel': 'Funnel', 'channel': 'Channel',
+                    'device': 'Device_Type', 'placement': 'Placement',
+                    'region': 'Geographic_Region', 'ad_type': 'Ad Type'
+                }
+                for key, val in requested_filters.items():
+                    if val:
+                        actual_col = find_column(sample_df, key)
+                        filter_params[actual_col if actual_col else fallback_map.get(key, key)] = val
+
+        # Single full read — polars, no pandas round-trip for aggregations
+        total_pl = duckdb_mgr.get_campaigns_polars(filters=filter_params if filter_params else None)
+        if total_pl.is_empty():
+            return {"summary_groups": {}, "monthly_performance": [], "platform_performance": []}
+
+        total_df = total_pl.to_pandas()
         if total_df.empty:
             return {"summary_groups": {}, "monthly_performance": [], "platform_performance": []}
         

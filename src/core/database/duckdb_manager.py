@@ -461,6 +461,22 @@ class DuckDBManager:
             if not parquet_files:
                 return pl.DataFrame()
 
+            # Fast path: schema-only reads (limit ≤ 10, no filters, no offset).
+            # Read just the first file instead of all files — this is used by endpoints
+            # that only need column names, not actual data (e.g. get_campaigns(limit=1)
+            # for column detection before building filter_params).
+            if limit is not None and limit <= 10 and not filters and not offset:
+                try:
+                    first_df = pl.read_parquet(parquet_files[0]).head(limit)
+                    # Fill nulls for core metrics
+                    metric_cols = [c for c in ['spend', 'impressions', 'clicks', 'conversions', 'revenue']
+                                   if c in first_df.columns]
+                    if metric_cols:
+                        first_df = first_df.with_columns([pl.col(c).fill_null(0) for c in metric_cols])
+                    return first_df
+                except Exception as fast_err:
+                    logger.warning(f"Fast-path read failed ({fast_err}), falling back to full read")
+
             # Read each file individually to handle mixed schemas across uploads
             frames: List[pl.DataFrame] = []
             for f in parquet_files:
