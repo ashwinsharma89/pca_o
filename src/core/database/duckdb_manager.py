@@ -351,12 +351,8 @@ class DuckDBManager:
                     existing_data_behavior='overwrite_or_ignore'
                 )
                 
-                # Invalidate indexes (rebuild deferred to avoid crashes)
+                # Index rebuild disabled - queries use parquet directly (stable)
                 self._indexed = False
-                try:
-                    self.ensure_indexes()
-                except Exception as idx_e:
-                    logger.warning(f"Index rebuild skipped (non-fatal): {idx_e}")
                 
                 logger.info(f"Saved {len(df)} campaigns to {campaigns_dir} (partitioned)")
                 return len(df)
