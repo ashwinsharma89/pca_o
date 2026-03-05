@@ -113,10 +113,11 @@ class DuckDBManager:
     def get_connection(self):
         """
         Get the persistent shared DuckDB connection.
-        Ensures only ONE write connection exists to prevent file locking issues.
+        Uses in-memory mode to avoid file-based locking and C-level crashes.
+        All analytics are read from parquet files directly at query time.
         """
         import duckdb
-        
+
         # If connection exists and is alive, return it
         if self._conn:
             try:
@@ -131,38 +132,25 @@ class DuckDBManager:
             if self._conn:
                 return self._conn
 
-            # Initialize new connection
-            db_exists = DUCKDB_FILE.exists() and DUCKDB_FILE.stat().st_size > 0
-            
             try:
-                # 1. Try Primary Mode (Persistent File)
-                if not DUCKDB_FILE.parent.exists():
-                     DUCKDB_FILE.parent.mkdir(parents=True, exist_ok=True)
-                     
-                conn = duckdb.connect(str(DUCKDB_FILE), read_only=False)
+                # Use in-memory DuckDB to avoid file-based locking and segfaults.
+                # All campaign data is read from parquet files at query time via
+                # read_parquet(), so persistence in DuckDB is not needed.
+                conn = duckdb.connect(":memory:")
                 conn.execute("SET threads TO 4")
                 conn.execute("SET memory_limit = '2GB'")
-                # Enable Auto-Checkpointing to prevent WAL growth
-                conn.execute("SET checkpoint_threshold = '50MB'") 
-                
-                logger.info(f"DuckDB Connected (Read/Write) to {DUCKDB_FILE}")
+
+                logger.info("DuckDB Connected (In-Memory mode - analytics read from parquet)")
                 self._conn = conn
-                self._use_memory = False
-                
-                # Auto-initialize tables
+                self._use_memory = True
+
+                # Auto-initialize tracking tables
                 self.initialize()
 
-                
             except Exception as e:
-                logger.error(f"Failed to acquire Write Lock on {DUCKDB_FILE}: {e}")
-                logger.warning("Falling back to IN-MEMORY mode (Reads will work, Writes will be non-persistent)")
-                
-                # 2. Fallback: In-Memory
-                # This ensures the app doesn't crash, but warns heavily
-                self._use_memory = True
-                conn = duckdb.connect(":memory:")
-                self._conn = conn
-            
+                logger.error(f"Failed to connect to DuckDB: {e}")
+                raise
+
             return self._conn
 
     def shutdown(self):
@@ -373,69 +361,62 @@ class DuckDBManager:
 
     def get_job_summary(self, job_id: str) -> Dict[str, Any]:
         """
-        Get summary metrics for a specific upload job from the Database.
-        Acts as the Single Source of Truth for Upload Logic.
+        Get summary metrics for a specific upload job using pandas (DuckDB-free).
+        Uses pandas directly to avoid DuckDB C-level crashes during upload processing.
+        This is intentionally DuckDB-free for stability during the upload pipeline.
         """
+        empty = {
+            "row_count": 0, "total_spend": 0,
+            "total_impressions": 0, "total_clicks": 0,
+            "total_conversions": 0
+        }
         try:
-            with self.connection() as conn:
-                # Always use parquet directly for job summary to avoid
-                # dependency on the campaigns table (which may not be built yet)
-                target = f"read_parquet('{CAMPAIGNS_PATTERN}', hive_partitioning=true, union_by_name=true)"
-                
-                # Fetch schema to check which columns exist
-                # Using 0-row select is more robust than DESCRIBE for function targets
-                cols_df = conn.execute(f"SELECT * FROM {target} LIMIT 0").df()
-                existing_cols = {c.lower() for c in cols_df.columns}
-                
-                # Build dynamic SUM clauses
-                metrics_to_sum = {
-                    "total_spend": Columns.SPEND.value,
-                    "total_impressions": Columns.IMPRESSIONS.value,
-                    "total_clicks": Columns.CLICKS.value,
-                    "total_conversions": Columns.CONVERSIONS.value
-                }
-                
-                sum_clauses = ["count(*) as row_count"]
-                for alias, col in metrics_to_sum.items():
-                    # Column comparison should be case-insensitive for safety
-                    if col.lower() in existing_cols:
-                        sum_clauses.append(f"sum({col}) as {alias}")
-                    else:
-                        sum_clauses.append(f"0 as {alias}")
-                
-                query = f"""
-                    SELECT {', '.join(sum_clauses)}
-                    FROM {target}
-                    WHERE {Columns.JOB_ID.value} = '{job_id}'
-                """
-                
-                # Execute and fetch as list of tuples
-                result = conn.execute(query).fetchall()
-                
-                if not result:
-                    return {
-                        "row_count": 0, "total_spend": 0, 
-                        "total_impressions": 0, "total_clicks": 0, 
-                        "total_conversions": 0
-                    }
-                
-                row = result[0]
-                # Map results back to dict (indices match sum_clauses order)
-                return {
-                    "row_count": row[0] or 0,
-                    "total_spend": float(row[1] or 0),
-                    "total_impressions": int(row[2] or 0),
-                    "total_clicks": int(row[3] or 0),
-                    "total_conversions": int(row[4] or 0)
-                }
+            import pandas as pd
+
+            # Find all parquet files
+            if not CAMPAIGNS_DIR.exists():
+                return empty
+
+            parquet_files = list(CAMPAIGNS_DIR.glob("**/*.parquet"))
+            if not parquet_files:
+                return empty
+
+            # Read and filter by job_id using pandas (no DuckDB = no segfault risk)
+            job_col = Columns.JOB_ID.value  # "job_id"
+            matching_frames = []
+            for f in parquet_files:
+                try:
+                    df = pd.read_parquet(f)
+                    if job_col in df.columns:
+                        filtered = df[df[job_col] == job_id]
+                        if len(filtered) > 0:
+                            matching_frames.append(filtered)
+                except Exception as pq_err:
+                    logger.warning(f"Could not read parquet {f}: {pq_err}")
+
+            if not matching_frames:
+                return empty
+
+            combined = pd.concat(matching_frames, ignore_index=True)
+
+            def _safe_sum(col_name: str, as_int: bool = False):
+                if col_name in combined.columns:
+                    val = combined[col_name].fillna(0).sum()
+                    return int(val) if as_int else float(val)
+                return 0
+
+            return {
+                "row_count": len(combined),
+                "total_spend": _safe_sum(Columns.SPEND.value),
+                "total_impressions": _safe_sum(Columns.IMPRESSIONS.value, as_int=True),
+                "total_clicks": _safe_sum(Columns.CLICKS.value, as_int=True),
+                "total_conversions": _safe_sum(Columns.CONVERSIONS.value, as_int=True),
+            }
+
         except Exception as e:
             logger.error(f"Failed to get job summary for {job_id}: {e}")
-            logger.warning("Returning zero-summary due to DB error")
-            return {
-                "row_count": 0, "total_spend": 0, 
-                "total_impressions": 0, "total_clicks": 0, 
-                "total_conversions": 0
-            }
+            logger.warning("Returning zero-summary due to error")
+            return empty
     
     def get_campaigns(
         self,
