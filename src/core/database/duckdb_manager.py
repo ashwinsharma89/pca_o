@@ -185,17 +185,7 @@ class DuckDBManager:
             return
 
         try:
-            import signal
-            # Set a 30-second timeout for index creation to prevent hangs
-            def _timeout_handler(signum, frame):
-                raise TimeoutError("ensure_indexes timed out")
-            old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
-            signal.alarm(30)
-            try:
-                self._do_ensure_indexes()
-            finally:
-                signal.alarm(0)
-                signal.signal(signal.SIGALRM, old_handler)
+            self._do_ensure_indexes()
         except Exception as e:
             logger.warning(f"ensure_indexes failed (non-fatal): {e}")
             self._indexed = True  # Mark as done to prevent retries
@@ -392,8 +382,9 @@ class DuckDBManager:
         """
         try:
             with self.connection() as conn:
-                # Use dynamic table/view to ensure we pick up job_id
-                target = self.get_optimized_table()
+                # Always use parquet directly for job summary to avoid
+                # dependency on the campaigns table (which may not be built yet)
+                target = f"read_parquet('{CAMPAIGNS_PATTERN}', hive_partitioning=true, union_by_name=true)"
                 
                 # Fetch schema to check which columns exist
                 # Using 0-row select is more robust than DESCRIBE for function targets
