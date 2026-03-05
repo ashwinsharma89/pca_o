@@ -18,7 +18,7 @@ import os
 from src.interface.api.middleware.auth import get_current_user
 from src.core.database.connection import get_db
 from src.core.database.repositories import CampaignRepository, AnalysisRepository
-from src.core.database.duckdb_manager import CAMPAIGNS_PATTERN, CAMPAIGNS_DIR
+from src.core.database.duckdb_manager import get_duckdb_manager
 from src.interface.api.v1.models import ChatRequest
 # from src.engine.agents.enhanced_reasoning_agent import PatternDetector
 
@@ -81,7 +81,6 @@ async def chat_global(
             return await _handle_knowledge_mode_query(question)
         
         # 2. DATA MODE
-        from src.core.database.duckdb_manager import get_duckdb_manager
         db_manager = get_duckdb_manager()
         
         if not db_manager.has_data():
@@ -91,9 +90,13 @@ async def chat_global(
         
         # Load and verify data
         engine = get_query_engine()
+        campaigns_df = None
         try:
-            # nl_to_sql engine expects a path string. For partitioned reads, we pass the pattern.
-            engine.load_parquet_data(str(CAMPAIGNS_PATTERN), table_name="all_campaigns")
+            # Use DuckDBManager (polars-based) to safely load data into the query engine.
+            # Avoids DuckDB glob-pattern reads which cause C-level SIGSEGV crashes and 502s.
+            campaigns_pl = db_manager.get_campaigns_polars()
+            campaigns_df = campaigns_pl.to_pandas()
+            engine.load_data(campaigns_df, table_name="all_campaigns")
         except Exception as load_err:
             logger.error(f"Failed to load data for chat: {load_err}")
             return {"success": False, "error": f"Failed to load data: {str(load_err)}"}
@@ -109,19 +112,21 @@ async def chat_global(
         if not result.get('success'):
             logger.info("Attempting local template fallback...")
             try:
-                from src.platform.query_engine.template_generator import load_schema_from_parquet, generate_templates_for_schema
-                schema_columns = load_schema_from_parquet(str(CAMPAIGNS_PATTERN))
+                from src.platform.query_engine.template_generator import generate_templates_for_schema
+                # Use already-loaded campaigns_df columns instead of re-reading parquet (avoids DuckDB glob crash)
+                schema_columns = list(campaigns_df.columns) if campaigns_df is not None and not campaigns_df.empty else []
                 if schema_columns:
                     dynamic_templates = generate_templates_for_schema(schema_columns)
                     template = next((t for t in dynamic_templates.values() if t.matches(question)), None)
-                    
+
                     if template:
                         logger.info(f"Using template fallback: {template.name}")
                         import duckdb
                         conn = duckdb.connect(':memory:')
-                        conn.execute("CREATE VIEW all_campaigns AS SELECT * FROM read_parquet(?, hive_partitioning=true, union_by_name=true)", [str(CAMPAIGNS_PATTERN)])
+                        # Register campaigns_df directly — no glob-pattern DuckDB read
+                        conn.register("all_campaigns", campaigns_df)
                         df = conn.execute(template.sql).fetchdf()
-                        
+
                         result = {
                             "success": True,
                             "answer": f"I used an analytical template for {template.name} to answer your question.",
@@ -131,7 +136,18 @@ async def chat_global(
             except Exception as t_err:
                 logger.error(f"Template fallback failed: {t_err}")
 
-        # C. Post-processing (RAG, Summary, Charts)
+        # C. No-LLM fallback: if still not successful and no API keys configured, explain clearly
+        if not result.get('success') and not engine.available_models:
+            result = {
+                "success": False,
+                "error": (
+                    "No LLM API key is configured. Please add at least one of these environment variables: "
+                    "GOOGLE_API_KEY (Gemini), DEEPSEEK_API_KEY, OPENAI_API_KEY, "
+                    "ANTHROPIC_API_KEY, or GROQ_API_KEY."
+                )
+            }
+
+        # D. Post-processing (RAG, Summary, Charts)
         if result.get('success'):
             final_result = {
                 "success": True,
@@ -160,10 +176,9 @@ async def chat_global(
             
             # D. Pattern & Reasoning Injection
             try:
-                # Load full data for pattern detection
-                # Load sample data for pattern detection (limit to 10k rows for speed)
-                import duckdb
-                full_df = duckdb.connect().execute(f"SELECT * FROM read_parquet('{str(CAMPAIGNS_PATTERN)}', hive_partitioning=true, union_by_name=true) LIMIT 10000").df()
+                # Reuse already-loaded campaigns_df for pattern detection.
+                # Avoids a second DuckDB glob-pattern read (SIGSEGV risk).
+                full_df = campaigns_df.head(10000) if campaigns_df is not None else pd.DataFrame()
                 
                 # Check for API key before running potentially expensive AI patterns
                 sys_api_key = os.getenv("OPENAI_API_KEY", "dummy")
