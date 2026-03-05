@@ -390,200 +390,290 @@ async def kg_query(
         age_col = find_column(df, "age")
         funnel_col = find_column(df, "funnel")
 
-        # Known platform aliases → canonical name as stored in data
+        import re
+
+        # ── Lookup tables ────────────────────────────────────────────────────
         PLATFORM_ALIASES = {
             "meta": "Meta", "facebook": "Meta",
             "google": "Google", "google ads": "Google",
-            "tiktok": "TikTok",
-            "snapchat": "Snapchat",
-            "linkedin": "LinkedIn",
-            "youtube": "YouTube",
+            "tiktok": "TikTok", "snapchat": "Snapchat",
+            "linkedin": "LinkedIn", "youtube": "YouTube",
             "twitter": "Twitter", "x ads": "Twitter",
             "bing": "Bing", "microsoft": "Bing",
-            "pinterest": "Pinterest",
-            "dv360": "DV360",
+            "pinterest": "Pinterest", "dv360": "DV360",
+        }
+        CHANNEL_ALIASES = {
+            "search": "Search", "paid search": "Search",
+            "social": "Social", "paid social": "Social",
+            "display": "Display", "programmatic": "Display",
+            "video": "Video", "youtube": "Video",
+            "email": "Email", "affiliate": "Affiliate",
         }
 
-        # Intent detection + optional single-entity filter
-        intent = "general"
-        confidence = 0.7
-        group_col = None
-        entity_filter_col = None   # column to filter on
-        entity_filter_val = None   # value to filter for
+        # ── Extract explicit limit from "top N / bottom N" ───────────────────
+        top_n_match = re.search(r'\b(?:top|bottom|worst|best)\s+(\d+)\b', query_lower)
+        explicit_limit = int(top_n_match.group(1)) if top_n_match else None
 
-        # Check for a specific platform mention (e.g. "Meta ads performance")
+        # ── Detect "compare X vs Y" pair ────────────────────────────────────
+        compare_match = re.search(
+            r'\bcompare\s+(\w[\w\s]*?)\s+(?:vs\.?|versus|and)\s+(\w[\w\s]*?)(?:\s+|$)',
+            query_lower
+        )
+        compare_pair = None   # (canonical_a, canonical_b)
+        if compare_match:
+            a_raw = compare_match.group(1).strip()
+            b_raw = compare_match.group(2).strip()
+            compare_pair = (
+                CHANNEL_ALIASES.get(a_raw, a_raw.title()),
+                CHANNEL_ALIASES.get(b_raw, b_raw.title()),
+            )
+
+        # ── Detect specific single-platform mention ──────────────────────────
         specific_platform = None
         for alias, canonical in PLATFORM_ALIASES.items():
-            if alias in query_lower:
+            if re.search(rf'\b{re.escape(alias)}\b', query_lower):
                 specific_platform = canonical
                 break
 
-        if specific_platform:
-            # User asked about ONE platform → filter, don't just group
+        # ── Intent + grouping/filter resolution (priority order) ─────────────
+        intent = "general"
+        confidence = 0.7
+        group_col = None
+        entity_filter_col = None
+        entity_filter_val = None
+        cypher_where_clause = ""
+        cypher_dimension_label = None   # label used in RETURN
+
+        if any(w in query_lower for w in ["top", "best", "worst", "rank", "highest", "lowest"]):
+            # "Top N campaigns by spend" → group by campaign, honour N
+            intent = "ranking"
+            group_col = campaign_col
+            confidence = 0.9
+            if explicit_limit:
+                request.limit = explicit_limit
+
+        elif compare_pair and channel_col:
+            # "Compare Search vs Social" → filter to those two channels
+            intent = "cross_channel"
+            group_col = channel_col
+            confidence = 0.95
+            cypher_where_clause = (
+                f"WHERE m.channel IN ['{compare_pair[0]}', '{compare_pair[1]}']\n"
+            )
+            cypher_dimension_label = "channel"
+            if channel_col in df.columns:
+                mask = df[channel_col].astype(str).str.lower().isin(
+                    [compare_pair[0].lower(), compare_pair[1].lower()]
+                )
+                df = df[mask]
+
+        elif specific_platform:
+            # "Meta ads performance" → filter to Meta, return totals
             intent = "platform"
             confidence = 0.95
             entity_filter_col = platform_col
             entity_filter_val = specific_platform
-            # group_col stays None so we return totals for that platform
+            cypher_where_clause = f"WHERE toLower(m.platform) = toLower('{specific_platform}')\n"
+            cypher_dimension_label = "platform"
+            if platform_col and platform_col in df.columns:
+                mask = df[platform_col].astype(str).str.lower() == specific_platform.lower()
+                if not mask.any():
+                    mask = df[platform_col].astype(str).str.lower().str.contains(
+                        specific_platform.lower(), na=False
+                    )
+                df = df[mask]
+
         elif any(w in query_lower for w in ["platform", "all platforms", "by platform", "platforms"]):
             intent = "platform"
             group_col = platform_col
             confidence = 0.9
+            cypher_dimension_label = "platform"
+
         elif any(w in query_lower for w in ["channel", "search", "social", "display", "video"]):
             intent = "cross_channel"
             group_col = channel_col
             confidence = 0.85
+            cypher_dimension_label = "channel"
+
         elif any(w in query_lower for w in ["device", "mobile", "desktop", "tablet"]):
             intent = "targeting"
             group_col = device_col
             confidence = 0.85
+            cypher_dimension_label = "device"
+
         elif any(w in query_lower for w in ["age", "age group", "demographic"]):
             intent = "targeting"
             group_col = age_col
             confidence = 0.8
+            cypher_dimension_label = "age_range"
+
         elif any(w in query_lower for w in ["funnel", "upper", "lower", "middle"]):
             intent = "targeting"
             group_col = funnel_col
             confidence = 0.8
-        elif any(w in query_lower for w in ["daily", "weekly", "monthly", "trend", "over time", "last", "week", "month"]):
+            cypher_dimension_label = "funnel"
+
+        elif any(w in query_lower for w in ["daily", "weekly", "monthly", "trend",
+                                             "over time", "last", "week", "month"]):
             intent = "temporal"
             group_col = date_col
             confidence = 0.9
 
-        # Apply single-entity filter BEFORE aggregation
-        cypher_where_clause = ""
-        if entity_filter_col and entity_filter_val and entity_filter_col in df.columns:
-            # Try exact match first, then case-insensitive
-            mask = df[entity_filter_col].astype(str).str.lower() == entity_filter_val.lower()
-            if not mask.any():
-                mask = df[entity_filter_col].astype(str).str.lower().str.contains(
-                    entity_filter_val.lower(), na=False
-                )
-            df = df[mask]
-            cypher_where_clause = f"WHERE toLower(m.platform) = toLower('{entity_filter_val}')\n"
-
-        # Handle explicit date filtering (e.g., "last 2 weeks")
-        date_filter_desc = ""
-        if intent == "temporal" or "last" in query_lower:
+        # ── Date window filtering (temporal + "last N days/weeks/months") ────
+        if date_col and date_col in df.columns:
             try:
-                # Ensure date column is datetime
                 df[date_col] = pd.to_datetime(df[date_col])
                 max_date = df[date_col].max()
-                
+                date_where = ""
+
                 if "2 months" in query_lower or "60 days" in query_lower:
-                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=60))]
-                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=60)).date() }'"
+                    cutoff = max_date - pd.Timedelta(days=60)
+                    df = df[df[date_col] >= cutoff]
+                    date_where = f"AND m.date >= date('{cutoff.date()}')"
                 elif "1 month" in query_lower or "30 days" in query_lower:
-                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=30))]
-                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=30)).date() }'"
+                    cutoff = max_date - pd.Timedelta(days=30)
+                    df = df[df[date_col] >= cutoff]
+                    date_where = f"AND m.date >= date('{cutoff.date()}')"
                 elif "2 weeks" in query_lower or "14 days" in query_lower:
-                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=14))]
-                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=14)).date() }'"
-                elif "1 week" in query_lower or "7 days" in query_lower or ("week" in query_lower and "last" in query_lower):
-                    df = df[df[date_col] >= (max_date - pd.Timedelta(days=7))]
-                    date_filter_desc = f"WHERE {date_col} >= '{ (max_date - pd.Timedelta(days=7)).date() }'"
+                    cutoff = max_date - pd.Timedelta(days=14)
+                    df = df[df[date_col] >= cutoff]
+                    date_where = f"AND m.date >= date('{cutoff.date()}')"
+                elif ("1 week" in query_lower or "7 days" in query_lower
+                      or ("week" in query_lower and "last" in query_lower)):
+                    cutoff = max_date - pd.Timedelta(days=7)
+                    df = df[df[date_col] >= cutoff]
+                    date_where = f"AND m.date >= date('{cutoff.date()}')"
 
-                # Month-over-month comparison logic: if user mentions "month", group by month start
-                if "month" in query_lower:
+                if date_where:
+                    # Append to existing WHERE or start one
+                    if cypher_where_clause:
+                        cypher_where_clause = cypher_where_clause.rstrip("\n") + f" {date_where}\n"
+                    else:
+                        cypher_where_clause = f"WHERE {date_where[4:]}\n"  # strip leading AND
+
+                # Group by month for monthly trend
+                if intent == "temporal" and "month" in query_lower:
                     df[date_col] = df[date_col].dt.to_period('M').dt.to_timestamp()
-                    date_filter_desc += " [Grouped by Month]"
+
             except Exception as e:
-                logger.warning(f"Temporal filtering failed: {e}")
-                pass
+                logger.warning(f"Date filtering failed: {e}")
 
-        elif any(w in query_lower for w in ["top", "best", "worst", "rank", "highest", "lowest"]):
-            intent = "ranking"
-            group_col = campaign_col
-            confidence = 0.85
-
-        # Build aggregation
+        # ── Build aggregation ────────────────────────────────────────────────
         metric_cols = {}
-        if spend_col:
-            metric_cols[spend_col] = "sum"
-        if impr_col:
-            metric_cols[impr_col] = "sum"
-        if clicks_col:
-            metric_cols[clicks_col] = "sum"
-        if conv_col:
-            metric_cols[conv_col] = "sum"
-        if revenue_col:
-            metric_cols[revenue_col] = "sum"
+        for col in [spend_col, impr_col, clicks_col, conv_col, revenue_col]:
+            if col:
+                metric_cols[col] = "sum"
+
+        ascending = "worst" in query_lower or "lowest" in query_lower
+        sort_metric = spend_col or (list(metric_cols.keys())[0] if metric_cols else None)
+        if "impression" in query_lower:
+            sort_metric = impr_col or sort_metric
+        elif "click" in query_lower and "ctr" not in query_lower:
+            sort_metric = clicks_col or sort_metric
+        elif "conversion" in query_lower or "roas" in query_lower:
+            sort_metric = conv_col or sort_metric
+
+        # ── Helper: build comma-separated metric RETURN clause ───────────────
+        def _metric_returns(prefix="m"):
+            items = [f"SUM({prefix}.{c}) AS {c}" for c in metric_cols]
+            return ",\n       ".join(items)
 
         if group_col and group_col in df.columns and metric_cols:
             result_df = df.groupby(group_col, dropna=True).agg(metric_cols).reset_index()
 
-            # Compute derived metrics
-            if spend_col and clicks_col:
+            # Derived metrics
+            if spend_col and clicks_col and spend_col in result_df and clicks_col in result_df:
                 result_df["cpc"] = (result_df[spend_col] / result_df[clicks_col].replace(0, float("nan"))).round(2)
-            if clicks_col and impr_col:
+            if clicks_col and impr_col and clicks_col in result_df and impr_col in result_df:
                 result_df["ctr"] = ((result_df[clicks_col] / result_df[impr_col].replace(0, float("nan"))) * 100).round(2)
-            if revenue_col and spend_col:
+            if revenue_col and spend_col and revenue_col in result_df and spend_col in result_df:
                 result_df["roas"] = (result_df[revenue_col] / result_df[spend_col].replace(0, float("nan"))).round(2)
-            if spend_col and conv_col:
+            if spend_col and conv_col and spend_col in result_df and conv_col in result_df:
                 result_df["cpa"] = (result_df[spend_col] / result_df[conv_col].replace(0, float("nan"))).round(2)
 
             # Sort
-            # For temporal intent, default to chronological order (Period ASC)
-            # For others, default to spend DESC
             if intent == "temporal":
-                sort_col = group_col
-                ascending = True
-            else:
-                sort_col = spend_col or (list(metric_cols.keys())[0] if metric_cols else None)
-                ascending = "worst" in query_lower or "lowest" in query_lower
+                result_df = result_df.sort_values(group_col, ascending=True)
+            elif sort_metric and sort_metric in result_df.columns:
+                result_df = result_df.sort_values(sort_metric, ascending=ascending)
 
-            if sort_col:
-                result_df = result_df.sort_values(sort_col, ascending=ascending)
-
-            # Format Period column if it's a date
+            # Format date column
             if intent == "temporal":
                 try:
-                    if "month" in query_lower:
-                        result_df[group_col] = pd.to_datetime(result_df[group_col]).dt.strftime('%Y-%m')
-                    else:
-                        result_df[group_col] = pd.to_datetime(result_df[group_col]).dt.strftime('%Y-%m-%d')
-                except:
+                    fmt = '%Y-%m' if "month" in query_lower else '%Y-%m-%d'
+                    result_df[group_col] = pd.to_datetime(result_df[group_col]).dt.strftime(fmt)
+                except Exception:
                     pass
 
-            # Rename group column to something user friendly for the frontend table
-            rename_label = "Period" if intent == "temporal" else "Dimension"
+            # Friendly column rename for frontend table
+            rename_label = "Period" if intent == "temporal" else (
+                "Campaign" if intent == "ranking" else "Dimension"
+            )
             result_df = result_df.rename(columns={group_col: rename_label})
-
-            result_df = result_df.head(request.limit)
-            result_df = result_df.fillna(0)
+            result_df = result_df.head(request.limit).fillna(0)
             data = result_df.to_dict(orient="records")
 
-            # Build Cypher query for display (mirrors what a real KG query would look like)
-            metric_returns = "\n       ".join(
-                [f"SUM(m.{c}) AS {c}" for c in metric_cols.keys()]
-            )
+            # ── Cypher for display ───────────────────────────────────────────
+            mr = _metric_returns()
+            dim = cypher_dimension_label or group_col
+            order_dir = "ASC" if intent == "temporal" else ("ASC" if ascending else "DESC")
+            order_by_expr = "Period" if intent == "temporal" else sort_metric or dim
+
             if intent == "temporal":
                 cypher_display = (
                     f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
                     f"{cypher_where_clause}"
-                    f"RETURN m.date AS Period,\n       {metric_returns}\n"
-                    f"ORDER BY Period ASC\nLIMIT {request.limit}"
+                    f"RETURN m.date AS Period,\n       {mr}\n"
+                    f"ORDER BY Period ASC\n"
+                    f"LIMIT {request.limit}"
                 )
-            else:
-                dim_label = group_col or (entity_filter_col or "platform")
+            elif intent == "ranking":
                 cypher_display = (
                     f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
                     f"{cypher_where_clause}"
-                    f"RETURN m.{dim_label} AS Dimension,\n       {metric_returns}\n"
-                    f"ORDER BY m.spend DESC\nLIMIT {request.limit}"
+                    f"RETURN c.name AS Campaign,\n       {mr}\n"
+                    f"ORDER BY {sort_metric or 'spend'} {order_dir}\n"
+                    f"LIMIT {request.limit}"
+                )
+            else:
+                cypher_display = (
+                    f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
+                    f"{cypher_where_clause}"
+                    f"RETURN m.{dim} AS {dim.title()},\n       {mr}\n"
+                    f"ORDER BY {sort_metric or 'spend'} {order_dir}\n"
+                    f"LIMIT {request.limit}"
                 )
         else:
-            # Fallback: return overall summary (no grouping)
-            summary_row = {}
-            for col, agg in metric_cols.items():
-                if col in df.columns:
-                    summary_row[col] = float(df[col].sum())
+            # No grouping — return filtered totals (e.g. "Meta ads performance")
+            summary_row = {col: float(df[col].sum()) for col in metric_cols if col in df.columns}
+            if summary_row:
+                # Add derived metrics
+                s = summary_row.get(spend_col, 0)
+                c_ = summary_row.get(clicks_col, 0)
+                i_ = summary_row.get(impr_col, 0)
+                cv = summary_row.get(conv_col, 0)
+                rv = summary_row.get(revenue_col, 0)
+                if c_ > 0:
+                    summary_row["cpc"] = round(s / c_, 2)
+                if i_ > 0:
+                    summary_row["ctr"] = round(c_ / i_ * 100, 2)
+                if i_ > 0:
+                    summary_row["cpm"] = round(s / i_ * 1000, 2)
+                if cv > 0:
+                    summary_row["cpa"] = round(s / cv, 2)
+                if s > 0:
+                    summary_row["roas"] = round(rv / s, 2)
+                # Label the row with the filter value so frontend can display it
+                if entity_filter_val:
+                    summary_row["Dimension"] = entity_filter_val
             data = [summary_row] if summary_row else []
-            metric_returns = "\n       ".join([f"SUM(m.{c}) AS {c}" for c in metric_cols.keys()])
+
+            mr = _metric_returns()
+            filter_label = f"m.{cypher_dimension_label or 'platform'} AS {(cypher_dimension_label or 'platform').title()},\n       " if entity_filter_val else ""
             cypher_display = (
                 f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
                 f"{cypher_where_clause}"
-                f"RETURN {metric_returns}"
+                f"RETURN {filter_label}{mr}"
             )
 
         # Build summary stats
