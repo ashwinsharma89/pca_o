@@ -63,45 +63,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
       - name: Deploy to EC2
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USERNAME }}
-          GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << ENDSSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: ENCRYPTION_KEY,JWT_SECRET_KEY,GHCR_IMAGE,GITHUB_TOKEN,GITHUB_ACTOR
+          script: |
             set -e
 
-            # Login to GHCR (free, no extra secrets needed)
-            echo "${GITHUB_TOKEN}" | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
-            # Pull latest image
             echo "Pulling latest image..."
-            docker pull ${GHCR_IMAGE}
+            docker pull $GHCR_IMAGE
+            docker tag $GHCR_IMAGE pca-agent:latest
 
-            # Re-tag as pca-agent:latest (what docker-compose.full.yml expects)
-            docker tag ${GHCR_IMAGE} pca-agent:latest
+            export ENCRYPTION_KEY="$ENCRYPTION_KEY"
+            export JWT_SECRET_KEY="$JWT_SECRET_KEY"
 
-            # Export secrets so docker compose can inject them
-            export ENCRYPTION_KEY="${ENCRYPTION_KEY}"
-            export JWT_SECRET_KEY="${JWT_SECRET_KEY}"
-
-            # Restart ALL services with the new image
             cd /home/ubuntu/pca_o/docker
             docker compose -f docker-compose.full.yml up -d --no-build
 
-            # Wait for API to come up
             echo "Waiting for API to be healthy..."
             sleep 20
 
@@ -113,7 +96,12 @@ jobs:
               docker logs pca-api --tail 50
               exit 1
             fi
-          ENDSSH
+        env:
+          GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
       - name: Verify deployment
         run: |
