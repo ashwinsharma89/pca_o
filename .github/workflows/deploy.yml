@@ -97,6 +97,20 @@ jobs:
             exit 1
           fi
 
+          # ONE-TIME CLEANUP: Remove duplicate parquet files accumulated by the
+          # overwrite_or_ignore bug (each upload added files instead of replacing).
+          # This runs once here; the fix in save_campaigns() prevents re-accumulation.
+          DATA_DIR="/home/ubuntu/pca_o/docker/data/campaigns"
+          if [ -d "$DATA_DIR" ]; then
+            FILE_COUNT=$(find "$DATA_DIR" -name "*.parquet" | wc -l)
+            echo "Found $FILE_COUNT parquet files — clearing duplicates..."
+            find "$DATA_DIR" -name "*.parquet" -delete
+            find "$DATA_DIR" -mindepth 1 -type d -empty -delete
+            echo "✅ Cleared $FILE_COUNT parquet files. User must re-upload data."
+          else
+            echo "No campaigns data directory found, skipping cleanup."
+          fi
+
       - name: Verify deployment
         run: |
           sleep 5
