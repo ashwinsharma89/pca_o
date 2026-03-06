@@ -66,6 +66,12 @@ services:
       - PRODUCTION_MODE=true
       - CORS_ALLOWED_ORIGINS=https://media-analytics.in,https://www.media-analytics.in,http://localhost:3000
       - LOG_LEVEL=INFO
+      # LLM API Keys (at least one required for /chat NL-to-SQL)
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy
