@@ -107,7 +107,7 @@ class CampaignTransformer:
         platform = record.get("platform")
         if name and platform:
             hash_input = f"{platform}:{name}"
-            return hashlib.md5(hash_input.encode()).hexdigest()[:12]
+            return hashlib.md5(hash_input.encode(), usedforsecurity=False).hexdigest()[:12]
         
         return None
     
