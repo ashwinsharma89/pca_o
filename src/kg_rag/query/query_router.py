@@ -12,6 +12,7 @@ from langchain.prompts.prompt import PromptTemplate
 
 from src.kg_rag.client.connection import get_kuzu_connection, KuzuConnection
 from src.kg_rag.config.settings import get_kg_rag_settings
+from src.platform.query_engine.temporal_parser import TemporalParser, TemporalIntent
 
 
 logger = logging.getLogger(__name__)
@@ -24,10 +25,12 @@ Known templates:
 1. Campaign status filter: "campaigns with status X"
 2. Metric aggregation: "total spend by campaign"
 3. Performance comparison: "campaigns with high ROI"
+4. Period comparison: "compare last month vs previous", "MoM growth"
 
 If the query matches a template, respond with: TEMPLATE: [template_name]
 If not, respond with: NOVEL_QUERY
 
+Temporal Context: {temporal_context}
 Query: {query}
 """
 
@@ -46,9 +49,10 @@ class QueryRouter:
         self._conn = connection or get_kuzu_connection()
         self._settings = get_kg_rag_settings()
         self.routing_prompt = PromptTemplate(
-            input_variables=["query"],
+            input_variables=["query", "temporal_context"],
             template=ROUTING_PROMPT_TEMPLATE
         )
+        self.temporal_parser = TemporalParser()
 
     def route(self, query: str) -> Tuple[str, Dict[str, Any]]:
         """
@@ -60,9 +64,20 @@ class QueryRouter:
         if not self._settings.kg_rag_enabled:
             return "disabled", {}
 
+        # Parse temporal context
+        temporal = self.temporal_parser.parse(query)
+        temporal_desc = f"Intent: {temporal.intent.value}, POP: {temporal.is_period_over_period}"
+        if temporal.primary_period:
+            temporal_desc += f", P1: {temporal.primary_period.label}"
+        if temporal.comparison_period:
+            temporal_desc += f", P2: {temporal.comparison_period.label}"
+
         # Determine routing
         routing_result = self.llm.predict(
-            text=self.routing_prompt.format(query=query)
+            text=self.routing_prompt.format(
+                query=query,
+                temporal_context=temporal_desc
+            )
         )
 
         if "TEMPLATE:" in routing_result:

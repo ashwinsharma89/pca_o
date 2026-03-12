@@ -11,6 +11,7 @@ Used by: NL-to-SQL Engine
 
 from typing import Dict, Any, List, Optional
 from loguru import logger
+from src.platform.query_engine.temporal_parser import TemporalIntent
 
 
 # SQL Best Practices Template (condensed from the massive prompt)
@@ -121,6 +122,7 @@ class PromptBuilder:
         intent: str,
         complexity: str,
         entities: Any,
+        temporal: Optional[Any] = None
     ) -> "PromptBuilder":
         """
         Set the query analysis from hybrid retrieval.
@@ -173,6 +175,25 @@ class PromptBuilder:
         if entities.order_by:
             sql_hints.append(f"ORDER: {entities.order_by}")
         
+        # Temporal analysis integration
+        if temporal:
+            sql_hints.append(f"TEMPORAL INTENT: {temporal.intent.value}")
+            if temporal.primary_period:
+                sql_hints.append(f"PRIMARY PERIOD: {temporal.primary_period.label}")
+            if temporal.comparison_period:
+                sql_hints.append(f"COMPARISON PERIOD: {temporal.comparison_period.label}")
+            
+            if temporal.intent == TemporalIntent.COMPARISON or temporal.intent == TemporalIntent.GROWTH_CALCULATION:
+                mandatory_instructions.append(
+                    "⚠️ MANDATORY COMPARISON RULE: Use Two CTEs (period1, period2) and JOIN them.\n"
+                    "Calculate (period1.metric - period2.metric) / NULLIF(period2.metric, 0) for growth."
+                )
+            
+            if temporal.is_period_over_period:
+                mandatory_instructions.append(
+                    f"⚠️ POP COMPARISON: Compare the identified period with the immediately preceding period of same duration."
+                )
+
         self.query_analysis = f"""
 ⚠️ CRITICAL QUERY ANALYSIS - FOLLOW THESE INSTRUCTIONS:
 - Intent: {intent.upper()}

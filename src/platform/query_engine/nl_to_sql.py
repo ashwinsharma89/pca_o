@@ -401,7 +401,8 @@ class NaturalLanguageQueryEngine:
             .set_query_analysis(
                 intent=analysis['intent'].value,
                 complexity=analysis['complexity'].value,
-                entities=analysis['entities']
+                entities=analysis['entities'],
+                temporal=analysis.get('temporal')
             ) \
             .set_reference_date(datetime.now().strftime("%Y-%m-%d")) \
             .set_examples(rag_examples)

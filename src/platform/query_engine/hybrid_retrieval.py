@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from enum import Enum
 from loguru import logger
 import re
+from src.platform.query_engine.temporal_parser import TemporalParser, TemporalAnalysis, TemporalIntent
 
 
 class QueryIntent(Enum):
@@ -320,6 +321,7 @@ class HybridSQLRetrieval:
         self.intent_classifier = IntentClassifier()
         self.entity_extractor = EntityExtractor()
         self.complexity_classifier = ComplexityClassifier()
+        self.temporal_parser = TemporalParser()
         
         # Example SQL patterns for different intents
         self.intent_sql_patterns = {
@@ -342,12 +344,18 @@ class HybridSQLRetrieval:
         all_intents = self.intent_classifier.get_all_intents(question)
         entities = self.entity_extractor.extract(question)
         complexity = self.complexity_classifier.classify(question, entities)
+        temporal = self.temporal_parser.parse(question)
+        
+        # Override intent if temporal parser detects comparison/growth
+        if temporal.intent in [TemporalIntent.COMPARISON, TemporalIntent.GROWTH_CALCULATION]:
+            primary_intent = QueryIntent.COMPARISON
         
         return {
             'intent': primary_intent,
             'intents': all_intents,
             'entities': entities,
             'complexity': complexity,
+            'temporal': temporal
         }
     
     def get_sql_hints(self, analysis: Dict[str, Any]) -> List[str]:

@@ -25,6 +25,13 @@ Common query patterns:
 1. Find campaigns by status: MATCH (c:Campaign {status: $status}) RETURN c
 2. Find metrics for date range: MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric) WHERE m.date >= date($start_date) AND m.date <= date($end_date) RETURN m
 3. Sum metrics by campaign: MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric) RETURN c.name, SUM(m.spend) AS total_spend
+4. Period comparison (Growth): 
+   MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)
+   WHERE m.date >= date($p1_start) AND m.date <= date($p2_end)
+   WITH m, CASE WHEN m.date <= date($p1_end) THEN 'Previous' ELSE 'Current' END AS period
+   WITH period, SUM(m.spend) AS total_spend
+   RETURN period, total_spend
+5. Trend Analysis: MATCH (m:Metric) RETURN date.truncate('month', m.date) AS month, SUM(m.spend) ORDER BY month
 
 Return ONLY the Cypher query, no explanation.
 """
