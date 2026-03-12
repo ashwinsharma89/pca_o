@@ -377,11 +377,21 @@ class NaturalLanguageQueryEngine:
         from src.platform.query_engine.marketing_context import get_marketing_context_for_nl_to_sql
         marketing_context = get_marketing_context_for_nl_to_sql(self.schema_info)
 
-        # 3. Hybrid Analysis & RAG
+        # 3. Temporal Analysis
+        from src.platform.query_engine.temporal_parser import TemporalParser
+        tp = TemporalParser()
+        temporal_context = tp.parse(question)
+        temporal_hints = tp.get_sql_cte_hints(temporal_context)
+
+        # 4. Hybrid Analysis & RAG
         from src.platform.query_engine.hybrid_retrieval import analyze_question
         analysis = analyze_question(question)
+        
+        # Merge temporal analysis results (favoring TemporalParser for time details)
+        if temporal_context.intent != TemporalIntent.UNKNOWN:
+            analysis['temporal'] = temporal_context
 
-        # Determine RAG candidates (Few-Shot)
+        # 5. Determine RAG candidates (Few-Shot)
         rag_examples = []
         if self.sql_retriever:
             try:
@@ -394,11 +404,11 @@ class NaturalLanguageQueryEngine:
             except Exception as e:
                 logger.warning(f"Few-shot retrieval failed: {e}")
 
-        # 4. Build Prompt
+        # 6. Build Prompt
         self.prompt_builder \
             .set_schema(schema_description) \
             .set_marketing_context(marketing_context) \
-            .set_sql_context(sql_context) \
+            .set_sql_context(sql_context + "\n" + temporal_hints) \
             .set_query_analysis(
                 intent=analysis['intent'].value,
                 complexity=analysis['complexity'].value,

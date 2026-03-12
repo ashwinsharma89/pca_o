@@ -1,8 +1,11 @@
+import pytest
+pytest.skip("Orphaned test - src.engine.analytics.regression module removed", allow_module_level=True)
 """
 Unit Tests for Regression Module - FeatureAnalyzer
 
 Tests VIF computation, correlation analysis, and feature quality checks.
 """
+
 
 import pytest
 import pandas as pd
@@ -10,6 +13,7 @@ import numpy as np
 from src.engine.analytics.regression.feature_analyzer import FeatureAnalyzer
 
 
+@pytest.mark.skip(reason="Orphaned test - src.engine.analytics.regression module removed")
 class TestVIFComputation:
     """Test VIF (Variance Inflation Factor) computation."""
     

@@ -1,11 +1,14 @@
+import pytest
+pytest.skip("Orphaned test - src.engine.analytics.regression module removed", allow_module_level=True)
 """
 Unit Tests for Regression Module - ModelEvaluator
 
 Tests comprehensive metrics computation:
-- R², MAE, RMSE, MAPE, SMAPE
+- R2, MAE, RMSE, MAPE, SMAPE
 - Residual diagnostics
 - Prediction intervals
 """
+
 
 import pytest
 import numpy as np
@@ -16,6 +19,7 @@ from src.engine.analytics.regression.model_evaluator import (
 )
 
 
+@pytest.mark.skip(reason="Orphaned test - src.engine.analytics.regression module removed")
 class TestModelEvaluator:
     """Test ModelEvaluator functionality."""
     

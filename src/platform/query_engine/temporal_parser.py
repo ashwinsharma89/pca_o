@@ -1,218 +1,136 @@
 """
-Temporal Parser for NL-to-SQL Query Engine
+Temporal Parser for Marketing Queries
 
-Parses natural language temporal expressions into structured objects for comparison queries.
+Parses natural language temporal expressions into structured objects
+suitable for SQL generation and comparative analysis.
 """
 
 import re
-from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
+from typing import Optional, List, Dict, Any, Tuple
+from dataclasses import dataclass, field
+from loguru import logger
 
 
 class TemporalIntent(Enum):
-    POINT_IN_TIME_SNAPSHOT = "snapshot"  # "on Feb 1st"
-    TIME_RANGE_AGGREGATION = "range"      # "last 30 days"
-    TREND_ANALYSIS = "trend"             # "over time", "monthly trend"
-    COMPARISON = "comparison"             # "vs last month", "MoM", "YoY"
-    GROWTH_CALCULATION = "growth"         # "growth rate", "% change"
+    POINT_IN_TIME = "point_in_time"
+    RANGE = "range"
+    COMPARISON = "comparison"
+    GROWTH_CALCULATION = "growth"
+    TREND = "trend"
+    LAG_ANALYSIS = "lag"
+    UNKNOWN = "unknown"
 
-class Granularity(Enum):
-    DAY = "day"
-    WEEK = "week"
-    MONTH = "month"
-    QUARTER = "quarter"
-    YEAR = "year"
 
 @dataclass
-class TimePeriod:
-    """Represents a structured time period."""
-    label: str
-    offset_value: int = 0
-    offset_unit: str = "days"
-    duration_value: Optional[int] = None
-    duration_unit: Optional[str] = None
-    is_relative: bool = True
-    fixed_date: Optional[str] = None
+class DateRange:
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    label: str = ""
+    sql_interval: Optional[str] = None
+
 
 @dataclass
-class TemporalAnalysis:
-    """Result of temporal parsing."""
-    intent: TemporalIntent = TemporalIntent.TIME_RANGE_AGGREGATION
-    primary_period: Optional[TimePeriod] = None
-    comparison_period: Optional[TimePeriod] = None
-    granularity: Optional[Granularity] = None
+class TemporalContext:
+    intent: TemporalIntent = TemporalIntent.UNKNOWN
+    primary_period: Optional[DateRange] = None
+    comparison_period: Optional[DateRange] = None
     is_period_over_period: bool = False
-    metric_intent: list[str] = field(default_factory=list)
+    is_year_over_year: bool = False
+    granularity: str = "daily"  # daily, weekly, monthly, yearly
+    raw_query: str = ""
+
 
 class TemporalParser:
     """
-    Parses natural language queries to extract temporal context.
-
-    Supports complex relative time expressions and comparison intents.
+    Parses temporal expressions like 'last 2 months', 'MoM', 'YoY vs previous year'.
     """
 
-    # Intent Detection Patterns
-    COMPARISON_PATTERNS = [
-        r"\bcompare\b", r"\bvs\b", r"\bversus\b", r"\bagainst\b",
-        r"\bcompared\s+to\b", r"\bdifference\b", r"\bdelta\b"
-    ]
+    # Common patterns
+    RE_LAST_N_MONTHS = re.compile(r"last\s+(\d+)\s+months?", re.IGNORECASE)
+    RE_PAST_N_DAYS = re.compile(r"past\s+(\d+)\s+days?", re.IGNORECASE)
+    RE_MOM = re.compile(r"\b(mom|month\s+over\s+month)\b", re.IGNORECASE)
+    RE_YOY = re.compile(r"\b(yoy|year\s+over\s+year)\b", re.IGNORECASE)
+    RE_COMPARE = re.compile(r"\b(compare|vs|versus|growth|change)\b", re.IGNORECASE)
 
-    GROWTH_PATTERNS = [
-        r"\bgrowth\b", r"\bchange\b", r"\b%\b", r"\bpercent\b", r"\bincrease\b", r"\bdecrease\b"
-    ]
+    def __init__(self, reference_date: Optional[datetime] = None):
+        self.reference_date = reference_date or datetime.now()
 
-    TREND_PATTERNS = [
-        r"\btrend\b", r"\bover\s+time\b", r"\bdaily\b", r"\bweekly\b", r"\bmonthly\b", r"\bquarterly\b"
-    ]
+    def parse(self, query: str) -> TemporalContext:
+        """Parse natural language query for temporal context."""
+        context = TemporalContext(raw_query=query)
+        
+        # 1. Identify Intent
+        if self.RE_COMPARE.search(query) or self.RE_MOM.search(query) or self.RE_YOY.search(query):
+            context.intent = TemporalIntent.COMPARISON
+            if self.RE_MOM.search(query):
+                context.is_period_over_period = True
+                context.granularity = "monthly"
+            if self.RE_YOY.search(query):
+                context.is_year_over_year = True
+                context.granularity = "yearly"
+        elif "trend" in query.lower():
+            context.intent = TemporalIntent.TREND
+        else:
+            context.intent = TemporalIntent.RANGE
 
-    # Relative Time Patterns
-    RELATIVE_PATTERNS = {
-        "last_n_days": r"last\s+(\d+)\s+days?",
-        "last_n_weeks": r"last\s+(\d+)\s+weeks?",
-        "last_n_months": r"last\s+(\d+)\s+months?",
-        "past_n_days": r"past\s+(\d+)\s+days?",
-        "this_week": r"this\s+week",
-        "last_week": r"last\s+week",
-        "this_month": r"this\s+month",
-        "last_month": r"last\s+month",
-        "last_quarter": r"last\s+quarter",
-        "this_year": r"this\s+year",
-        "last_year": r"last\s+year",
-        "ytd": r"\bytd\b",
-        "mtd": r"\bmtd\b",
-        "wtd": r"\bwtd\b"
-    }
-
-    # PoP Abbreviations
-    POP_PATTERNS = {
-        "wow": r"\bwow\b|\bweek\s+over\s+week\b",
-        "mom": r"\bmom\b|\bmonth\s+over\s+month\b",
-        "qoq": r"\bqoq\b|\bquarter\s+over\s+quarter\b",
-        "yoy": r"\byoy\b|\byear\s+over\s+year\b"
-    }
-
-    def __init__(self):
-        self._compiled_relative = {k: re.compile(v, re.IGNORECASE) for k, v in self.RELATIVE_PATTERNS.items()}
-        self._compiled_pop = {k: re.compile(v, re.IGNORECASE) for k, v in self.POP_PATTERNS.items()}
-
-    def parse(self, query: str) -> TemporalAnalysis:
-        """
-        Main entry point for parsing temporal context from a query.
-        """
-        analysis = TemporalAnalysis()
-        query_lower = query.lower()
-
-        # 1. Detect Intent
-        is_comp = any(re.search(p, query_lower) for p in self.COMPARISON_PATTERNS)
-        is_growth = any(re.search(p, query_lower) for p in self.GROWTH_PATTERNS)
-        is_trend = any(re.search(p, query_lower) for p in self.TREND_PATTERNS)
-
-        if is_comp:
-            analysis.intent = TemporalIntent.COMPARISON
-        if is_growth:
-            # Growth often implies comparison
-            analysis.intent = TemporalIntent.GROWTH_CALCULATION if not is_comp else TemporalIntent.COMPARISON
-        elif is_trend:
-            analysis.intent = TemporalIntent.TREND_ANALYSIS
-
-        # 2. Extract Relative Periods
-        found_periods = self._extract_periods(query_lower)
-
-        # 3. Handle Period-over-Period Abbreviations
-        pop_match = self._check_pop(query_lower)
-        if pop_match:
-            analysis.is_period_over_period = True
-            analysis.intent = TemporalIntent.COMPARISON
-            analysis.granularity = pop_match
-            # Auto-fill periods if not explicitly mentioned
-            if not found_periods:
-                if pop_match == Granularity.WEEK:
-                    found_periods = [TimePeriod("last week", duration_value=1, duration_unit="week")]
-                elif pop_match == Granularity.MONTH:
-                    found_periods = [TimePeriod("last month", duration_value=1, duration_unit="month")]
-                elif pop_match == Granularity.QUARTER:
-                    found_periods = [TimePeriod("last quarter", duration_value=1, duration_unit="quarter")]
-                elif pop_match == Granularity.YEAR:
-                    found_periods = [TimePeriod("last year", duration_value=1, duration_unit="year")]
-
-        # 4. Assign Primary and Comparison Periods
-        if found_periods:
-            analysis.primary_period = found_periods[0]
-            if len(found_periods) > 1:
-                analysis.comparison_period = found_periods[1]
-            elif analysis.intent in [TemporalIntent.COMPARISON, TemporalIntent.GROWTH_CALCULATION]:
-                # Auto-generate comparison period (the period immediately preceding)
-                analysis.comparison_period = self._get_previous_period(analysis.primary_period)
-                analysis.is_period_over_period = True
-
-        # 5. Detect Granularity
-        if not analysis.granularity:
-            analysis.granularity = self._detect_granularity(query_lower, analysis.primary_period)
-
-        return analysis
-
-    def _extract_periods(self, query: str) -> list[TimePeriod]:
-        periods = []
-
-        # Check "last N days/weeks/months"
-        match_days = self._compiled_relative["last_n_days"].search(query) or self._compiled_relative["past_n_days"].search(query)
-        if match_days:
-            n = int(match_days.group(1))
-            periods.append(TimePeriod(f"last {n} days", duration_value=n, duration_unit="day"))
-
-        match_weeks = self._compiled_relative["last_n_weeks"].search(query)
-        if match_weeks:
-            n = int(match_weeks.group(1))
-            periods.append(TimePeriod(f"last {n} weeks", duration_value=n, duration_unit="week"))
-
-        match_months = self._compiled_relative["last_n_months"].search(query)
+        # 2. Extract Primary Period
+        match_months = self.RE_LAST_N_MONTHS.search(query)
+        match_days = self.RE_PAST_N_DAYS.search(query)
+        
         if match_months:
             n = int(match_months.group(1))
-            periods.append(TimePeriod(f"last {n} months", duration_value=n, duration_unit="month"))
+            context.primary_period = DateRange(
+                label=f"last {n} months",
+                sql_interval=f"{n} MONTH"
+            )
+            # Rough dates for reasoning (if absolute tracking isn't available)
+            context.primary_period.end_date = self.reference_date
+            context.primary_period.start_date = self.reference_date - timedelta(days=n * 30)
+        
+        elif match_days:
+            n = int(match_days.group(1))
+            context.primary_period = DateRange(
+                label=f"past {n} days",
+                sql_interval=f"{n} DAY"
+            )
+            context.primary_period.end_date = self.reference_date
+            context.primary_period.start_date = self.reference_date - timedelta(days=n)
+        
+        # 3. Handle Comparisons (P2)
+        if context.intent == TemporalIntent.COMPARISON or context.is_period_over_period:
+            if context.primary_period:
+                # Default comparison is the previous period of the same length
+                context.comparison_period = DateRange(
+                    label=f"previous {context.primary_period.label}"
+                )
+                if context.primary_period.start_date and context.primary_period.end_date:
+                    duration = context.primary_period.end_date - context.primary_period.start_date
+                    context.comparison_period.end_date = context.primary_period.start_date
+                    context.comparison_period.start_date = context.primary_period.start_date - duration
+            
+            elif context.is_period_over_period:
+                # Default MoM if no specific range mentioned
+                context.primary_period = DateRange(label="this month", sql_interval="1 MONTH")
+                context.comparison_period = DateRange(label="previous month")
+        
+        return context
 
-        # Check singular keywords
-        if "last month" in query and not any(p.label == "last 1 months" for p in periods):
-            periods.append(TimePeriod("last month", duration_value=1, duration_unit="month"))
-        if "this month" in query:
-            periods.append(TimePeriod("this month", offset_value=0, duration_unit="month"))
-        if "last week" in query and not any(p.label == "last 1 weeks" for p in periods):
-            periods.append(TimePeriod("last week", duration_value=1, duration_unit="week"))
-        if "this week" in query:
-            periods.append(TimePeriod("this week", offset_value=0, duration_unit="week"))
-        if "ytd" in query:
-            periods.append(TimePeriod("YTD", duration_unit="year"))
-
-        return periods
-
-    def _check_pop(self, query: str) -> Optional[Granularity]:
-        if self._compiled_pop["wow"].search(query): return Granularity.WEEK
-        if self._compiled_pop["mom"].search(query): return Granularity.MONTH
-        if self._compiled_pop["qoq"].search(query): return Granularity.QUARTER
-        if self._compiled_pop["yoy"].search(query): return Granularity.YEAR
-        return None
-
-    def _get_previous_period(self, period: TimePeriod) -> TimePeriod:
-        """Calculates the period immediately preceding the given one."""
-        prev = TimePeriod(
-            label=f"previous {period.duration_value or ''} {period.duration_unit or ''}".strip(),
-            duration_value=period.duration_value,
-            duration_unit=period.duration_unit,
-            offset_value=(period.duration_value or 1) + (period.offset_value or 0),
-            offset_unit=period.duration_unit or "day"
-        )
-        return prev
-
-    def _detect_granularity(self, query: str, period: Optional[TimePeriod]) -> Optional[Granularity]:
-        if "daily" in query or "by day" in query: return Granularity.DAY
-        if "weekly" in query or "by week" in query: return Granularity.WEEK
-        if "monthly" in query or "by month" in query: return Granularity.MONTH
-
-        # Infer from period
-        if period and period.duration_unit:
-            unit = period.duration_unit.lower()
-            if "day" in unit: return Granularity.DAY
-            if "week" in unit: return Granularity.WEEK
-            if "month" in unit: return Granularity.MONTH
-
-        return None
+    def get_sql_cte_hints(self, context: TemporalContext) -> str:
+        """Generate SQL hints for PromptBuilder to create CTEs."""
+        if context.intent != TemporalIntent.COMPARISON:
+            return ""
+            
+        p1_label = context.primary_period.label if context.primary_period else "Current Period"
+        p2_label = context.comparison_period.label if context.comparison_period else "Previous Period"
+        
+        hint = f"-- Comparison Mode Detected: {p1_label} vs {p2_label}\n"
+        hint += "-- Request: Use CTEs (period1, period2) and JOIN them to calculate growth metrics.\n"
+        
+        if context.primary_period and context.primary_period.sql_interval:
+            hint += f"-- Period 1 Filter: date >= (SELECT MAX(date) FROM campaigns) - INTERVAL {context.primary_period.sql_interval}\n"
+            hint += f"-- Period 2 Filter: date >= (SELECT MAX(date) FROM campaigns) - INTERVAL {context.primary_period.sql_interval} * 2 "
+            hint += f"AND date < (SELECT MAX(date) FROM campaigns) - INTERVAL {context.primary_period.sql_interval}\n"
+            
+        return hint
