@@ -4,11 +4,10 @@ Campaign Transformer for KG-RAG ETL
 Transforms raw campaign data into graph-ready format.
 """
 
-import logging
-from typing import Dict, Any, List, Optional
-from datetime import date, datetime
 import hashlib
-
+import logging
+from datetime import date, datetime
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -16,38 +15,38 @@ logger = logging.getLogger(__name__)
 class CampaignTransformer:
     """
     Transform campaign records for KùzuDB ingestion.
-    
+
     Creates Campaign nodes with proper ID generation and field mapping.
     """
-    
+
     # Fields to extract for Campaign node
     CAMPAIGN_FIELDS = [
         "campaign_id", "campaign_name", "platform", "account_id",
         "objective", "status", "budget", "budget_type",
         "start_date", "end_date"
     ]
-    
+
     def __init__(self, default_platform: Optional[str] = None):
         """
         Initialize transformer.
-        
+
         Args:
             default_platform: Default platform if not in data
         """
         self.default_platform = default_platform
-    
-    def transform(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+
+    def transform(self, records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         Transform campaign records for KùzuDB.
-        
+
         Args:
             records: Raw campaign records (with canonical column names)
-            
+
         Returns:
             List of transformed Campaign node properties
         """
         transformed = []
-        
+
         for record in records:
             try:
                 campaign = self._transform_record(record)
@@ -56,22 +55,22 @@ class CampaignTransformer:
             except Exception as e:
                 logger.warning(f"Failed to transform record: {e}")
                 continue
-        
+
         return transformed
-    
-    def _transform_record(self, record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+
+    def _transform_record(self, record: dict[str, Any]) -> Optional[dict[str, Any]]:
         """Transform a single campaign record."""
         # Generate ID
         campaign_id = self._get_campaign_id(record)
         if not campaign_id:
             logger.warning("Record missing campaign_id, skipping")
             return None
-        
+
         # Get platform
         platform = record.get("platform", self.default_platform)
         if not platform:
             logger.warning(f"Record {campaign_id} missing platform")
-        
+
         # Build node properties
         campaign = {
             "id": campaign_id,
@@ -84,7 +83,7 @@ class CampaignTransformer:
             "budget_type": record.get("budget_type"),
             "start_date": self._to_date(record.get("start_date")),
             "end_date": self._to_date(record.get("end_date")),
-            
+
             # Initialize totals (will be updated by metrics)
             "impressions_total": 0,
             "clicks_total": 0,
@@ -92,32 +91,32 @@ class CampaignTransformer:
             "conversions_total": 0.0,
             "revenue_total": 0.0,
         }
-        
+
         return campaign
-    
-    def _get_campaign_id(self, record: Dict[str, Any]) -> Optional[str]:
+
+    def _get_campaign_id(self, record: dict[str, Any]) -> Optional[str]:
         """Get or generate campaign ID."""
         # Try common ID fields
         for field in ["campaign_id", "id", "Campaign ID", "campaign"]:
             if field in record and record[field]:
                 return str(record[field])
-        
+
         # Generate from name + platform if available
         name = record.get("campaign_name") or record.get("name")
         platform = record.get("platform")
         if name and platform:
             hash_input = f"{platform}:{name}"
             return hashlib.md5(hash_input.encode(), usedforsecurity=False).hexdigest()[:12]
-        
+
         return None
-    
+
     def _normalize_platform(self, platform: str) -> str:
         """Normalize platform name to ID."""
         if not platform:
             return "unknown"
-        
+
         platform_lower = platform.lower().strip()
-        
+
         # Common mappings
         mappings = {
             "facebook": "meta",
@@ -149,16 +148,16 @@ class CampaignTransformer:
             "ttd": "trade_desk",
             "the trade desk": "trade_desk",
         }
-        
+
         return mappings.get(platform_lower, platform_lower.replace(" ", "_"))
-    
+
     def _normalize_objective(self, objective: Optional[str]) -> Optional[str]:
         """Normalize campaign objective."""
         if not objective:
             return None
-        
+
         obj_lower = objective.lower().strip()
-        
+
         mappings = {
             "conversions": "conversions",
             "conversion": "conversions",
@@ -180,16 +179,16 @@ class CampaignTransformer:
             "messages": "messages",
             "catalog sales": "catalog_sales",
         }
-        
+
         return mappings.get(obj_lower, objective)
-    
+
     def _normalize_status(self, status: Optional[str]) -> Optional[str]:
         """Normalize campaign status."""
         if not status:
             return None
-        
+
         status_lower = status.lower().strip()
-        
+
         mappings = {
             "active": "active",
             "enabled": "active",
@@ -203,9 +202,9 @@ class CampaignTransformer:
             "archived": "archived",
             "draft": "draft",
         }
-        
+
         return mappings.get(status_lower, status)
-    
+
     def _to_float(self, value: Any) -> Optional[float]:
         """Convert value to float."""
         if value is None:
@@ -214,12 +213,12 @@ class CampaignTransformer:
             return float(value)
         except (ValueError, TypeError):
             return None
-    
+
     def _to_date(self, value: Any) -> Optional[str]:
         """Convert value to date string (ISO format)."""
         if value is None:
             return None
-        
+
         if isinstance(value, datetime):
             return value.date().isoformat()
         if isinstance(value, date):
@@ -232,5 +231,5 @@ class CampaignTransformer:
                 except ValueError:
                     continue
             return value  # Return as-is if can't parse
-        
+
         return None

@@ -9,10 +9,9 @@ Depends on: Schema Manager, Marketing Context, Hybrid Retrieval
 Used by: NL-to-SQL Engine
 """
 
-from typing import Dict, Any, List, Optional
-from loguru import logger
-from src.platform.query_engine.temporal_parser import TemporalIntent
+from typing import Any, Optional
 
+from src.platform.query_engine.temporal_parser import TemporalIntent
 
 # SQL Best Practices Template (condensed from the massive prompt)
 SQL_RULES_TEMPLATE = """
@@ -83,40 +82,40 @@ When user asks about "wasting money", "inefficient", "underperforming":
 class PromptBuilder:
     """
     Builds the LLM prompt for SQL generation.
-    
+
     Responsibilities:
     - Combine schema, context, and rules
     - Inject query analysis hints
     - Format the final prompt for the LLM
     """
-    
+
     def __init__(self):
         self.schema_description: str = ""
         self.marketing_context: str = ""
         self.sql_context: str = ""
         self.query_analysis: str = ""
-        self.examples: List[str] = []
-    
+        self.examples: list[str] = []
+
     def set_schema(self, schema_description: str) -> "PromptBuilder":
         """Set the schema description."""
         self.schema_description = schema_description
         return self
-    
+
     def set_marketing_context(self, context: str) -> "PromptBuilder":
         """Set the marketing domain context."""
         self.marketing_context = context
         return self
-    
+
     def set_sql_context(self, context: str) -> "PromptBuilder":
         """Set the SQL knowledge context."""
         self.sql_context = context
         return self
-    
-    def set_examples(self, examples: List[str]) -> "PromptBuilder":
+
+    def set_examples(self, examples: list[str]) -> "PromptBuilder":
         """Set few-shot SQL examples."""
         self.examples = examples
         return self
-    
+
     def set_query_analysis(
         self,
         intent: str,
@@ -126,7 +125,7 @@ class PromptBuilder:
     ) -> "PromptBuilder":
         """
         Set the query analysis from hybrid retrieval.
-        
+
         Args:
             intent: Query intent (aggregation, comparison, etc.)
             complexity: Query complexity (simple, medium, complex)
@@ -134,7 +133,7 @@ class PromptBuilder:
         """
         sql_hints = []
         mandatory_instructions = []
-        
+
         # Group by extraction
         if entities.group_by:
             sql_hints.append(f"GROUP BY: {', '.join(entities.group_by)}")
@@ -150,7 +149,7 @@ class PromptBuilder:
                 f"⚠️ MANDATORY: User said 'by {', '.join(entities.group_by)}' - "
                 f"YOU MUST GROUP BY {', '.join(actual_cols)}"
             )
-        
+
         # Granularity extraction
         if entities.granularity:
             granularity_sql = {
@@ -165,7 +164,7 @@ class PromptBuilder:
                 f"GROUP BY the date column with DATE_TRUNC\n"
                 f"ORDER BY date chronologically"
             )
-        
+
         if entities.metrics:
             sql_hints.append(f"METRICS: {', '.join(entities.metrics)}")
         if entities.time_period:
@@ -174,7 +173,7 @@ class PromptBuilder:
             sql_hints.append(f"LIMIT: {entities.limit}")
         if entities.order_by:
             sql_hints.append(f"ORDER: {entities.order_by}")
-        
+
         # Temporal analysis integration
         if temporal:
             sql_hints.append(f"TEMPORAL INTENT: {temporal.intent.value}")
@@ -182,16 +181,16 @@ class PromptBuilder:
                 sql_hints.append(f"PRIMARY PERIOD: {temporal.primary_period.label}")
             if temporal.comparison_period:
                 sql_hints.append(f"COMPARISON PERIOD: {temporal.comparison_period.label}")
-            
+
             if temporal.intent == TemporalIntent.COMPARISON or temporal.intent == TemporalIntent.GROWTH_CALCULATION:
                 mandatory_instructions.append(
                     "⚠️ MANDATORY COMPARISON RULE: Use Two CTEs (period1, period2) and JOIN them.\n"
                     "Calculate (period1.metric - period2.metric) / NULLIF(period2.metric, 0) for growth."
                 )
-            
+
             if temporal.is_period_over_period:
                 mandatory_instructions.append(
-                    f"⚠️ POP COMPARISON: Compare the identified period with the immediately preceding period of same duration."
+                    "⚠️ POP COMPARISON: Compare the identified period with the immediately preceding period of same duration."
                 )
 
         self.query_analysis = f"""
@@ -210,15 +209,15 @@ class PromptBuilder:
     def build(self, question: str) -> str:
         """
         Build the final prompt for the LLM.
-        
+
         Args:
             question: Natural language question
-        
+
         Returns:
             Complete prompt string
         """
         reference_context = f"\nToday's Reference Date: {self.reference_date}\n" if hasattr(self, 'reference_date') else ""
-        
+
         prompt = f"""You are a SQL expert specializing in marketing campaign analytics. Convert the following natural language question into a DuckDB SQL query.
 
 {self.query_analysis}
@@ -249,21 +248,21 @@ IMPORTANT:
 SQL Query:
 """
         return prompt
-    
+
     def build_correction_prompt(
         self,
         original_sql: str,
-        failed_rules: List[str],
+        failed_rules: list[str],
         question: str
     ) -> str:
         """
         Build prompt for SQL self-correction.
-        
+
         Args:
             original_sql: The SQL that failed validation
             failed_rules: List of rule violations
             question: Original question for context
-        
+
         Returns:
             Correction prompt
         """
@@ -285,7 +284,7 @@ Please rewrite the SQL to fix these issues, following these rules:
 
 Corrected SQL:
 """
-    
+
     def build_answer_prompt(
         self,
         question: str,
@@ -294,12 +293,12 @@ Corrected SQL:
     ) -> str:
         """
         Build prompt for generating strategic insights from results.
-        
+
         Args:
             question: Original question
             results_summary: Summary of query results
             sample_context: Sample size and confidence context
-        
+
         Returns:
             Answer generation prompt
         """

@@ -5,15 +5,14 @@ Routes natural language queries to template-based or LLM-based Cypher generation
 """
 
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any, Optional
 
 from langchain.llms.base import BaseLanguageModel
 from langchain.prompts.prompt import PromptTemplate
 
-from src.kg_rag.client.connection import get_kuzu_connection, KuzuConnection
+from src.kg_rag.client.connection import KuzuConnection, get_kuzu_connection
 from src.kg_rag.config.settings import get_kg_rag_settings
-from src.platform.query_engine.temporal_parser import TemporalParser, TemporalIntent
-
+from src.platform.query_engine.temporal_parser import TemporalParser
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +53,10 @@ class QueryRouter:
         )
         self.temporal_parser = TemporalParser()
 
-    def route(self, query: str) -> Tuple[str, Dict[str, Any]]:
+    def route(self, query: str) -> tuple[str, dict[str, Any]]:
         """
         Route query to handler and execute.
-        
+
         Returns:
             (query_type, results)
         """
@@ -85,13 +84,13 @@ class QueryRouter:
         else:
             return self._handle_novel_query(query)
 
-    def _handle_template(self, query: str, template_name: str) -> Tuple[str, Dict[str, Any]]:
+    def _handle_template(self, query: str, template_name: str) -> tuple[str, dict[str, Any]]:
         """Execute template-based query."""
         logger.info(f"Using template: {template_name}")
         # Template implementations would go here
         return "template", {}
 
-    def _handle_novel_query(self, query: str) -> Tuple[str, Dict[str, Any]]:
+    def _handle_novel_query(self, query: str) -> tuple[str, dict[str, Any]]:
         """Handle novel query with LLM."""
         if not self._settings.kg_rag_use_llm_for_novel_queries:
             logger.warning("Novel query routing disabled")
@@ -101,7 +100,7 @@ class QueryRouter:
         # LLM-based Cypher generation would go here
         return "llm", {}
 
-    def execute_cypher(self, cypher_query: str) -> List[Dict[str, Any]]:
+    def execute_cypher(self, cypher_query: str) -> list[dict[str, Any]]:
         """Execute a Cypher query."""
         try:
             result = self._conn.execute_query(cypher_query)

@@ -5,11 +5,9 @@ Generates Cypher queries for KùzuDB from natural language using LLM.
 """
 
 import logging
-from typing import Optional, Dict, Any
 
 from langchain.llms.base import BaseLanguageModel
 from langchain.prompts.prompt import PromptTemplate
-
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +23,7 @@ Common query patterns:
 1. Find campaigns by status: MATCH (c:Campaign {status: $status}) RETURN c
 2. Find metrics for date range: MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric) WHERE m.date >= date($start_date) AND m.date <= date($end_date) RETURN m
 3. Sum metrics by campaign: MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric) RETURN c.name, SUM(m.spend) AS total_spend
-4. Period comparison (Growth): 
+4. Period comparison (Growth):
    MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)
    WHERE m.date >= date($p1_start) AND m.date <= date($p2_end)
    WITH m, CASE WHEN m.date <= date($p1_end) THEN 'Previous' ELSE 'Current' END AS period

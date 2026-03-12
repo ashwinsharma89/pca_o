@@ -5,12 +5,14 @@ Combines semantic search with SQL pattern matching for better query generation.
 Uses intent classification and entity extraction to find more relevant examples.
 """
 
-from typing import Dict, List, Optional, Any, Set
+import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Optional
+
 from loguru import logger
-import re
-from src.platform.query_engine.temporal_parser import TemporalParser, TemporalAnalysis, TemporalIntent
+
+from src.platform.query_engine.temporal_parser import TemporalIntent, TemporalParser
 
 
 class QueryIntent(Enum):
@@ -35,11 +37,11 @@ class QueryComplexity(Enum):
 @dataclass
 class QueryEntities:
     """Extracted entities from a natural language question."""
-    group_by: List[str]          # Dimensions to group by
-    metrics: List[str]           # Metrics requested
+    group_by: list[str]          # Dimensions to group by
+    metrics: list[str]           # Metrics requested
     time_period: Optional[str]   # Time filter requested
     granularity: Optional[str]   # Temporal granularity (daily, weekly, monthly)
-    filters: Dict[str, str]      # Column -> value filters
+    filters: dict[str, str]      # Column -> value filters
     limit: Optional[int]         # Number of results wanted
     order_by: Optional[str]      # Sort field
 
@@ -52,12 +54,12 @@ class RetrievalResult:
     intent: QueryIntent
     complexity: QueryComplexity
     relevance_score: float
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class IntentClassifier:
     """Classifies the intent of a natural language question."""
-    
+
     INTENT_PATTERNS = {
         QueryIntent.RANKING: [
             r'\b(best|worst|top|bottom|highest|lowest|most|least|leading|lagging)\b',
@@ -96,16 +98,16 @@ class IntentClassifier:
             r'\bfor\s+(facebook|google|mobile|desktop)\b',
         ],
     }
-    
+
     def classify(self, question: str) -> QueryIntent:
         """
         Classify the intent of a natural language question.
-        
+
         Returns the most likely intent based on pattern matching.
         """
         question_lower = question.lower()
-        intent_scores: Dict[QueryIntent, int] = {}
-        
+        intent_scores: dict[QueryIntent, int] = {}
+
         for intent, patterns in self.INTENT_PATTERNS.items():
             score = 0
             for pattern in patterns:
@@ -113,18 +115,18 @@ class IntentClassifier:
                 score += len(matches)
             if score > 0:
                 intent_scores[intent] = score
-        
+
         if not intent_scores:
             return QueryIntent.UNKNOWN
-        
+
         # Return intent with highest score
         return max(intent_scores, key=intent_scores.get)
-    
-    def get_all_intents(self, question: str) -> List[QueryIntent]:
+
+    def get_all_intents(self, question: str) -> list[QueryIntent]:
         """Get all matching intents, ordered by relevance."""
         question_lower = question.lower()
-        intent_scores: Dict[QueryIntent, int] = {}
-        
+        intent_scores: dict[QueryIntent, int] = {}
+
         for intent, patterns in self.INTENT_PATTERNS.items():
             score = 0
             for pattern in patterns:
@@ -132,7 +134,7 @@ class IntentClassifier:
                 score += len(matches)
             if score > 0:
                 intent_scores[intent] = score
-        
+
         # Sort by score descending
         sorted_intents = sorted(intent_scores.keys(), key=lambda i: intent_scores[i], reverse=True)
         return sorted_intents if sorted_intents else [QueryIntent.UNKNOWN]
@@ -140,7 +142,7 @@ class IntentClassifier:
 
 class EntityExtractor:
     """Extracts entities from natural language questions."""
-    
+
     DIMENSION_PATTERNS = {
         'platform': [r'\bplatform\b', r'\bfacebook\b', r'\bgoogle\b', r'\bmeta\b', r'\bad\s*network\b'],
         'channel': [r'\bchannel\b', r'\bsem\b', r'\bdisplay\b', r'\bsocial\b', r'\bvideo\b'],
@@ -149,7 +151,7 @@ class EntityExtractor:
         'campaign': [r'\bcampaign\b', r'\bad\b', r'\bcreative\b'],
         'ad_type': [r'\bad\s*type\b', r'\bformat\b'],
     }
-    
+
     METRIC_PATTERNS = {
         'spend': [r'\bspend\b', r'\bcost\b', r'\bbudget\b', r'\b\$\b'],
         'impressions': [r'\bimpressions?\b', r'\bviews?\b', r'\breach\b'],
@@ -161,7 +163,7 @@ class EntityExtractor:
         'roas': [r'\broas\b', r'\breturn\s*on\s*ad\s*spend\b'],
         'cvr': [r'\bcvr\b', r'\bconversion\s*rate\b'],
     }
-    
+
     TIME_PATTERNS = {
         'last_7_days': r'\b(last|past)\s*(7|seven)\s*days?\b',
         'last_30_days': r'\b(last|past)\s*(30|thirty)\s*days?\b',
@@ -172,11 +174,11 @@ class EntityExtractor:
         'week_over_week': r'\bweek\s*(over|vs\.?)\s*week\b',
         'month_over_month': r'\bmonth\s*(over|vs\.?)\s*month\b',
     }
-    
+
     # Granularity patterns - CRITICAL for SQL structure matching
     GRANULARITY_PATTERNS = {
         'daily': [
-            r'\bdaily\b', r'\bday\s*over\s*day\b', r'\beach\s*day\b', 
+            r'\bdaily\b', r'\bday\s*over\s*day\b', r'\beach\s*day\b',
             r'\bper\s*day\b', r'\bby\s*day\b', r'\bday\s*by\s*day\b',
         ],
         'weekly': [
@@ -188,11 +190,11 @@ class EntityExtractor:
             r'\bper\s*month\b', r'\bby\s*month\b', r'\bmonth\s*by\s*month\b',
         ],
     }
-    
+
     def extract(self, question: str) -> QueryEntities:
         """Extract entities from a natural language question."""
         question_lower = question.lower()
-        
+
         # Extract dimensions (group by)
         group_by = []
         for dim, patterns in self.DIMENSION_PATTERNS.items():
@@ -200,7 +202,7 @@ class EntityExtractor:
                 if re.search(pattern, question_lower):
                     group_by.append(dim)
                     break
-        
+
         # Extract metrics
         metrics = []
         for metric, patterns in self.METRIC_PATTERNS.items():
@@ -208,14 +210,14 @@ class EntityExtractor:
                 if re.search(pattern, question_lower):
                     metrics.append(metric)
                     break
-        
+
         # Extract time period
         time_period = None
         for period, pattern in self.TIME_PATTERNS.items():
             if re.search(pattern, question_lower):
                 time_period = period
                 break
-        
+
         # Extract granularity - CRITICAL for SQL structure
         granularity = None
         for gran, patterns in self.GRANULARITY_PATTERNS.items():
@@ -225,20 +227,20 @@ class EntityExtractor:
                     break
             if granularity:
                 break
-        
+
         # Extract limit (e.g., "top 10")
         limit = None
         limit_match = re.search(r'\b(top|bottom|best|worst)\s+(\d+)\b', question_lower)
         if limit_match:
             limit = int(limit_match.group(2))
-        
+
         # Extract order direction
         order_by = None
         if re.search(r'\b(best|top|highest|most)\b', question_lower):
             order_by = "DESC"
         elif re.search(r'\b(worst|bottom|lowest|least)\b', question_lower):
             order_by = "ASC"
-        
+
         return QueryEntities(
             group_by=group_by,
             metrics=metrics,
@@ -252,44 +254,44 @@ class EntityExtractor:
 
 class ComplexityClassifier:
     """Classifies the complexity of a natural language question."""
-    
+
     def classify(self, question: str, entities: QueryEntities) -> QueryComplexity:
         """
         Classify complexity based on question and extracted entities.
-        
+
         Returns:
             QueryComplexity: SIMPLE, MEDIUM, or COMPLEX
         """
         complexity_score = 0
-        
+
         # Multiple dimensions = more complex
         if len(entities.group_by) > 1:
             complexity_score += 2
         elif len(entities.group_by) == 1:
             complexity_score += 1
-        
+
         # Multiple metrics = more complex
         if len(entities.metrics) > 2:
             complexity_score += 2
         elif len(entities.metrics) > 0:
             complexity_score += 1
-        
+
         # Time period = more complex
         if entities.time_period:
             complexity_score += 1
             # Period comparisons are extra complex
             if 'week_over' in (entities.time_period or '') or 'month_over' in (entities.time_period or ''):
                 complexity_score += 2
-        
+
         # Ranking/comparison intents are medium
         question_lower = question.lower()
         if re.search(r'\b(vs|versus|compare|top|best|worst)\b', question_lower):
             complexity_score += 1
-        
+
         # Subqueries / advanced patterns = complex
         if re.search(r'\b(percentile|anomaly|outlier|growth|trend)\b', question_lower):
             complexity_score += 3
-        
+
         # Classify based on score
         if complexity_score >= 5:
             return QueryComplexity.COMPLEX
@@ -302,18 +304,18 @@ class ComplexityClassifier:
 class HybridSQLRetrieval:
     """
     Hybrid retrieval system combining semantic search with SQL pattern matching.
-    
+
     Improves over pure semantic search by:
     1. Classifying query intent (ranking, comparison, trend, etc.)
     2. Extracting entities (dimensions, metrics, time periods)
     3. Filtering retrieved examples by matching SQL patterns
     4. Reranking by structural similarity
     """
-    
+
     def __init__(self, vector_store=None):
         """
         Initialize hybrid retrieval system.
-        
+
         Args:
             vector_store: Optional vector store for semantic search
         """
@@ -322,7 +324,7 @@ class HybridSQLRetrieval:
         self.entity_extractor = EntityExtractor()
         self.complexity_classifier = ComplexityClassifier()
         self.temporal_parser = TemporalParser()
-        
+
         # Example SQL patterns for different intents
         self.intent_sql_patterns = {
             QueryIntent.RANKING: ['ORDER BY', 'LIMIT', 'DESC', 'ASC'],
@@ -332,11 +334,11 @@ class HybridSQLRetrieval:
             QueryIntent.AGGREGATION: ['SUM', 'COUNT', 'AVG', 'TOTAL'],
             QueryIntent.BREAKDOWN: ['GROUP BY'],
         }
-    
-    def analyze_question(self, question: str) -> Dict[str, Any]:
+
+    def analyze_question(self, question: str) -> dict[str, Any]:
         """
         Analyze a question and return intent, entities, and complexity.
-        
+
         Returns:
             Dict with keys: intent, intents, entities, complexity
         """
@@ -345,11 +347,11 @@ class HybridSQLRetrieval:
         entities = self.entity_extractor.extract(question)
         complexity = self.complexity_classifier.classify(question, entities)
         temporal = self.temporal_parser.parse(question)
-        
+
         # Override intent if temporal parser detects comparison/growth
         if temporal.intent in [TemporalIntent.COMPARISON, TemporalIntent.GROWTH_CALCULATION]:
             primary_intent = QueryIntent.COMPARISON
-        
+
         return {
             'intent': primary_intent,
             'intents': all_intents,
@@ -357,78 +359,78 @@ class HybridSQLRetrieval:
             'complexity': complexity,
             'temporal': temporal
         }
-    
-    def get_sql_hints(self, analysis: Dict[str, Any]) -> List[str]:
+
+    def get_sql_hints(self, analysis: dict[str, Any]) -> list[str]:
         """
         Generate SQL hints based on question analysis.
-        
+
         Returns:
             List of SQL patterns/hints for the LLM to use
         """
         hints = []
         intent = analysis['intent']
         entities = analysis['entities']
-        
+
         # Add intent-based hints
         if intent in self.intent_sql_patterns:
             hints.extend(self.intent_sql_patterns[intent])
-        
+
         # Add entity-based hints
         if entities.group_by:
             hints.append(f"GROUP BY {', '.join(entities.group_by)}")
-        
+
         if entities.limit:
             hints.append(f"LIMIT {entities.limit}")
-        
+
         if entities.order_by:
             hints.append(f"ORDER BY ... {entities.order_by}")
-        
+
         if entities.time_period:
             hints.append(f"Date filter: {entities.time_period}")
-        
+
         return hints
-    
-    def retrieve_examples(self, question: str, k: int = 3) -> List[RetrievalResult]:
+
+    def retrieve_examples(self, question: str, k: int = 3) -> list[RetrievalResult]:
         """
         Retrieve relevant SQL examples using METADATA-FIRST hybrid approach.
-        
+
         Steps:
         1. Extract query intent, metrics, and granularity
         2. Filter by metadata FIRST (intent, metric, granularity)
         3. Semantic rerank within filtered results
         4. Fallback: relax constraints if too few matches
-        
+
         Returns:
             List of RetrievalResult with structurally matching examples
         """
         analysis = self.analyze_question(question)
         entities = analysis['entities']
         intent = analysis['intent']
-        
+
         # If no vector store, return analysis only
         if not self.vector_store:
             logger.debug(f"No vector store, returning analysis: {intent.value}")
             return []
-        
+
         try:
             # Build metadata filter based on extracted entities
             metadata_filter = {
                 'intent': intent.value,
             }
-            
+
             # Add metric filter if specific metric detected
             if entities.metrics:
                 metadata_filter['metric'] = entities.metrics[0]  # Primary metric
-            
+
             # Add granularity filter - CRITICAL for structure matching
             if entities.granularity:
                 metadata_filter['granularity'] = entities.granularity
-            
+
             logger.info(f"Metadata filter: {metadata_filter}")
-            
+
             # Step 1: Try strict metadata filter first
             candidates = self._filter_by_metadata(metadata_filter, k * 5)
-            
+
             # Step 2: If not enough matches, relax constraints progressively
             if len(candidates) < k:
                 # Try without granularity
@@ -437,28 +439,28 @@ class HybridSQLRetrieval:
                     relaxed_filter['metric'] = entities.metrics[0]
                 logger.debug(f"Relaxing filter to: {relaxed_filter}")
                 candidates = self._filter_by_metadata(relaxed_filter, k * 5)
-            
+
             if len(candidates) < k:
                 # Try just intent
                 relaxed_filter = {'intent': intent.value}
                 logger.debug(f"Relaxing filter to just intent: {relaxed_filter}")
                 candidates = self._filter_by_metadata(relaxed_filter, k * 5)
-            
+
             if len(candidates) < k:
                 # Fallback to pure semantic search
                 logger.debug("Falling back to pure semantic search")
                 candidates = self.vector_store.similarity_search(question, k=k * 3)
-            
+
             # Step 3: Semantic rerank within filtered results
             results = self._rerank_by_similarity(question, candidates, analysis, k)
-            
+
             return results
-            
+
         except Exception as e:
             logger.warning(f"Hybrid retrieval failed: {e}")
             return []
-    
-    def _filter_by_metadata(self, metadata_filter: Dict[str, str], k: int) -> List:
+
+    def _filter_by_metadata(self, metadata_filter: dict[str, str], k: int) -> list:
         """Filter vector store by metadata constraints."""
         try:
             # Try metadata filtering if supported
@@ -484,24 +486,24 @@ class HybridSQLRetrieval:
         except Exception as e:
             logger.debug(f"Metadata filter failed: {e}")
             return []
-    
-    def _rerank_by_similarity(self, question: str, candidates: List, 
-                               analysis: Dict[str, Any], k: int) -> List[RetrievalResult]:
+
+    def _rerank_by_similarity(self, question: str, candidates: list,
+                               analysis: dict[str, Any], k: int) -> list[RetrievalResult]:
         """Rerank candidates by structural + semantic similarity."""
         scored_results = []
         entities = analysis['entities']
-        
+
         for result in candidates:
             metadata = getattr(result, 'metadata', {})
             sql = metadata.get('sql', '')
-            
+
             # Calculate structural match score
             score = 0.5  # Base score
-            
+
             # Intent match bonus
             if metadata.get('intent') == analysis['intent'].value:
                 score += 0.2
-            
+
             # Granularity match bonus (most important!)
             if entities.granularity:
                 result_gran = metadata.get('granularity', '')
@@ -509,17 +511,17 @@ class HybridSQLRetrieval:
                     score += 0.3  # Big bonus for matching granularity
                 elif result_gran:
                     score -= 0.2  # Penalty for wrong granularity
-            
+
             # Metric match bonus
             for metric in entities.metrics:
                 if metric.upper() in sql.upper():
                     score += 0.1
-            
+
             # SQL pattern match bonus
             for pattern in self.intent_sql_patterns.get(analysis['intent'], []):
                 if pattern.upper() in sql.upper():
                     score += 0.05
-            
+
             scored_results.append(RetrievalResult(
                 question=getattr(result, 'page_content', ''),
                 sql=sql,
@@ -528,7 +530,7 @@ class HybridSQLRetrieval:
                 relevance_score=score,
                 metadata=metadata
             ))
-        
+
         # Sort by score and return top k
         scored_results.sort(key=lambda x: x.relevance_score, reverse=True)
         return scored_results[:k]
@@ -551,6 +553,6 @@ def classify_complexity(question: str) -> QueryComplexity:
     return ComplexityClassifier().classify(question, entities)
 
 
-def analyze_question(question: str) -> Dict[str, Any]:
+def analyze_question(question: str) -> dict[str, Any]:
     """Full analysis of a question."""
     return HybridSQLRetrieval().analyze_question(question)

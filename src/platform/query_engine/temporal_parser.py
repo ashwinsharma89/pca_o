@@ -5,10 +5,10 @@ Parses natural language temporal expressions into structured objects for compari
 """
 
 import re
-from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
-from datetime import datetime, timedelta
+from typing import Optional
+
 
 class TemporalIntent(Enum):
     POINT_IN_TIME_SNAPSHOT = "snapshot"  # "on Feb 1st"
@@ -43,29 +43,29 @@ class TemporalAnalysis:
     comparison_period: Optional[TimePeriod] = None
     granularity: Optional[Granularity] = None
     is_period_over_period: bool = False
-    metric_intent: List[str] = field(default_factory=list)
+    metric_intent: list[str] = field(default_factory=list)
 
 class TemporalParser:
     """
     Parses natural language queries to extract temporal context.
-    
+
     Supports complex relative time expressions and comparison intents.
     """
-    
+
     # Intent Detection Patterns
     COMPARISON_PATTERNS = [
         r"\bcompare\b", r"\bvs\b", r"\bversus\b", r"\bagainst\b",
         r"\bcompared\s+to\b", r"\bdifference\b", r"\bdelta\b"
     ]
-    
+
     GROWTH_PATTERNS = [
         r"\bgrowth\b", r"\bchange\b", r"\b%\b", r"\bpercent\b", r"\bincrease\b", r"\bdecrease\b"
     ]
-    
+
     TREND_PATTERNS = [
         r"\btrend\b", r"\bover\s+time\b", r"\bdaily\b", r"\bweekly\b", r"\bmonthly\b", r"\bquarterly\b"
     ]
-    
+
     # Relative Time Patterns
     RELATIVE_PATTERNS = {
         "last_n_days": r"last\s+(\d+)\s+days?",
@@ -83,7 +83,7 @@ class TemporalParser:
         "mtd": r"\bmtd\b",
         "wtd": r"\bwtd\b"
     }
-    
+
     # PoP Abbreviations
     POP_PATTERNS = {
         "wow": r"\bwow\b|\bweek\s+over\s+week\b",
@@ -102,12 +102,12 @@ class TemporalParser:
         """
         analysis = TemporalAnalysis()
         query_lower = query.lower()
-        
+
         # 1. Detect Intent
         is_comp = any(re.search(p, query_lower) for p in self.COMPARISON_PATTERNS)
         is_growth = any(re.search(p, query_lower) for p in self.GROWTH_PATTERNS)
         is_trend = any(re.search(p, query_lower) for p in self.TREND_PATTERNS)
-        
+
         if is_comp:
             analysis.intent = TemporalIntent.COMPARISON
         if is_growth:
@@ -115,10 +115,10 @@ class TemporalParser:
             analysis.intent = TemporalIntent.GROWTH_CALCULATION if not is_comp else TemporalIntent.COMPARISON
         elif is_trend:
             analysis.intent = TemporalIntent.TREND_ANALYSIS
-            
+
         # 2. Extract Relative Periods
         found_periods = self._extract_periods(query_lower)
-        
+
         # 3. Handle Period-over-Period Abbreviations
         pop_match = self._check_pop(query_lower)
         if pop_match:
@@ -152,20 +152,20 @@ class TemporalParser:
 
         return analysis
 
-    def _extract_periods(self, query: str) -> List[TimePeriod]:
+    def _extract_periods(self, query: str) -> list[TimePeriod]:
         periods = []
-        
+
         # Check "last N days/weeks/months"
         match_days = self._compiled_relative["last_n_days"].search(query) or self._compiled_relative["past_n_days"].search(query)
         if match_days:
             n = int(match_days.group(1))
             periods.append(TimePeriod(f"last {n} days", duration_value=n, duration_unit="day"))
-            
+
         match_weeks = self._compiled_relative["last_n_weeks"].search(query)
         if match_weeks:
             n = int(match_weeks.group(1))
             periods.append(TimePeriod(f"last {n} weeks", duration_value=n, duration_unit="week"))
-            
+
         match_months = self._compiled_relative["last_n_months"].search(query)
         if match_months:
             n = int(match_months.group(1))
@@ -182,7 +182,7 @@ class TemporalParser:
             periods.append(TimePeriod("this week", offset_value=0, duration_unit="week"))
         if "ytd" in query:
             periods.append(TimePeriod("YTD", duration_unit="year"))
-            
+
         return periods
 
     def _check_pop(self, query: str) -> Optional[Granularity]:
@@ -207,12 +207,12 @@ class TemporalParser:
         if "daily" in query or "by day" in query: return Granularity.DAY
         if "weekly" in query or "by week" in query: return Granularity.WEEK
         if "monthly" in query or "by month" in query: return Granularity.MONTH
-        
+
         # Infer from period
         if period and period.duration_unit:
             unit = period.duration_unit.lower()
             if "day" in unit: return Granularity.DAY
             if "week" in unit: return Granularity.WEEK
             if "month" in unit: return Granularity.MONTH
-            
+
         return None

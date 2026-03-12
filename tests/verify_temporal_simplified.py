@@ -2,9 +2,8 @@
 Simplified Verification script for Comparative Time Queries.
 Avoids loading heavy libraries that might have environment issues in this specific workspace.
 """
-import sys
 import os
-from unittest.mock import MagicMock, patch
+import sys
 
 # Ensure project root is in path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -15,14 +14,14 @@ def verify_prompt_builder():
     print("--- Verifying PromptBuilder Enhanced with Temporal Context ---")
     try:
         from src.platform.query_engine.prompt_builder import PromptBuilder
-        from src.platform.query_engine.temporal_parser import TemporalParser, TemporalIntent
-        
+        from src.platform.query_engine.temporal_parser import TemporalParser
+
         builder = PromptBuilder()
         parser = TemporalParser()
-        
+
         query = "Compare spend for last 2 months vs previous period"
         temporal_analysis = parser.parse(query)
-        
+
         # Mock entities
         class MockEntities:
             def __init__(self):
@@ -32,23 +31,23 @@ def verify_prompt_builder():
                 self.granularity = None
                 self.limit = None
                 self.order_by = None
-        
+
         builder.set_query_analysis(
             intent="comparison",
             complexity="complex",
             entities=MockEntities(),
             temporal=temporal_analysis
         )
-        
+
         prompt = builder.build("Test Question")
-        
+
         checks = [
             "TEMPORAL INTENT: comparison",
             "PRIMARY PERIOD: last 2 months",
             "COMPARISON PERIOD: previous 2 month",
             "MANDATORY COMPARISON RULE: Use Two CTEs"
         ]
-        
+
         all_passed = True
         for check in checks:
             if check in prompt:
@@ -56,7 +55,7 @@ def verify_prompt_builder():
             else:
                 print(f"❌ Missing: {check}")
                 all_passed = False
-        
+
         return all_passed
     except Exception as e:
         print(f"❌ Error during PromptBuilder verification: {e}")
@@ -72,13 +71,13 @@ def verify_hybrid_analysis():
              mock.patch('src.platform.query_engine.prompt_builder.PromptBuilder'), \
              mock.patch('src.platform.query_engine.executor.QueryExecutor'), \
              mock.patch('src.platform.knowledge.semantic_cache.SemanticCache'):
-             
+
             from src.platform.query_engine.hybrid_retrieval import HybridSQLRetrieval
-            
+
             hybrid = HybridSQLRetrieval(vector_store=None)
             query = "Compare last month vs previous month"
             analysis = hybrid.analyze_question(query)
-            
+
             if 'temporal' in analysis:
                 print("✅ 'temporal' key found in analysis")
                 if analysis['temporal'].intent.value == 'comparison':

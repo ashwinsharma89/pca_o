@@ -4,35 +4,37 @@ Converts natural language questions into SQL queries using LLM
 """
 # NOTE: duckdb imported lazily inside methods to avoid C++ mutex locks at import time
 # import duckdb  # REMOVED - causes import-time DuckDB file locks
+from typing import TYPE_CHECKING, Any, Optional
+
 import pandas as pd
 import polars as pl
-from typing import Dict, Any, Optional, List, TYPE_CHECKING
 
 # Type checking only (no runtime import)
 if TYPE_CHECKING:
-    import duckdb
+    pass
 
-from openai import OpenAI
 import os
-from loguru import logger
-import sys
 from datetime import datetime
 
-from .sql_knowledge import SQLKnowledgeHelper
+from loguru import logger
+from openai import OpenAI
+
 from src.core.utils.anthropic_helpers import create_anthropic_client
-from .query_optimizer import QueryOptimizer
-from .multi_table_manager import MultiTableManager
-from .template_generator import TemplateGenerator
-from .validator import SQLValidator
-from .safe_query import SafeQueryExecutor
-from .bulletproof_queries import BulletproofQueries
+from src.platform.knowledge.semantic_cache import SemanticCache
+from src.platform.query_engine.executor import QueryExecutor
+from src.platform.query_engine.hybrid_retrieval import HybridSQLRetrieval
+from src.platform.query_engine.prompt_builder import PromptBuilder
 
 # New Modular Components
 from src.platform.query_engine.schema_manager import SchemaManager
-from src.platform.query_engine.prompt_builder import PromptBuilder
-from src.platform.query_engine.executor import QueryExecutor
-from src.platform.knowledge.semantic_cache import SemanticCache
-from src.platform.query_engine.hybrid_retrieval import HybridSQLRetrieval
+
+from .bulletproof_queries import BulletproofQueries
+from .multi_table_manager import MultiTableManager
+from .query_optimizer import QueryOptimizer
+from .safe_query import SafeQueryExecutor
+from .sql_knowledge import SQLKnowledgeHelper
+from .template_generator import TemplateGenerator
+from .validator import SQLValidator
 
 # Configure logger to also write to file
 # logger.add("logs/query_debug.log", rotation="1 MB", level="INFO")
@@ -59,27 +61,27 @@ DEEPSEEK_AVAILABLE = True  # Uses OpenAI-compatible API
 
 class NaturalLanguageQueryEngine:
     """Engine to convert natural language questions to SQL queries and execute them."""
-    
+
     def __init__(self, api_key: str):
         """
         Initialize the query engine.
-        
+
         Args:
             api_key: OpenAI API key for LLM
         """
         self.openai_client = OpenAI(api_key=api_key)
-        
+
         # Setup available models in priority order
         self.available_models = []
         self.sql_helper = SQLKnowledgeHelper(enable_hybrid=True)
-        
+
         # 1. Gemini 1.5 Flash (FREE & FAST)
         google_key = os.getenv('GOOGLE_API_KEY')
         if google_key and GEMINI_AVAILABLE:
             genai.configure(api_key=google_key)
             self.available_models.append(('gemini', 'gemini-2.5-flash'))
             logger.info("Tier 1: Gemini 2.5 Flash (FREE)")
-        
+
         # 2. DeepSeek (FREE CODING SPECIALIST)
         deepseek_key = os.getenv('DEEPSEEK_API_KEY')
         if deepseek_key and DEEPSEEK_AVAILABLE:
@@ -89,12 +91,12 @@ class NaturalLanguageQueryEngine:
             )
             self.available_models.append(('deepseek', 'deepseek-chat'))
             logger.info("Tier 2: DeepSeek Chat (FREE CODING SPECIALIST)")
-        
+
         # 3. OpenAI GPT-4o
         if self.openai_client and api_key and api_key != "dummy":
             self.available_models.append(('openai', 'gpt-4o'))
             logger.info("Tier 3: OpenAI GPT-4o")
-        
+
         # 4. Claude 3.5 Sonnet
         anthropic_key = os.getenv('ANTHROPIC_API_KEY')
         if anthropic_key and anthropic_key.startswith('sk-ant-'):
@@ -104,7 +106,7 @@ class NaturalLanguageQueryEngine:
                 logger.info("Tier 4: Claude 3.5 Sonnet")
             else:
                 logger.warning("Anthropic client unavailable. Skipping Claude tier.")
-        
+
         # 5. Groq (ULTIMATE FREE FALLBACK)
         groq_key = os.getenv('GROQ_API_KEY')
         if groq_key:
@@ -117,98 +119,97 @@ class NaturalLanguageQueryEngine:
                 logger.warning("Groq SDK not installed. Skipping Groq tier.")
             except Exception as e:
                 logger.warning(f"Groq initialization failed: {e}")
-        
+
         logger.info(f"Available models: {[m[0] for m in self.available_models]}")
-        
+
         self.conn = None
-        
+
         # Initialize Modular Components
         self.schema_manager = SchemaManager()
         self.prompt_builder = PromptBuilder()
         self.executor = QueryExecutor()
         self.cache = SemanticCache()  # Phase 3 Intelligence
-        
+
         # RAG Component (Few-Shot SQL)
         try:
              # Assuming shared vector store config
-             from src.platform.knowledge.vector_store import VectorStoreConfig
              self.sql_retriever = HybridSQLRetrieval(vector_store=None) # We will need to properly init with store if available, or let it handle its own defaults
         except Exception as e:
              logger.warning(f"Failed to init HybridSQLRetrieval: {e}")
              self.sql_retriever = None
-        
+
         # Legacy components (keeping for strict compatibility if needed, but aiming to deprecate)
         self.optimizer: Optional[QueryOptimizer] = None
         self.multi_table_manager: Optional[MultiTableManager] = None
         self.template_generator: Optional[TemplateGenerator] = None
-        
+
         logger.info("Initialized NaturalLanguageQueryEngine with Modular Architecture (v3)")
-    
+
     def load_data(self, df: pd.DataFrame, table_name: str = "campaigns"):
         """
         Load data into DuckDB.
-        
+
         Args:
             df: DataFrame with campaign data
             table_name: Name for the table
         """
         from .safe_query import SafeQueryExecutor
-        
+
         # Sanitize table name to prevent SQL injection
         table_name = SafeQueryExecutor.sanitize_identifier(table_name)
-        
+
         # Convert Date-related columns to datetime if they exist
         df_copy = df.copy()
-        
+
         # Detect date-related columns (date, week, week range, day, month, etc.)
         date_keywords = ['date', 'week', 'day', 'month', 'year', 'time', 'period']
-        date_columns = [col for col in df_copy.columns 
+        date_columns = [col for col in df_copy.columns
                        if any(keyword in col.lower() for keyword in date_keywords)]
-        
+
         for col in date_columns:
             try:
                 df_copy[col] = pd.to_datetime(df_copy[col], errors='coerce')
                 logger.info(f"Converted {col} to datetime")
             except:
                 logger.warning(f"Could not convert {col} to datetime")
-        
+
         import duckdb  # Lazy import to avoid C++ mutex lock at module load
         self.conn = duckdb.connect(':memory:')
 
         self.conn.register(table_name, df_copy)
-        
+
         # Configure modular components
         self.schema_manager.set_connection(self.conn)
         self.executor.set_connection(self.conn)
-        
+
         # Extract schema
         self.schema_info = self.schema_manager.extract_schema(df_copy, table_name)
-        
+
         # Initialize legacy optimizer/manager (keeping for now)
         self.optimizer = QueryOptimizer(self.conn)
         self.multi_table_manager = MultiTableManager(self.conn)
         self.template_generator = TemplateGenerator(df_copy.columns.tolist())
-        
+
         # Register primary table with multi-table manager
         primary_key = None
         for col in df_copy.columns:
             if 'id' in col.lower() and col.lower() in ['id', 'campaign_id', f'{table_name}_id']:
                 primary_key = col
                 break
-        
+
         self.multi_table_manager.register_table(
             name=table_name,
             df=df_copy,
             primary_key=primary_key,
             description=f"Main {table_name} table"
         )
-        
+
         logger.info(f"Loaded {len(df_copy)} rows into table '{table_name}'")
 
     def load_parquet_data(self, parquet_path: str, table_name: str = "campaigns"):
         """
         Load data from Parquet file into DuckDB.
-        
+
         Args:
             parquet_path: Path to the Parquet file
             table_name: Name for the table
@@ -219,27 +220,27 @@ class NaturalLanguageQueryEngine:
 
         import duckdb  # Lazy import to avoid C++ mutex lock at module load
         self.conn = duckdb.connect(':memory:')
-        
+
         # Persist path for Bulletproof fallback
         self.parquet_path = parquet_path
         self.table_name = table_name
 
         # Register the parquet file as a view
         self.conn.execute(f"CREATE VIEW {table_name} AS SELECT * FROM read_parquet('{parquet_path}', union_by_name=true)")  # nosec B608
-        
+
         # Configure modular components
         self.schema_manager.set_connection(self.conn)
         self.executor.set_connection(self.conn)
-        
+
         # Get schema info from sample
         sample_df = self.conn.execute(f"SELECT * FROM {table_name} LIMIT 5").df()  # nosec B608
         self.schema_info = self.schema_manager.extract_schema(sample_df, table_name)
-        
+
         # Initialize legacy components
         self.optimizer = QueryOptimizer(self.conn)
         self.multi_table_manager = MultiTableManager(self.conn)
         self.template_generator = TemplateGenerator(self.schema_info['columns'])
-        
+
         # Register with multi-table manager
         self.multi_table_manager.register_table(
             name=table_name,
@@ -247,9 +248,9 @@ class NaturalLanguageQueryEngine:
             description=f"Persistent {table_name} table from Parquet",
             skip_db_registration=True
         )
-        
+
         logger.info(f"Registered Parquet file {parquet_path} as table '{table_name}'")
-    
+
     def load_additional_table(
         self,
         df: pd.DataFrame,
@@ -259,7 +260,7 @@ class NaturalLanguageQueryEngine:
     ):
         """
         Load an additional table for multi-table queries.
-        
+
         Args:
             df: DataFrame to load
             table_name: Name for the table
@@ -268,20 +269,20 @@ class NaturalLanguageQueryEngine:
         """
         if not self.multi_table_manager:
             raise ValueError("Call load_data() first to initialize the query engine")
-        
+
         # Convert date columns
         df_copy = df.copy()
         date_keywords = ['date', 'week', 'day', 'month', 'year', 'time', 'period']
-        date_columns = [col for col in df_copy.columns 
+        date_columns = [col for col in df_copy.columns
                        if any(keyword in col.lower() for keyword in date_keywords)]
-        
+
         for col in date_columns:
             try:
                 df_copy[col] = pd.to_datetime(df_copy[col], errors='coerce')
                 logger.info(f"Converted {col} to datetime in {table_name}")
             except:
                 logger.warning(f"Could not convert {col} to datetime in {table_name}")
-        
+
         # Register with multi-table manager
         self.multi_table_manager.register_table(
             name=table_name,
@@ -289,41 +290,41 @@ class NaturalLanguageQueryEngine:
             primary_key=primary_key,
             description=description or f"{table_name} table"
         )
-        
+
         logger.info(f"Loaded additional table '{table_name}' with {len(df_copy)} rows")
-    
-    def auto_detect_relationships(self) -> List[Dict[str, Any]]:
+
+    def auto_detect_relationships(self) -> list[dict[str, Any]]:
         """
         Auto-detect relationships between loaded tables.
-        
+
         Returns:
             List of detected relationships
         """
         if not self.multi_table_manager:
             raise ValueError("No tables loaded")
-        
+
         detected = self.multi_table_manager.auto_detect_relationships()
-        
+
         # Add to relationships list
         self.multi_table_manager.relationships.extend(detected)
-        
+
         logger.info(f"Auto-detected {len(detected)} relationships")
         return [r.to_dict() for r in detected]
-    
-    def validate_relationships(self) -> Dict[str, Any]:
+
+    def validate_relationships(self) -> dict[str, Any]:
         """
         Validate all relationships.
-        
+
         Returns:
             Dictionary with validation results
         """
         if not self.multi_table_manager:
             return {'validated': 0, 'failed': 0, 'results': []}
-        
+
         results = []
         validated_count = 0
         failed_count = 0
-        
+
         for rel in self.multi_table_manager.relationships:
             is_valid, message = self.multi_table_manager.validate_relationship(rel)
             results.append({
@@ -335,7 +336,7 @@ class NaturalLanguageQueryEngine:
                 validated_count += 1
             else:
                 failed_count += 1
-        
+
         return {
             'validated': validated_count,
             'failed': failed_count,
@@ -353,10 +354,10 @@ class NaturalLanguageQueryEngine:
     def generate_sql(self, question: str) -> str:
         """
         Convert natural language question to SQL query.
-        
+
         Args:
             question: Natural language question
-            
+
         Returns:
             SQL query string
         """
@@ -365,21 +366,21 @@ class NaturalLanguageQueryEngine:
         if cached:
             logger.info(f"🎯 SEMANTIC CACHE HIT for: {question}")
             return cached['sql']
-        
+
         # 2. Context Retrieval
         schema_description = self.schema_manager.get_schema_for_prompt()
-        
+
         # DEDUPLICATION: Don't pass schema_info to sql_helper if we already got schema_description
         # This prevents the schema from appearing twice in the final prompt (saving thousands of chars)
         sql_context = self.sql_helper.build_context(question, schema_info=None)
-        
+
         from src.platform.query_engine.marketing_context import get_marketing_context_for_nl_to_sql
         marketing_context = get_marketing_context_for_nl_to_sql(self.schema_info)
-        
+
         # 3. Hybrid Analysis & RAG
         from src.platform.query_engine.hybrid_retrieval import analyze_question
         analysis = analyze_question(question)
-        
+
         # Determine RAG candidates (Few-Shot)
         rag_examples = []
         if self.sql_retriever:
@@ -406,23 +407,23 @@ class NaturalLanguageQueryEngine:
             ) \
             .set_reference_date(datetime.now().strftime("%Y-%m-%d")) \
             .set_examples(rag_examples)
-            
+
         prompt = self.prompt_builder.build(question)
-        
+
         logger.info(f"=== GENERATING SQL FOR QUESTION: {question} ===")
         logger.info(f"Intent: {analysis['intent'].value}, Complexity: {analysis['complexity'].value}")
         logger.info(f"Schema info available: {self.schema_info is not None}")
-        
+
         logger.info(f"FULL PROMPT LENGTH: {len(prompt)} chars")
-        
+
         # Try each available model in order
         sql_query = None
         last_error = None
-        
+
         for provider, model_name in self.available_models:
             try:
                 logger.info(f"Attempting to use {provider} ({model_name})...")
-                
+
                 if provider == 'claude':
                     response = self.anthropic_client.messages.create(
                         model=model_name,
@@ -434,11 +435,11 @@ class NaturalLanguageQueryEngine:
                         }]
                     )
                     sql_query = response.content[0].text.strip()
-                    
+
                     if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
                         logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
                         continue
-                        
+
                     self._last_model_used = f"{provider} ({model_name})"
                     usage = getattr(response, 'usage', None)
                     if usage:
@@ -446,7 +447,7 @@ class NaturalLanguageQueryEngine:
                     else:
                         logger.info(f"Successfully used {provider}")
                     break
-                    
+
                 elif provider == 'gemini':
                     model = genai.GenerativeModel(model_name)
                     response = model.generate_content(
@@ -457,7 +458,7 @@ class NaturalLanguageQueryEngine:
                         )
                     )
                     sql_query = response.text.strip()
-                    
+
                     if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
                         logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
                         continue
@@ -469,7 +470,7 @@ class NaturalLanguageQueryEngine:
                     else:
                         logger.info(f"Successfully used {provider} (FREE)")
                     break
-                    
+
                 elif provider == 'openai':
                     response = self.openai_client.chat.completions.create(
                         model=model_name,
@@ -481,7 +482,7 @@ class NaturalLanguageQueryEngine:
                         max_tokens=2000
                     )
                     sql_query = response.choices[0].message.content.strip()
-                    
+
                     if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
                         logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
                         continue
@@ -493,7 +494,7 @@ class NaturalLanguageQueryEngine:
                     else:
                         logger.info(f"Successfully used {provider}")
                     break
-                    
+
                 elif provider == 'groq':
                     response = self.groq_client.chat.completions.create(
                         model=model_name,
@@ -505,7 +506,7 @@ class NaturalLanguageQueryEngine:
                         max_tokens=2000
                     )
                     sql_query = response.choices[0].message.content.strip()
-                    
+
                     if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
                         logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
                         continue
@@ -517,7 +518,7 @@ class NaturalLanguageQueryEngine:
                     else:
                         logger.info(f"Successfully used {provider} (FREE & FAST)")
                     break
-                    
+
                 elif provider == 'deepseek':
                     response = self.deepseek_client.chat.completions.create(
                         model=model_name,
@@ -529,7 +530,7 @@ class NaturalLanguageQueryEngine:
                         max_tokens=2000
                     )
                     sql_query = response.choices[0].message.content.strip()
-                    
+
                     # Validate basic completion before accepting
                     if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
                         logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
@@ -538,25 +539,25 @@ class NaturalLanguageQueryEngine:
                     self._last_model_used = f"{provider} ({model_name})"
                     logger.info(f"Successfully used {provider} (FREE CODING SPECIALIST)")
                     break
-                    
+
             except Exception as e:
                 last_error = e
                 logger.warning(f"{provider} failed: {e}")
                 continue
-        
+
         if not sql_query:
             logger.error(f"All models failed. Last error: {last_error}")
             raise Exception(f"All LLM providers failed. Last error: {last_error}")
         logger.info(f"RAW LLM RESPONSE: {sql_query}")
-        
+
         # Clean up the query (remove markdown code blocks if present)
         sql_query = sql_query.replace("```sql", "").replace("```", "").strip()
         logger.info(f"AFTER CLEANUP: {sql_query}")
-        
+
         # Sanitize SQL query to fix common issues
         sql_query = self._sanitize_sql(sql_query)
         logger.info(f"AFTER SANITIZE: {sql_query}")
-        
+
         # ====================================================================================
         # MARKETING ANALYTICS VALIDATION PROTOCOL
         # Check for common mistakes and attempt self-correction
@@ -564,7 +565,7 @@ class NaturalLanguageQueryEngine:
         validation_result = self._validate_marketing_sql_rules(sql_query)
         if not validation_result['all_passed']:
             logger.warning(f"SQL validation failed: {validation_result['failed_rules']}")
-            
+
             # Attempt self-correction
             corrected_sql = self._self_correct_sql(sql_query, validation_result['failed_rules'], question)
             if corrected_sql:
@@ -572,57 +573,57 @@ class NaturalLanguageQueryEngine:
                 logger.info(f"AFTER SELF-CORRECTION: {sql_query}")
             else:
                 logger.warning("Self-correction failed, using original SQL with warnings")
-        
+
         # Validate SQL completeness (detect truncated responses)
         sql_upper = sql_query.upper()
         open_parens = sql_query.count('(')
         close_parens = sql_query.count(')')
-        
+
         is_incomplete = (
             ('SELECT' in sql_upper and 'FROM' not in sql_upper) or
             open_parens != close_parens or
             sql_query.rstrip().endswith(',') or
             sql_query.rstrip().endswith('(')
         )
-        
+
         if is_incomplete:
             logger.warning(f"Detected incomplete/truncated SQL from LLM: {sql_query[:200]}...")
-            raise ValueError(f"LLM returned incomplete SQL (truncated response). Triggering fallback.")
-        
+            raise ValueError("LLM returned incomplete SQL (truncated response). Triggering fallback.")
+
         # Validate SQL is not a dummy query
         if sql_query.upper().strip() == "SELECT 1" or not sql_query or len(sql_query) < 10:
             logger.error(f"LLM returned invalid/dummy query: '{sql_query}'")
             logger.error(f"Question was: {question}")
             logger.error(f"Schema had {len(self.schema_info.get('columns', []))} columns")
             raise ValueError(f"Failed to generate valid SQL for question: {question}. Got: {sql_query}")
-        
+
         return sql_query
-    
-    def _validate_marketing_sql_rules(self, sql: str) -> Dict[str, Any]:
+
+    def _validate_marketing_sql_rules(self, sql: str) -> dict[str, Any]:
         """
         Validate SQL against marketing analytics best practices.
-        
+
         Checks for:
         1. No AVG() on rate columns (CTR, ROAS, CPA, etc.)
         2. NULLIF usage for all divisions
         3. MAX(date) usage instead of CURRENT_DATE
         4. No arbitrary thresholds for ROAS/CPA
-        
+
         Returns:
             Dict with 'all_passed', 'failed_rules', 'passed_rules'
         """
         import re
         sql_upper = sql.upper()
-        
+
         checks = {
             'no_avg_on_rates': True,
             'has_nullif_for_division': True,
             'no_current_date': True,
             'no_arbitrary_thresholds': True
         }
-        
+
         failed_rules = []
-        
+
         # Rule 1: Check for AVG() on rate columns
         rate_columns = ['CTR', 'ROAS', 'CPA', 'CPC', 'CPM', 'CVR', 'CONVERSION_RATE']
         for col in rate_columns:
@@ -630,7 +631,7 @@ class NaturalLanguageQueryEngine:
                 checks['no_avg_on_rates'] = False
                 failed_rules.append(f"Rule 1: Found AVG({col}) - use SUM(numerator)/NULLIF(SUM(denominator), 0) instead")
                 break
-        
+
         # Rule 2: Check for division without NULLIF
         # Look for patterns like "spend/conversions" without NULLIF
         division_pattern = r'/\s*(?!NULLIF)[a-zA-Z0-9_]+'
@@ -638,40 +639,40 @@ class NaturalLanguageQueryEngine:
             if 'NULLIF' not in sql_upper:
                 checks['has_nullif_for_division'] = False
                 failed_rules.append("Rule 2: Division without NULLIF - wrap denominator in NULLIF(x, 0)")
-        
+
         # Rule 3: Check for CURRENT_DATE or NOW()
         if 'CURRENT_DATE' in sql_upper or 'NOW()' in sql_upper or 'GETDATE()' in sql_upper:
             checks['no_current_date'] = False
             failed_rules.append("Rule 3: Using CURRENT_DATE - use (SELECT MAX(date) FROM table) instead")
-        
+
         # Rule 4: Check for arbitrary thresholds on ROAS/CPA
         # Look for patterns like "ROAS > 3" or "CPA < 50"
         threshold_pattern = r'(ROAS|CPA)\s*[><]=?\s*\d+'
         if re.search(threshold_pattern, sql_upper):
             checks['no_arbitrary_thresholds'] = False
             failed_rules.append("Rule 4: Arbitrary threshold - use ORDER BY and LIMIT or percentiles instead")
-        
+
         all_passed = all(checks.values())
         passed_rules = [k for k, v in checks.items() if v]
-        
+
         return {
             'all_passed': all_passed,
             'failed_rules': failed_rules,
             'passed_rules': passed_rules,
             'checks': checks
         }
-    
-    def _self_correct_sql(self, sql: str, failed_rules: List[str], question: str) -> Optional[str]:
+
+    def _self_correct_sql(self, sql: str, failed_rules: list[str], question: str) -> Optional[str]:
         """
         Attempt to self-correct SQL that violates marketing analytics rules.
-        
+
         Uses the LLM to rewrite the SQL fixing the identified issues.
-        
+
         Args:
             sql: Original SQL query
             failed_rules: List of rule violations
             question: Original question for context
-            
+
         Returns:
             Corrected SQL or None if correction fails
         """
@@ -753,10 +754,10 @@ Return ONLY the corrected SQL, no explanations."""
                         corrected = response.choices[0].message.content.strip()
                     else:
                         continue
-                    
+
                     # Clean up the corrected SQL
                     corrected = corrected.replace("```sql", "").replace("```", "").strip()
-                    
+
                     # Validate the correction fixed the issues
                     recheck = self._validate_marketing_sql_rules(corrected)
                     if recheck['all_passed']:
@@ -767,43 +768,43 @@ Return ONLY the corrected SQL, no explanations."""
                         # Return corrected version anyway if it's better than original
                         if len(recheck['failed_rules']) < len(failed_rules):
                             return corrected
-                        
+
                 except Exception as e:
                     logger.warning(f"Self-correction failed with {provider}: {e}")
                     continue
-            
+
             return None
-            
+
         except Exception as e:
             logger.error(f"Self-correction failed: {e}")
             return None
-    
+
     def _sanitize_sql(self, sql_query: str) -> str:
         """
         Sanitize SQL query to fix common issues.
-        
+
         Args:
             sql_query: Original SQL query
-            
+
         Returns:
             Sanitized SQL query
         """
         import re
-        
+
         # Fix double-quoted identifiers that result from over-escaping
         # Pattern: ""identifier" or ""identifier".something"
         # This happens when LLM generates "Column.2" and we try to quote it again
         sql_query = re.sub(r'""([^"]+)"', r'"\1', sql_query)  # ""Campaign_Name" -> "Campaign_Name
-        
+
         # Check if we need to use quoted column names (spaces in original data)
         # Look at the actual schema to determine the format
         if self.schema_info and 'columns' in self.schema_info:
             columns = self.schema_info['columns']
-            
+
             # If columns have spaces, we need to quote them in SQL
             has_spaces = any(' ' in col for col in columns)
             patterns = []
-            
+
             # Unified Column Mapping (Standardize to current schema)
             if 'spend' in columns:
                 patterns.append((r'\b"?(?:Total Spent|Total_Spent|Spend|Amount_Spent)"?\b', 'spend'))
@@ -817,7 +818,7 @@ Return ONLY the corrected SQL, no explanations."""
                 patterns.append((r'\b"?Platform"?\b', 'platform'))
             if 'channel' in columns:
                 patterns.append((r'\b"?Channel"?\b', 'channel'))
-            
+
             # Legacy/Fallback patterns
             if has_spaces:
                 # Replace underscored versions with quoted space versions
@@ -836,7 +837,7 @@ Return ONLY the corrected SQL, no explanations."""
                     (r'\bTotal Spent\b', 'Total_Spent'),
                     (r'\bSite Visit\b', 'Site_Visit'),
                 ])
-            
+
             for pattern, replacement in patterns:
                 sql_query = re.sub(pattern, replacement, sql_query, flags=re.IGNORECASE)
 
@@ -849,24 +850,24 @@ Return ONLY the corrected SQL, no explanations."""
                     sql_query,
                     flags=re.IGNORECASE,
                 )
-        
+
         return sql_query
-    
+
     def execute_query(self, sql_query: str, analyze_plan: bool = False) -> pd.DataFrame:
         """
         Execute SQL query and return results.
-        
+
         Args:
             sql_query: SQL query to execute
             analyze_plan: If True, analyze query plan with EXPLAIN
-            
+
         Returns:
             DataFrame with query results
         """
         # --- AST SECURITY GATE (v2.0) ---
         if not hasattr(self, 'validator'):
             self.validator = SQLValidator()
-        
+
         is_valid, sec_error = self.validator.validate(sql_query)
         if not is_valid:
             logger.critical(f"🛑 AST SECURITY BLOCK: {sec_error} | Query: {sql_query}")
@@ -877,9 +878,9 @@ Return ONLY the corrected SQL, no explanations."""
             allowed_tables = [self.schema_info.get("table_name", "campaigns")]
             if self.multi_table_manager:
                 allowed_tables.extend(list(self.multi_table_manager.tables.keys()))
-            
+
             allowed_columns = self.schema_info.get("columns", [])
-            
+
             SafeQueryExecutor.validate_query_against_schema(
                 sql_query,
                 allowed_tables=allowed_tables,
@@ -888,30 +889,30 @@ Return ONLY the corrected SQL, no explanations."""
 
         # Delegate to Executor (Phase 3)
         result, error = self.executor.execute(sql_query, analyze_plan=analyze_plan)
-        
+
         if error:
             raise ValueError(error)
-            
+
         logger.info(f"Query executed successfully, returned {result.height if result is not None else 0} rows")
         return result
 
-    def answer_question(self, question: str) -> Dict[str, Any]:
+    def answer_question(self, question: str) -> dict[str, Any]:
         """
         End-to-end flow: Answer a natural language question.
-        
+
         1. Generate SQL (cached or new)
         2. Execute SQL
         3. Generate Insights
         4. Cache Result
-        
+
         Args:
             question: Natural language question
-            
+
         Returns:
             Dictionary with answer, data, and metadata
         """
         start_time = pd.Timestamp.now()
-        
+
         # 1. Generate SQL
         try:
             sql_query = self.generate_sql(question)
@@ -922,7 +923,7 @@ Return ONLY the corrected SQL, no explanations."""
                 "error": f"Failed to generate SQL: {str(e)}",
                 "success": False
             }
-            
+
         # 2. Execute SQL
         try:
             results = self.execute_query(sql_query)
@@ -935,21 +936,21 @@ Return ONLY the corrected SQL, no explanations."""
                 "error": f"Failed to execute SQL: {str(e)}",
                 "success": False
             }
-            
+
         # 3. Generate Answer/Insights
         try:
             answer = self._generate_answer(question, results)
         except Exception as e:
             logger.warning(f"Failed to generate insights: {e}")
             answer = "Here are the data results (AI insights unavailable)."
-            
+
         # 4. Cache Result (Phase 3)
         # Only cache if we have results and a valid answer
         if results is not None and not results.is_empty():
             self.cache.set(question, sql_query, answer)
-            
+
         execution_time = (pd.Timestamp.now() - start_time).total_seconds()
-        
+
         return {
             "question": question,
             "sql": sql_query,
@@ -960,20 +961,20 @@ Return ONLY the corrected SQL, no explanations."""
             "success": True
         }
 
-    
-    def ask(self, question: str) -> Dict[str, Any]:
+
+    def ask(self, question: str) -> dict[str, Any]:
         """
         Ask a natural language question and get results.
-        
+
         Args:
             question: Natural language question
-        
+
         Returns:
             Dictionary with SQL query, results, and metadata
         """
         import time
 
-        context_package: Optional[Dict[str, Any]] = None
+        context_package: Optional[dict[str, Any]] = None
         start_time = time.time()
 
         # --- BULLETPROOF QUERIES FIRST ---
@@ -986,15 +987,15 @@ Return ONLY the corrected SQL, no explanations."""
                 # Replace table name if needed
                 table_name = getattr(self, 'table_name', 'all_campaigns')
                 sql_query = bulletproof_sql.replace('all_campaigns', table_name)
-                
+
                 # Execute the query
                 import duckdb  # Lazy import to avoid C++ mutex lock at module load
                 with duckdb.connect() as conn:
                     if hasattr(self, 'parquet_path') and self.parquet_path:
                         conn.execute(f"CREATE OR REPLACE VIEW {table_name} AS SELECT * FROM read_parquet('{self.parquet_path}', union_by_name=true)")
-                    
+
                     results_df = conn.execute(sql_query).df()
-                
+
                 return {
                     "question": question,
                     "sql_query": sql_query.strip(),
@@ -1017,7 +1018,7 @@ Return ONLY the corrected SQL, no explanations."""
             try:
                 all_templates = self.template_generator.generate_all_templates()
                 q_lower = question.lower()
-                
+
                 # Check if user is requesting a specific dimension that might override template
                 dimension_overrides = {
                     'by platform': 'platform',
@@ -1029,14 +1030,14 @@ Return ONLY the corrected SQL, no explanations."""
                     'each platform': 'platform',
                     'each channel': 'channel',
                 }
-                
+
                 requested_dimension = None
                 for phrase, dim in dimension_overrides.items():
                     if phrase in q_lower:
                         requested_dimension = dim
                         logger.info(f"Detected dimension override: '{phrase}' -> {dim}")
                         break
-                
+
                 # Check for template match
                 for t_name, template in all_templates.items():
                     if any(pattern in q_lower for pattern in template.patterns):
@@ -1047,28 +1048,28 @@ Return ONLY the corrected SQL, no explanations."""
                             if t_name not in dimension_aware_templates:
                                 logger.info(f"Skipping template '{t_name}' - user requested '{requested_dimension}' dimension")
                                 continue  # Skip this template and try LLM instead
-                        
+
                         logger.info(f"Matched template FIRST: {template.name}")
                         sql_query = template.sql
-                        
+
                         # Replace 'all_campaigns' with actual table name
                         if self.schema_info:
                             table_name = self.schema_info.get("table_name", "campaigns")
                             sql_query = sql_query.replace("all_campaigns", table_name)
-                        
+
                         # Try executing the template query
                         try:
                             results = self.execute_query(sql_query)
-                            
+
                             # Check if we got meaningful results
                             if not results.is_empty():
                                 answer = self._generate_answer(question, results)
                                 context_package = self.sql_helper.get_last_context_package() or {}
-                                
+
                                 # Convert to Pandas for downstream compatibility
                                 if hasattr(results, 'to_pandas'):
                                     results = results.to_pandas()
-                                
+
                                 return {
                                     "question": question,
                                     "sql_query": sql_query,
@@ -1149,20 +1150,20 @@ Return ONLY the corrected SQL, no explanations."""
 
         except Exception as e:
             logger.warning(f"NL-to-SQL failed: {e}. Attempting template fallback...")
-            
+
             # --- TEMPLATE FALLBACK ---
             if self.template_generator:
                 try:
                     all_templates = self.template_generator.generate_all_templates()
                     best_template = None
-                    
+
                     # Simple pattern matching for templates
                     q_lower = question.lower()
                     for t_name, template in all_templates.items():
                         if any(pattern in q_lower for pattern in template.patterns):
                             best_template = template
                             break
-                    
+
                     if best_template:
                         logger.info(f"Matched template: {best_template.name}")
                         sql_query = best_template.sql
@@ -1170,14 +1171,14 @@ Return ONLY the corrected SQL, no explanations."""
                         if self.schema_info:
                             table_name = self.schema_info.get("table_name", "campaigns")
                             sql_query = sql_query.replace("all_campaigns", table_name)
-                        
+
                         results = self.execute_query(sql_query)
                         answer = self._generate_answer(question, results)
-                        
+
                         # Convert to Pandas for downstream compatibility
                         if hasattr(results, 'to_pandas'):
                             results = results.to_pandas()
-                        
+
                         return {
                             "question": question,
                             "sql_query": sql_query,
@@ -1205,28 +1206,28 @@ Return ONLY the corrected SQL, no explanations."""
     def _extract_sample_context(self, results: pd.DataFrame) -> str:
         """
         Extract sample size and confidence context from query results.
-        
+
         Looks for conversion/sample size columns and provides confidence indicators.
-        
+
         Args:
             results: Query results DataFrame
-            
+
         Returns:
             String describing sample size and confidence level
         """
         if results is None or (hasattr(results, 'is_empty') and results.is_empty()) or (hasattr(results, 'empty') and results.empty):
             return "No data available"
-        
+
         context_parts = []
-        
+
         # Number of rows
         row_count = len(results)
         context_parts.append(f"Rows: {row_count}")
-        
+
         # Look for conversion/sample size columns
-        conversion_cols = [c for c in results.columns if any(kw in c.lower() for kw in 
+        conversion_cols = [c for c in results.columns if any(kw in c.lower() for kw in
             ['conversion', 'sample', 'count', 'total_conversions', 'conversions', 'site_visit'])]
-        
+
         total_conversions = 0
         for col in conversion_cols:
             try:
@@ -1236,11 +1237,11 @@ Return ONLY the corrected SQL, no explanations."""
                     break  # Use first valid conversion column
             except:
                 pass
-        
+
         # Look for spend columns to understand scale
-        spend_cols = [c for c in results.columns if any(kw in c.lower() for kw in 
+        spend_cols = [c for c in results.columns if any(kw in c.lower() for kw in
             ['spend', 'cost', 'total_spent', 'budget'])]
-        
+
         total_spend = 0
         for col in spend_cols:
             try:
@@ -1264,18 +1265,18 @@ Return ONLY the corrected SQL, no explanations."""
                 break  # Use first valid spend column
             except:
                 pass
-        
+
         # Determine confidence level based on conversions
         if total_conversions > 0:
             context_parts.append(f"Total Conversions: {int(total_conversions):,}")
-            
+
             if total_conversions >= 1000:
                 confidence = "HIGH (>1000 conversions - statistically robust)"
             elif total_conversions >= 100:
                 confidence = "MEDIUM (100-1000 conversions - directionally reliable)"
             else:
                 confidence = "LOW (<100 conversions - interpret with caution)"
-            
+
             context_parts.append(f"Confidence: {confidence}")
         elif row_count > 0:
             # No conversion column found, use row count
@@ -1283,7 +1284,7 @@ Return ONLY the corrected SQL, no explanations."""
                 context_parts.append("Confidence: MEDIUM (based on row count)")
             else:
                 context_parts.append("Confidence: LOW (limited data points)")
-        
+
         if total_spend > 0:
             if total_spend >= 1000000:
                 context_parts.append(f"Total Spend: ${total_spend/1000000:.1f}M")
@@ -1291,26 +1292,26 @@ Return ONLY the corrected SQL, no explanations."""
                 context_parts.append(f"Total Spend: ${total_spend/1000:.1f}K")
             else:
                 context_parts.append(f"Total Spend: ${total_spend:.0f}")
-        
+
         return " | ".join(context_parts)
-    
+
     def _generate_answer(self, question: str, results: pl.DataFrame) -> str:
         """
         Generate strategic insights and recommendations from query results.
-        
+
         Args:
             question: Original question
             results: Query results
-            
+
         Returns:
             Strategic analysis with insights and recommendations
         """
         if results.is_empty():
             return "No results found for your question."
-        
+
         # Skip AI-generated text answers in data mode - just return results
         return "Query executed successfully."
-        
+
         # Convert to Pandas for robust date inference and string formatting needed for LLM
         # Shadowing 'results' to minimize code changes downstream
         try:
@@ -1318,10 +1319,10 @@ Return ONLY the corrected SQL, no explanations."""
         except Exception as e:
             logger.warning(f"Failed to convert results to Pandas: {e}")
             return "Here are the results (AI analysis unavailable due to format error)."
-        
+
         # Convert results to text summary
         results_text = results.to_string(index=False, max_rows=20)
-        
+
         # Extract date context from the data if available
         date_context = ""
         if self.schema_info:
@@ -1338,7 +1339,7 @@ Return ONLY the corrected SQL, no explanations."""
                             break
                     except Exception as e:
                         logger.debug(f"Failed to extract date from results: {e}")
-            
+
             # If no date in results, check original data for context
             if not date_context and hasattr(self, 'conn') and self.conn:
                 try:
@@ -1353,18 +1354,18 @@ Return ONLY the corrected SQL, no explanations."""
                         date_context = f"\n\nData covers: {min_d.strftime('%B %d, %Y')} to {max_d.strftime('%B %d, %Y')}"
                 except Exception as e:
                     logger.debug(f"Failed to get date range from campaigns table: {e}")
-        
+
         # Determine if this is an insight or recommendation question
         is_insight_question = any(keyword in question.lower() for keyword in [
-            'why', 'what explains', 'root cause', 'underlying', 'story', 'pattern', 
+            'why', 'what explains', 'root cause', 'underlying', 'story', 'pattern',
             'hidden', 'surprising', 'counterintuitive', 'narrative', 'drivers'
         ])
-        
+
         is_recommendation_question = any(keyword in question.lower() for keyword in [
-            'recommend', 'should we', 'how should', 'what should', 'suggest', 
+            'recommend', 'should we', 'how should', 'what should', 'suggest',
             'optimize', 'improve', 'action plan', 'strategy', 'roadmap'
         ])
-        
+
         if is_recommendation_question:
             system_prompt = """You are a strategic marketing analyst providing actionable recommendations.
 
@@ -1384,7 +1385,7 @@ Format your recommendation as:
 **Risks:** [What could go wrong]
 **Success Metrics:** [How to measure]
 **Priority:** [High/Medium/Low]"""
-            
+
             user_prompt = f"""Based on the data below, provide a strategic recommendation.
 
 Question: {question}
@@ -1397,7 +1398,7 @@ IMPORTANT: If the question mentions a time period, explicitly state the specific
 
 Provide a structured, actionable recommendation:"""
             max_tokens = 500
-            
+
         elif is_insight_question:
             system_prompt = """You are a strategic marketing analyst uncovering deep insights.
 
@@ -1411,7 +1412,7 @@ For INSIGHTS, you MUST:
 * Compare against benchmarks when relevant
 
 Provide insights that tell a story and reveal the underlying drivers of performance."""
-            
+
             user_prompt = f"""Based on the data below, provide strategic insights that explain the underlying story.
 
 Question: {question}
@@ -1424,16 +1425,16 @@ IMPORTANT: If the question mentions a time period (like "last month", "this week
 
 Provide deep insights with context and business implications:"""
             max_tokens = 400
-            
+
         else:
             # ====================================================================================
             # ENHANCED 3-SECTION ANSWER FRAMEWORK (Phase 2)
             # Structure: Direct Answer → Context → Interpretation (conditional)
             # ====================================================================================
-            
+
             # Calculate sample size context from results
             sample_size_info = self._extract_sample_context(results)
-            
+
             system_prompt = """You are a marketing analytics expert (Rand Fishkin + Alex Freberg style).
 You provide answers with DATA → CONTEXT → HYPOTHESIS → ACTION framework.
 
@@ -1476,7 +1477,7 @@ CRITICAL RULES:
 
 Provide your answer in the 2-section format (Context → Interpretation):"""
             max_tokens = 450
-        
+
         # Use same fallback system as SQL generation
         for provider, model_name in self.available_models:
             try:
@@ -1491,7 +1492,7 @@ Provide your answer in the 2-section format (Context → Interpretation):"""
                         }]
                     )
                     return response.content[0].text.strip()
-                    
+
                 elif provider == 'gemini':
                     model = genai.GenerativeModel(model_name)
                     response = model.generate_content(
@@ -1502,7 +1503,7 @@ Provide your answer in the 2-section format (Context → Interpretation):"""
                         )
                     )
                     return response.text.strip()
-                    
+
                 elif provider == 'openai':
                     response = self.openai_client.chat.completions.create(
                         model=model_name,
@@ -1514,7 +1515,7 @@ Provide your answer in the 2-section format (Context → Interpretation):"""
                         max_tokens=max_tokens
                     )
                     return response.choices[0].message.content.strip()
-                    
+
                 elif provider == 'groq':
                     response = self.groq_client.chat.completions.create(
                         model=model_name,
@@ -1526,7 +1527,7 @@ Provide your answer in the 2-section format (Context → Interpretation):"""
                         max_tokens=max_tokens
                     )
                     return response.choices[0].message.content.strip()
-                    
+
                 elif provider == 'deepseek':
                     response = self.deepseek_client.chat.completions.create(
                         model=model_name,
@@ -1538,14 +1539,14 @@ Provide your answer in the 2-section format (Context → Interpretation):"""
                         max_tokens=max_tokens
                     )
                     return response.choices[0].message.content.strip()
-                    
+
             except Exception as e:
                 logger.warning(f"Insights generation failed with {provider}: {e}")
                 continue
-        
+
         return "Unable to generate insights - all AI providers failed."
-    
-    def get_suggested_questions(self) -> List[str]:
+
+    def get_suggested_questions(self) -> list[str]:
         """Get suggested questions based on the data schema."""
         return [
             # Temporal Comparisons
@@ -1554,32 +1555,32 @@ Provide your answer in the 2-section format (Context → Interpretation):"""
             "How did our CTR in the last month compare to the month before?",
             "What's the month-over-month growth in leads for the past 6 months?",
             "Compare Q3 2024 vs Q2 2024 performance for ROAS and CPA",
-            
+
             # Channel & Performance Analysis
             "Which marketing channel generated the highest ROI?",
             "Compare the cost per acquisition (CPA) across different channels",
             "Which platform performs best in terms of ROAS? Calculate from total revenue and spend",
             "Show me the top 5 campaigns by conversions with their ROAS",
-            
+
             # Funnel & Conversion Analysis
             "What was the conversion rate at each stage: impressions to clicks to conversions?",
             "Calculate the click-through rate and conversion rate for each platform",
             "Where did we see the highest drop-off in the funnel?",
-            
+
             # Budget & ROI Analysis
             "Calculate the return on ad spend (ROAS) for each campaign",
             "What is the total spend vs total revenue across all campaigns?",
             "Which channel should we invest more in based on ROAS performance?",
-            
+
             # Creative & Timing
             "What were the best performing days for campaign engagement?",
             "Show me performance trends by day of week",
-            
+
             # Comparative Analysis
             "Compare new vs returning customer conversion metrics",
             "How did different audience segments perform in terms of engagement rate?"
         ]
-    
+
     def close(self):
         """Close the database connection."""
         if self.conn:
@@ -1589,9 +1590,9 @@ Provide your answer in the 2-section format (Context → Interpretation):"""
 
 class QueryTemplates:
     """Pre-built query templates for common questions."""
-    
+
     @staticmethod
-    def get_templates() -> Dict[str, str]:
+    def get_templates() -> dict[str, str]:
         """Get dictionary of query templates."""
         return {
             "top_campaigns_by_roas": """
@@ -1600,9 +1601,9 @@ class QueryTemplates:
                 ORDER BY ROAS DESC
                 LIMIT 10
             """,
-            
+
             "total_spend_by_platform": """
-                SELECT Platform, 
+                SELECT Platform,
                        SUM(Spend) as Total_Spend,
                        SUM(Conversions) as Total_Conversions,
                        ROUND(SUM(Revenue) / NULLIF(SUM(Spend), 0), 2) as ROAS,
@@ -1611,7 +1612,7 @@ class QueryTemplates:
                 GROUP BY Platform
                 ORDER BY Total_Spend DESC
             """,
-            
+
             "campaign_performance_summary": """
                 SELECT Campaign_Name,
                        COUNT(DISTINCT Platform) as Platforms,
@@ -1624,7 +1625,7 @@ class QueryTemplates:
                 GROUP BY Campaign_Name
                 ORDER BY Total_Spend DESC
             """,
-            
+
             "monthly_trends": """
                 SELECT DATE_TRUNC('month', CAST(Date AS DATE)) as Month,
                        SUM(Spend) as Total_Spend,
@@ -1635,7 +1636,7 @@ class QueryTemplates:
                 GROUP BY Month
                 ORDER BY Month
             """,
-            
+
             "platform_comparison": """
                 SELECT Platform,
                        COUNT(*) as Campaign_Count,
@@ -1652,7 +1653,7 @@ class QueryTemplates:
                 GROUP BY Platform
                 ORDER BY Total_Spend DESC
             """,
-            
+
             "best_worst_performers": """
                 (SELECT 'Top 5' as Category, Campaign_Name, Platform, ROAS, Spend
                  FROM campaigns
@@ -1664,7 +1665,7 @@ class QueryTemplates:
                  ORDER BY ROAS ASC
                  LIMIT 5)
             """,
-            
+
             "efficiency_analysis": """
                 SELECT Campaign_Name,
                        Platform,
@@ -1672,7 +1673,7 @@ class QueryTemplates:
                        Conversions,
                        CPA,
                        ROAS,
-                       CASE 
+                       CASE
                            WHEN ROAS >= 4.0 THEN 'Excellent'
                            WHEN ROAS >= 3.0 THEN 'Good'
                            WHEN ROAS >= 2.0 THEN 'Average'
