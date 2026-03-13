@@ -41,7 +41,7 @@ class QueryEntities:
     metrics: list[str]           # Metrics requested
     time_period: Optional[str]   # Time filter requested
     granularity: Optional[str]   # Temporal granularity (daily, weekly, monthly)
-    filters: dict[str, str]      # Column -> value filters
+    filters: dict[str, list[str]] # Column -> values filters
     limit: Optional[int]         # Number of results wanted
     order_by: Optional[str]      # Sort field
 
@@ -91,6 +91,7 @@ class IntentClassifier:
             r'\b(by\s+(platform|channel|device|funnel|campaign|ad\s*type))\b',
             r'\b(breakdown|split|segment|per)\b',
             r'\b(each|every)\s+(platform|channel|device)\b',
+            r'\b(platform|channel|device|funnel|campaign)\s+performance\b',
         ],
         QueryIntent.FILTER: [
             r'\b(where|only|exclude|filter|except)\b',
@@ -144,12 +145,37 @@ class EntityExtractor:
     """Extracts entities from natural language questions."""
 
     DIMENSION_PATTERNS = {
-        'platform': [r'\bplatform\b', r'\bfacebook\b', r'\bgoogle\b', r'\bmeta\b', r'\bad\s*network\b'],
-        'channel': [r'\bchannel\b', r'\bsem\b', r'\bdisplay\b', r'\bsocial\b', r'\bvideo\b'],
-        'device': [r'\bdevice\b', r'\bmobile\b', r'\bdesktop\b', r'\btablet\b'],
-        'funnel': [r'\bfunnel\b', r'\bawareness\b', r'\bconsideration\b', r'\bconversion\b'],
-        'campaign': [r'\bcampaign\b', r'\bad\b', r'\bcreative\b'],
+        'platform': [
+            r'\bplatforms?\b', r'\bfacebook\b', r'\bgoogle\b', r'\bmeta\b', 
+            r'\bad\s*network\b', r'\binstagram\b', r'\big\b', r'\bfb\b',
+            r'\blinkedin\b', r'\bsnapchat\b', r'\bdv360\b', r'\bcm360\b'
+        ],
+        'channel': [
+            r'\bchannels?\b', r'\bsem\b', r'\bdisplay\b', r'\bsocial\b', 
+            r'\bvideo\b', r'\bsearch\b', r'\bsoc\b', r'\bpmax\b'
+        ],
+        'device': [r'\bdevices?\b', r'\bmobile\b', r'\bdesktop\b', r'\btablet\b'],
+        'funnel': [
+            r'\bfunnel\b', r'\bawareness\b', r'\bconsideration\b', r'\bconversion\b',
+            r'\btofu\b', r'\bmofu\b', r'\bbofu\b', r'\bupper\s*funnel\b', r'\bmiddle\s*funnel\b', r'\blower\s*funnel\b'
+        ],
+        'campaign': [r'\bcampaigns?\b', r'\bad\b', r'\bcreative\b'],
         'ad_type': [r'\bad\s*type\b', r'\bformat\b'],
+    }
+
+    # Map aliases to canonical values
+    ALIAS_MAP = {
+        'fb': 'facebook',
+        'ig': 'instagram',
+        'meta': 'facebook', # Usually mapped to FB in underlying data
+        'soc': 'social',
+        'sem': 'search',
+        'tofu': 'awareness',
+        'mofu': 'consideration',
+        'bofu': 'conversion',
+        'upper funnel': 'awareness',
+        'middle funnel': 'consideration',
+        'lower funnel': 'conversion',
     }
 
     METRIC_PATTERNS = {
@@ -160,7 +186,7 @@ class EntityExtractor:
         'ctr': [r'\bctr\b', r'\bclick\s*(through|rate)\b'],
         'cpc': [r'\bcpc\b', r'\bcost\s*per\s*click\b'],
         'cpa': [r'\bcpa\b', r'\bcost\s*per\s*(acquisition|action)\b'],
-        'roas': [r'\broas\b', r'\breturn\s*on\s*ad\s*spend\b'],
+        'roas': [r'\broas\b', r'\breturn\s*on\s*ad\s*spend\b', r'\bperformance\b', r'\bperforming\b'],
         'cvr': [r'\bcvr\b', r'\bconversion\s*rate\b'],
     }
 
@@ -200,14 +226,21 @@ class EntityExtractor:
         group_by = []
         for dim, patterns in self.DIMENSION_PATTERNS.items():
             for pattern in patterns:
-                match = re.search(pattern, question_lower)
-                if match:
-                    group_by.append(dim)
+                matches = re.findall(pattern, question_lower)
+                if matches:
+                    if dim not in group_by:
+                        group_by.append(dim)
+                    
                     # If the match isn't just the dimension name, it's likely a filter
-                    matched_text = match.group(0).lower()
-                    if matched_text not in ['platform', 'channel', 'device', 'funnel', 'campaign', 'ad type']:
-                        filters[dim] = matched_text
-                    break
+                    for matched_text in matches:
+                        matched_text = matched_text.lower()
+                        if matched_text not in ['platform', 'platforms', 'channel', 'channels', 'device', 'devices', 'funnel', 'campaign', 'campaigns', 'ad type', 'ad types']:
+                            # Map alias to canonical
+                            canonical = self.ALIAS_MAP.get(matched_text, matched_text)
+                            if dim not in filters:
+                                filters[dim] = []
+                            if canonical not in filters[dim]:
+                                filters[dim].append(canonical)
 
         # Extract metrics
         metrics = []

@@ -420,16 +420,25 @@ async def kg_query(
         
         # Platform/Channel/Dimension mapping from entities
         entity_filters = []
-        if 'platform' in entities.group_by or 'platform' in entities.filters:
-            specific_platform = entities.filters.get('platform') or entities.group_by[0] if 'platform' in entities.group_by else None
-            if specific_platform:
-                entity_filters.append(f"toLower({platform_col}) = toLower('{specific_platform}')")
+        if 'platform' in entities.filters:
+            platforms = entities.filters['platform']
+            if platforms:
+                platforms_str = ", ".join([f"'{p}'" for p in platforms])
+                entity_filters.append(f"toLower({platform_col}) IN [{platforms_str}]")
                 cypher_dimension_label = "platform"
         
-        if 'channel' in entities.group_by or 'channel' in entities.filters:
-            specific_channel = entities.filters.get('channel') or entities.group_by[0] if 'channel' in entities.group_by else None
-            if specific_channel:
-                entity_filters.append(f"toLower({channel_col}) = toLower('{specific_channel}')")
+        if 'channel' in entities.filters:
+            channels = entities.filters['channel']
+            if channels:
+                channels_str = ", ".join([f"'{c}'" for c in channels])
+                entity_filters.append(f"toLower({channel_col}) IN [{channels_str}]")
+                cypher_dimension_label = "channel"
+        
+        # Fallback to group_by if no filters
+        if not entity_filters:
+            if 'platform' in entities.group_by:
+                cypher_dimension_label = "platform"
+            if 'channel' in entities.group_by:
                 cypher_dimension_label = "channel"
 
         # Map QueryIntent to KG Intent
@@ -451,6 +460,7 @@ async def kg_query(
             if 'device' in entities.group_by: group_col = device_col
             elif 'age' in entities.group_by: group_col = age_col
             elif 'funnel' in entities.group_by: group_col = funnel_col
+            elif 'campaign' in entities.group_by: group_col = campaign_col
             else: group_col = platform_col or channel_col
         else:
             # Default fallback for platform/channel specific performance
@@ -463,6 +473,9 @@ async def kg_query(
                 intent = "cross_channel"
                 if "channels" in request.query.lower() or not entities.filters.get('channel'):
                     group_col = channel_col
+            elif 'funnel' in entities.group_by or 'funnel' in entities.filters:
+                intent = "targeting" # Funnel is mapped to targeting layer
+                group_col = funnel_col
             else:
                  intent = "general"
         
@@ -470,12 +483,12 @@ async def kg_query(
         if entity_filters:
             cypher_where_clause = "WHERE " + " AND ".join(entity_filters) + "\n"
             # Apply filters to dataframe
-            for filt in entity_filters:
-                 # Very basic filter parsing for the demo
-                 col_name = platform_col if 'platform' in filt else channel_col
-                 val = filt.split("'")[-2]
-                 if col_name and col_name in df.columns:
-                     df = df[df[col_name].astype(str).str.lower() == val.lower()]
+            for dim, vals in entities.filters.items():
+                col_name = platform_col if dim == 'platform' else (channel_col if dim == 'channel' else None)
+                if col_name and col_name in df.columns and vals:
+                    # Convert to lower list for case-insensitive matching
+                    vals_lower = [v.lower() for v in vals]
+                    df = df[df[col_name].astype(str).str.lower().isin(vals_lower)]
 
         # 6. Apply Temporal Filtering
         if temporal_context.primary_period and date_col and date_col in df.columns:
@@ -509,14 +522,22 @@ async def kg_query(
             if col:
                 metric_cols[col] = "sum"
 
-        ascending = "worst" in query_lower or "lowest" in query_lower
+        ascending = "worst" in query_lower or "lowest" in query_lower or "lagging" in query_lower
         sort_metric = spend_col or (list(metric_cols.keys())[0] if metric_cols else None)
         if "impression" in query_lower:
             sort_metric = impr_col or sort_metric
         elif "click" in query_lower and "ctr" not in query_lower:
             sort_metric = clicks_col or sort_metric
-        elif "conversion" in query_lower or "roas" in query_lower:
+        elif "conversion" in query_lower:
             sort_metric = conv_col or sort_metric
+        elif "roas" in query_lower or "performance" in query_lower or "performing" in query_lower:
+            sort_metric = "roas" # Sort by the derived column
+        elif "cvr" in query_lower:
+            sort_metric = "cvr"
+        elif "cpc" in query_lower:
+            sort_metric = "cpc"
+        elif "cpa" in query_lower:
+            sort_metric = "cpa"
 
         # ── Helper: build comma-separated metric RETURN clause ───────────────
         def _metric_returns(prefix="m"):
