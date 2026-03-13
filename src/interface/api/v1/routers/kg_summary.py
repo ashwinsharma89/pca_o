@@ -668,12 +668,26 @@ async def kg_query(
         if global_summary.get("total_spend", 0) and global_summary.get("total_conversions", 0):
             global_summary["avg_cpa"] = round(global_summary["total_spend"] / global_summary["total_conversions"], 2)
 
+        # ── LLM Guidance Generation ──────────────────────────────────────────
+        llm_guidance = None
+        try:
+             from src.platform.query_engine.insight_generator import KGInsightGenerator
+             insight_gen = KGInsightGenerator()
+             llm_guidance = insight_gen.generate_guidance(
+                 query=request.query,
+                 results=data,
+                 summary=global_summary
+             )
+        except Exception as l_err:
+             logger.warning(f"Failed to generate LLM guidance: {l_err}")
+
         elapsed = (time.time() - start) * 1000
 
         return {
             "success": True,
             "data": data,
             "summary": global_summary,
+            "llm_guidance": llm_guidance,
             "metadata": {
                 "query": request.query,
                 "intent": intent,

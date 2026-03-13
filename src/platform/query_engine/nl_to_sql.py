@@ -351,6 +351,84 @@ class NaturalLanguageQueryEngine:
     def _get_schema_description(self) -> str:
         return self.schema_manager.get_schema_for_prompt()
 
+    def generate_completion(
+        self, 
+        prompt: str, 
+        system_prompt: str = "You are a helpful AI assistant.",
+        temperature: float = 0.1,
+        max_tokens: int = 2000
+    ) -> str:
+        """
+        Generic LLM completion method that iterates through available models.
+        """
+        last_error = None
+        for provider, model_name in self.available_models:
+            try:
+                logger.info(f"Attempting completion with {provider} ({model_name})...")
+
+                if provider == 'claude':
+                    response = self.anthropic_client.messages.create(
+                        model=model_name,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        messages=[{"role": "user", "content": prompt}]
+                    )
+                    return response.content[0].text.strip()
+
+                elif provider == 'gemini':
+                    model = genai.GenerativeModel(model_name)
+                    response = model.generate_content(
+                        prompt,
+                        generation_config=genai.GenerationConfig(
+                            temperature=temperature,
+                            max_output_tokens=max_tokens
+                        )
+                    )
+                    return response.text.strip()
+
+                elif provider == 'openai':
+                    response = self.openai_client.chat.completions.create(
+                        model=model_name,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    )
+                    return response.choices[0].message.content.strip()
+
+                elif provider == 'groq':
+                    response = self.groq_client.chat.completions.create(
+                        model=model_name,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    )
+                    return response.choices[0].message.content.strip()
+
+                elif provider == 'deepseek':
+                    response = self.deepseek_client.chat.completions.create(
+                        model=model_name,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    )
+                    return response.choices[0].message.content.strip()
+
+            except Exception as e:
+                last_error = e
+                logger.warning(f"{provider} failed: {e}")
+                continue
+
+        raise Exception(f"All LLM providers failed. Last error: {last_error}")
+
     def generate_sql(self, question: str) -> str:
         """
         Convert natural language question to SQL query.
@@ -388,6 +466,7 @@ class NaturalLanguageQueryEngine:
         analysis = analyze_question(question)
         
         # Merge temporal analysis results (favoring TemporalParser for time details)
+        from src.platform.query_engine.temporal_parser import TemporalIntent
         if temporal_context.intent != TemporalIntent.UNKNOWN:
             analysis['temporal'] = temporal_context
 
@@ -426,138 +505,16 @@ class NaturalLanguageQueryEngine:
 
         logger.info(f"FULL PROMPT LENGTH: {len(prompt)} chars")
 
-        # Try each available model in order
-        sql_query = None
-        last_error = None
-
-        for provider, model_name in self.available_models:
-            try:
-                logger.info(f"Attempting to use {provider} ({model_name})...")
-
-                if provider == 'claude':
-                    response = self.anthropic_client.messages.create(
-                        model=model_name,
-                        max_tokens=2000,
-                        temperature=0.1,
-                        messages=[{
-                            "role": "user",
-                            "content": f"You are a SQL expert. Generate ONLY the SQL query, no explanations or markdown.\n\n{prompt}"
-                        }]
-                    )
-                    sql_query = response.content[0].text.strip()
-
-                    if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
-                        logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
-                        continue
-
-                    self._last_model_used = f"{provider} ({model_name})"
-                    usage = getattr(response, 'usage', None)
-                    if usage:
-                        logger.info(f"Successfully used {provider}. Tokens: {usage.input_tokens} in, {usage.output_tokens} out")
-                    else:
-                        logger.info(f"Successfully used {provider}")
-                    break
-
-                elif provider == 'gemini':
-                    model = genai.GenerativeModel(model_name)
-                    response = model.generate_content(
-                        f"You are a SQL expert. Generate ONLY the SQL query, no explanations or markdown.\n\n{prompt}",
-                        generation_config=genai.GenerationConfig(
-                            temperature=0.1,
-                            max_output_tokens=2500
-                        )
-                    )
-                    sql_query = response.text.strip()
-
-                    if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
-                        logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
-                        continue
-
-                    self._last_model_used = f"{provider} ({model_name})"
-                    usage = getattr(response, 'usage_metadata', None)
-                    if usage:
-                        logger.info(f"Successfully used {provider}. Tokens: {usage.prompt_token_count} prompt, {usage.candidates_token_count} completion")
-                    else:
-                        logger.info(f"Successfully used {provider} (FREE)")
-                    break
-
-                elif provider == 'openai':
-                    response = self.openai_client.chat.completions.create(
-                        model=model_name,
-                        messages=[
-                            {"role": "system", "content": "You are a SQL expert. Generate ONLY the SQL query, no explanations or markdown."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.1,
-                        max_tokens=2000
-                    )
-                    sql_query = response.choices[0].message.content.strip()
-
-                    if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
-                        logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
-                        continue
-
-                    self._last_model_used = f"{provider} ({model_name})"
-                    usage = getattr(response, 'usage', None)
-                    if usage:
-                        logger.info(f"Successfully used {provider}. Tokens: {usage.prompt_tokens} prompt, {usage.completion_tokens} completion")
-                    else:
-                        logger.info(f"Successfully used {provider}")
-                    break
-
-                elif provider == 'groq':
-                    response = self.groq_client.chat.completions.create(
-                        model=model_name,
-                        messages=[
-                            {"role": "system", "content": "You are a SQL expert. Generate ONLY the SQL query, no explanations or markdown."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.1,
-                        max_tokens=2000
-                    )
-                    sql_query = response.choices[0].message.content.strip()
-
-                    if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
-                        logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
-                        continue
-
-                    self._last_model_used = f"{provider} ({model_name})"
-                    usage = getattr(response, 'usage', None)
-                    if usage:
-                        logger.info(f"Successfully used {provider}. Tokens: {usage.prompt_tokens} prompt, {usage.completion_tokens} completion")
-                    else:
-                        logger.info(f"Successfully used {provider} (FREE & FAST)")
-                    break
-
-                elif provider == 'deepseek':
-                    response = self.deepseek_client.chat.completions.create(
-                        model=model_name,
-                        messages=[
-                            {"role": "system", "content": "You are a SQL expert. Generate ONLY the SQL query, no explanations or markdown."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.1,
-                        max_tokens=2000
-                    )
-                    sql_query = response.choices[0].message.content.strip()
-
-                    # Validate basic completion before accepting
-                    if not sql_query or len(sql_query) < 10 or sql_query.strip().upper().endswith("FROM"):
-                        logger.warning(f"{provider} returned truncated/empty SQL. Retrying next provider...")
-                        continue
-
-                    self._last_model_used = f"{provider} ({model_name})"
-                    logger.info(f"Successfully used {provider} (FREE CODING SPECIALIST)")
-                    break
-
-            except Exception as e:
-                last_error = e
-                logger.warning(f"{provider} failed: {e}")
-                continue
-
+        # Use the generic completion method for SQL generation
+        sql_query = self.generate_completion(
+            prompt=prompt,
+            system_prompt="You are a SQL expert. Generate ONLY the SQL query, no explanations or markdown.",
+            temperature=0.1
+        )
+        
         if not sql_query:
-            logger.error(f"All models failed. Last error: {last_error}")
-            raise Exception(f"All LLM providers failed. Last error: {last_error}")
+            raise Exception("Failed to generate SQL query")
+            
         logger.info(f"RAW LLM RESPONSE: {sql_query}")
 
         # Clean up the query (remove markdown code blocks if present)
