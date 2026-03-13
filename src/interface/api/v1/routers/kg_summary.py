@@ -393,170 +393,114 @@ async def kg_query(
         import re
 
         # ── Lookup tables ────────────────────────────────────────────────────
-        PLATFORM_ALIASES = {
-            "meta": "Meta", "facebook": "Meta",
-            "google": "Google", "google ads": "Google",
-            "tiktok": "TikTok", "snapchat": "Snapchat",
-            "linkedin": "LinkedIn", "youtube": "YouTube",
-            "twitter": "Twitter", "x ads": "Twitter",
-            "bing": "Bing", "microsoft": "Bing",
-            "pinterest": "Pinterest", "dv360": "DV360",
-        }
-        CHANNEL_ALIASES = {
-            "search": "Search", "paid search": "Search",
-            "social": "Social", "paid social": "Social",
-            "display": "Display", "programmatic": "Display",
-            "video": "Video", "youtube": "Video",
-            "email": "Email", "affiliate": "Affiliate",
-        }
-
-        # ── Extract explicit limit from "top N / bottom N" ───────────────────
-        top_n_match = re.search(r'\b(?:top|bottom|worst|best)\s+(\d+)\b', query_lower)
-        explicit_limit = int(top_n_match.group(1)) if top_n_match else None
-
-        # ── Detect "compare X vs Y" pair ────────────────────────────────────
-        compare_match = re.search(
-            r'\bcompare\s+(\w[\w\s]*?)\s+(?:vs\.?|versus|and)\s+(\w[\w\s]*?)(?:\s+|$)',
-            query_lower
-        )
-        compare_pair = None   # (canonical_a, canonical_b)
-        if compare_match:
-            a_raw = compare_match.group(1).strip()
-            b_raw = compare_match.group(2).strip()
-            compare_pair = (
-                CHANNEL_ALIASES.get(a_raw, a_raw.title()),
-                CHANNEL_ALIASES.get(b_raw, b_raw.title()),
-            )
-
-        # ── Detect specific single-platform mention ──────────────────────────
-        specific_platform = None
-        for alias, canonical in PLATFORM_ALIASES.items():
-            if re.search(rf'\b{re.escape(alias)}\b', query_lower):
-                specific_platform = canonical
-                break
-
-        # ── Intent + grouping/filter resolution (priority order) ─────────────
-        intent = "general"
-        confidence = 0.7
+        # ── Deterministic Intent & Entity Extraction ─────────────────────────
+        from src.platform.query_engine.hybrid_retrieval import IntentClassifier, EntityExtractor, QueryIntent
+        from src.platform.query_engine.temporal_parser import TemporalParser
+        
+        intent_classifier = IntentClassifier()
+        entity_extractor = EntityExtractor()
+        temporal_parser = TemporalParser()
+        
+        # 1. Classify Intent
+        intent_obj = intent_classifier.classify(request.query)
+        intent = intent_obj.value
+        
+        # 2. Extract Entities
+        entities = entity_extractor.extract(request.query)
+        
+        # 3. Parse Temporal Context
+        temporal_context = temporal_parser.parse(request.query)
+        
+        # 4. Map to SQL/Pandas Logic
+        confidence = 0.95  # Deterministic has high confidence for matched patterns
         group_col = None
-        entity_filter_col = None
-        entity_filter_val = None
+        cypher_dimension_label = None
         cypher_where_clause = ""
-        cypher_dimension_label = None   # label used in RETURN
+        
+        # Platform/Channel/Dimension mapping from entities
+        entity_filters = []
+        if 'platform' in entities.group_by or 'platform' in entities.filters:
+            specific_platform = entities.filters.get('platform') or entities.group_by[0] if 'platform' in entities.group_by else None
+            if specific_platform:
+                entity_filters.append(f"toLower({platform_col}) = toLower('{specific_platform}')")
+                cypher_dimension_label = "platform"
+        
+        if 'channel' in entities.group_by or 'channel' in entities.filters:
+            specific_channel = entities.filters.get('channel') or entities.group_by[0] if 'channel' in entities.group_by else None
+            if specific_channel:
+                entity_filters.append(f"toLower({channel_col}) = toLower('{specific_channel}')")
+                cypher_dimension_label = "channel"
 
-        if any(w in query_lower for w in ["top", "best", "worst", "rank", "highest", "lowest"]):
-            # "Top N campaigns by spend" → group by campaign, honour N
+        # Map QueryIntent to KG Intent
+        # Prioritize platform/cross_channel if specific entities are detected
+        # unless "trend" or "over time" is explicitly in the query.
+        is_explicit_trend = any(w in request.query.lower() for w in ["trend", "over time", "daily", "weekly", "monthly"])
+        
+        if intent == QueryIntent.RANKING.value:
             intent = "ranking"
             group_col = campaign_col
-            confidence = 0.9
-            if explicit_limit:
-                request.limit = explicit_limit
-
-        elif compare_pair and channel_col:
-            # "Compare Search vs Social" → filter to those two channels
+        elif intent == QueryIntent.COMPARISON.value:
             intent = "cross_channel"
             group_col = channel_col
-            confidence = 0.95
-            cypher_where_clause = (
-                f"WHERE m.channel IN ['{compare_pair[0]}', '{compare_pair[1]}']\n"
-            )
-            cypher_dimension_label = "channel"
-            if channel_col in df.columns:
-                mask = df[channel_col].astype(str).str.lower().isin(
-                    [compare_pair[0].lower(), compare_pair[1].lower()]
-                )
-                df = df[mask]
-
-        elif specific_platform:
-            # "Meta ads performance" → filter to Meta, return totals
-            intent = "platform"
-            confidence = 0.95
-            entity_filter_col = platform_col
-            entity_filter_val = specific_platform
-            cypher_where_clause = f"WHERE toLower(m.platform) = toLower('{specific_platform}')\n"
-            cypher_dimension_label = "platform"
-            if platform_col and platform_col in df.columns:
-                mask = df[platform_col].astype(str).str.lower() == specific_platform.lower()
-                if not mask.any():
-                    mask = df[platform_col].astype(str).str.lower().str.contains(
-                        specific_platform.lower(), na=False
-                    )
-                df = df[mask]
-
-        elif any(w in query_lower for w in ["platform", "all platforms", "by platform", "platforms"]):
-            intent = "platform"
-            group_col = platform_col
-            confidence = 0.9
-            cypher_dimension_label = "platform"
-
-        elif any(w in query_lower for w in ["channel", "search", "social", "display", "video"]):
-            intent = "cross_channel"
-            group_col = channel_col
-            confidence = 0.85
-            cypher_dimension_label = "channel"
-
-        elif any(w in query_lower for w in ["device", "mobile", "desktop", "tablet"]):
-            intent = "targeting"
-            group_col = device_col
-            confidence = 0.85
-            cypher_dimension_label = "device"
-
-        elif any(w in query_lower for w in ["age", "age group", "demographic"]):
-            intent = "targeting"
-            group_col = age_col
-            confidence = 0.8
-            cypher_dimension_label = "age_range"
-
-        elif any(w in query_lower for w in ["funnel", "upper", "lower", "middle"]):
-            intent = "targeting"
-            group_col = funnel_col
-            confidence = 0.8
-            cypher_dimension_label = "funnel"
-
-        elif any(w in query_lower for w in ["daily", "weekly", "monthly", "trend",
-                                             "over time", "last", "week", "month"]):
+        elif intent == QueryIntent.TREND.value and is_explicit_trend:
             intent = "temporal"
             group_col = date_col
-            confidence = 0.9
+        elif intent == QueryIntent.BREAKDOWN.value:
+            intent = "targeting"
+            if 'device' in entities.group_by: group_col = device_col
+            elif 'age' in entities.group_by: group_col = age_col
+            elif 'funnel' in entities.group_by: group_col = funnel_col
+            else: group_col = platform_col or channel_col
+        else:
+            # Default fallback for platform/channel specific performance
+            if 'platform' in entities.filters or 'platform' in entities.group_by:
+                intent = "platform"
+                # If plural "platforms", group by it
+                if "platforms" in request.query.lower() or not entities.filters.get('platform'):
+                    group_col = platform_col
+            elif 'channel' in entities.filters or 'channel' in entities.group_by:
+                intent = "cross_channel"
+                if "channels" in request.query.lower() or not entities.filters.get('channel'):
+                    group_col = channel_col
+            else:
+                 intent = "general"
+        
+        # 5. Build WHERE clause for Cypher display and Pandas filter
+        if entity_filters:
+            cypher_where_clause = "WHERE " + " AND ".join(entity_filters) + "\n"
+            # Apply filters to dataframe
+            for filt in entity_filters:
+                 # Very basic filter parsing for the demo
+                 col_name = platform_col if 'platform' in filt else channel_col
+                 val = filt.split("'")[-2]
+                 if col_name and col_name in df.columns:
+                     df = df[df[col_name].astype(str).str.lower() == val.lower()]
 
-        # ── Date window filtering (temporal + "last N days/weeks/months") ────
-        if date_col and date_col in df.columns:
+        # 6. Apply Temporal Filtering
+        if temporal_context.primary_period and date_col and date_col in df.columns:
             try:
                 df[date_col] = pd.to_datetime(df[date_col])
                 max_date = df[date_col].max()
-                date_where = ""
-
-                if "2 months" in query_lower or "60 days" in query_lower:
-                    cutoff = max_date - pd.Timedelta(days=60)
-                    df = df[df[date_col] >= cutoff]
-                    date_where = f"AND m.date >= date('{cutoff.date()}')"
-                elif "1 month" in query_lower or "30 days" in query_lower:
-                    cutoff = max_date - pd.Timedelta(days=30)
-                    df = df[df[date_col] >= cutoff]
-                    date_where = f"AND m.date >= date('{cutoff.date()}')"
-                elif "2 weeks" in query_lower or "14 days" in query_lower:
-                    cutoff = max_date - pd.Timedelta(days=14)
-                    df = df[df[date_col] >= cutoff]
-                    date_where = f"AND m.date >= date('{cutoff.date()}')"
-                elif ("1 week" in query_lower or "7 days" in query_lower
-                      or ("week" in query_lower and "last" in query_lower)):
-                    cutoff = max_date - pd.Timedelta(days=7)
-                    df = df[df[date_col] >= cutoff]
-                    date_where = f"AND m.date >= date('{cutoff.date()}')"
-
-                if date_where:
-                    # Append to existing WHERE or start one
-                    if cypher_where_clause:
-                        cypher_where_clause = cypher_where_clause.rstrip("\n") + f" {date_where}\n"
+                interval_type = temporal_context.primary_period.sql_interval
+                
+                if interval_type:
+                    # n is the number from "n MONTH" or "n DAY"
+                    n = int(interval_type.split()[0])
+                    unit = interval_type.split()[1].lower()
+                    
+                    if 'month' in unit:
+                        cutoff = max_date - pd.Timedelta(days=n * 30)
                     else:
-                        cypher_where_clause = f"WHERE {date_where[4:]}\n"  # strip leading AND
-
-                # Group by month for monthly trend
-                if intent == "temporal" and "month" in query_lower:
-                    df[date_col] = df[date_col].dt.to_period('M').dt.to_timestamp()
-
+                        cutoff = max_date - pd.Timedelta(days=n)
+                        
+                    df = df[df[date_col] >= cutoff]
+                    filter_str = f"m.date >= date('{cutoff.date()}')"
+                    if cypher_where_clause:
+                        cypher_where_clause = cypher_where_clause.rstrip("\n") + f" AND {filter_str}\n"
+                    else:
+                        cypher_where_clause = f"WHERE {filter_str}\n"
             except Exception as e:
-                logger.warning(f"Date filtering failed: {e}")
+                logger.warning(f"Temporal filtering failed: {e}")
 
         # ── Build aggregation ────────────────────────────────────────────────
         metric_cols = {}
@@ -663,45 +607,51 @@ async def kg_query(
                     summary_row["cpa"] = round(s / cv, 2)
                 if s > 0:
                     summary_row["roas"] = round(rv / s, 2)
+                
                 # Label the row with the filter value so frontend can display it
-                if entity_filter_val:
-                    summary_row["Dimension"] = entity_filter_val
+                dim_val = list(entities.filters.values())[0] if entities.filters else (
+                    list(entities.group_by)[0] if entities.group_by else "Total"
+                )
+                summary_row["Dimension"] = dim_val
             data = [summary_row] if summary_row else []
 
             mr = _metric_returns()
-            filter_label = f"m.{cypher_dimension_label or 'platform'} AS {(cypher_dimension_label or 'platform').title()},\n       " if entity_filter_val else ""
+            dim_key = list(entities.filters.keys())[0] if entities.filters else (
+                list(entities.group_by)[0] if entities.group_by else "platform"
+            )
+            filter_label = f"m.{dim_key} AS {dim_key.title()},\n       "
             cypher_display = (
                 f"MATCH (c:Campaign)-[:HAS_PERFORMANCE]->(m:Metric)\n"
                 f"{cypher_where_clause}"
                 f"RETURN {filter_label}{mr}"
             )
 
-        # Build summary stats
-        summary = {"count": len(data)}
-        all_spend = sum(r.get(spend_col, 0) for r in data) if spend_col else None
-        all_impr = sum(r.get(impr_col, 0) for r in data) if impr_col else None
-        all_clicks = sum(r.get(clicks_col, 0) for r in data) if clicks_col else None
-        all_conv = sum(r.get(conv_col, 0) for r in data) if conv_col else None
-
-        if all_spend is not None:
-            summary["total_spend"] = round(all_spend, 2)
-        if all_impr is not None:
-            summary["total_impressions"] = int(all_impr)
-        if all_clicks is not None:
-            summary["total_clicks"] = int(all_clicks)
-        if all_conv is not None:
-            summary["total_conversions"] = int(all_conv)
-        if all_clicks and all_impr:
-            summary["avg_ctr"] = round(all_clicks / all_impr * 100, 2) if all_impr > 0 else 0
-        if all_spend and all_clicks:
-            summary["avg_cpc"] = round(all_spend / all_clicks, 2) if all_clicks > 0 else 0
+        # ── Global Summary Calculation (Fix for KPI Cards) ───────────────────
+        # Calculate totals from the full filtered 'df' BEFORE grouping/truncation
+        global_summary = {"count": len(df)}
+        if spend_col and spend_col in df.columns:
+            global_summary["total_spend"] = round(float(df[spend_col].sum()), 2)
+        if impr_col and impr_col in df.columns:
+            global_summary["total_impressions"] = int(df[impr_col].sum())
+        if clicks_col and clicks_col in df.columns:
+            global_summary["total_clicks"] = int(df[clicks_col].sum())
+        if conv_col and conv_col in df.columns:
+            global_summary["total_conversions"] = int(df[conv_col].sum())
+        
+        # Calculate derived global metrics
+        if global_summary.get("total_clicks", 0) and global_summary.get("total_impressions", 0):
+            global_summary["avg_ctr"] = round(global_summary["total_clicks"] / global_summary["total_impressions"] * 100, 2)
+        if global_summary.get("total_spend", 0) and global_summary.get("total_clicks", 0):
+            global_summary["avg_cpc"] = round(global_summary["total_spend"] / global_summary["total_clicks"], 2)
+        if global_summary.get("total_spend", 0) and global_summary.get("total_conversions", 0):
+            global_summary["avg_cpa"] = round(global_summary["total_spend"] / global_summary["total_conversions"], 2)
 
         elapsed = (time.time() - start) * 1000
 
         return {
             "success": True,
             "data": data,
-            "summary": summary,
+            "summary": global_summary,
             "metadata": {
                 "query": request.query,
                 "intent": intent,

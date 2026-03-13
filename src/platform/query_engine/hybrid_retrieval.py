@@ -194,13 +194,19 @@ class EntityExtractor:
     def extract(self, question: str) -> QueryEntities:
         """Extract entities from a natural language question."""
         question_lower = question.lower()
+        filters = {}
 
-        # Extract dimensions (group by)
+        # Extract dimensions (group by) and specific filters
         group_by = []
         for dim, patterns in self.DIMENSION_PATTERNS.items():
             for pattern in patterns:
-                if re.search(pattern, question_lower):
+                match = re.search(pattern, question_lower)
+                if match:
                     group_by.append(dim)
+                    # If the match isn't just the dimension name, it's likely a filter
+                    matched_text = match.group(0).lower()
+                    if matched_text not in ['platform', 'channel', 'device', 'funnel', 'campaign', 'ad type']:
+                        filters[dim] = matched_text
                     break
 
         # Extract metrics
@@ -246,7 +252,7 @@ class EntityExtractor:
             metrics=metrics,
             time_period=time_period,
             granularity=granularity,
-            filters={},
+            filters=filters,
             limit=limit,
             order_by=order_by
         )
