@@ -57,37 +57,49 @@ jobs:
   deploy:
     name: Deploy to EC2
     needs: build-and-push
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            set -e
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            GHCR_IMAGE="ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest"
-            echo "Pulling latest image: $GHCR_IMAGE"
-            docker pull $GHCR_IMAGE
-            docker tag $GHCR_IMAGE pca-agent:latest
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            # Update compose file
-            # Note: In a real scenario, you'd transfer the new compose file via scp or git pull on the server
-            # For now, we assume the environment is set up as per DEPLOYMENT_GUIDE.md
-            
-            cd /home/ubuntu/pca_o/docker
-            docker compose -f docker-compose.full.yml up -d --no-build
+      - name: Pull and deploy
+        env:
+          GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+        run: |
+          set -e
 
-            echo "Waiting for API to be healthy..."
-            sleep 20
-            
-            if docker ps | grep -q "pca-api"; then
-              echo "✅ Deployment successful!"
-            else
-              echo "❌ Deployment failed!"
-              exit 1
-            fi
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+          echo "Pulling latest image..."
+          docker pull $GHCR_IMAGE
+          docker tag $GHCR_IMAGE pca-agent:latest
+
+          # Sync latest compose file from repo
+          cp $GITHUB_WORKSPACE/docker-compose.full.yml /home/ubuntu/pca_o/docker/docker-compose.full.yml
+
+          cd /home/ubuntu/pca_o/docker
+          docker compose -f docker-compose.full.yml up -d --no-build
+
+          echo "Waiting for API to be healthy..."
+          sleep 20
+
+          if docker ps | grep -q "pca-api"; then
+            echo "✅ Deployment successful!"
+            docker logs pca-api --tail 20
+          else
+            echo "❌ Deployment failed!"
+            docker logs pca-api --tail 50
+            exit 1
+          fi
+
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          curl -f http://localhost:8000/health || exit 1
+          echo "✅ Health check passed!"
