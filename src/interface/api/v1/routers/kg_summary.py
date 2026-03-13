@@ -394,22 +394,23 @@ async def kg_query(
 
         # ── Lookup tables ────────────────────────────────────────────────────
         # ── Deterministic Intent & Entity Extraction ─────────────────────────
-        from src.platform.query_engine.hybrid_retrieval import IntentClassifier, EntityExtractor, QueryIntent
-        from src.platform.query_engine.temporal_parser import TemporalParser
+        from src.platform.query_engine.hybrid_retrieval import HybridSQLRetrieval, QueryIntent
         
-        intent_classifier = IntentClassifier()
-        entity_extractor = EntityExtractor()
-        temporal_parser = TemporalParser()
+        hybrid_retrieval = HybridSQLRetrieval()
+        analysis = hybrid_retrieval.analyze_question(request.query)
+        kb_examples = hybrid_retrieval.retrieve_local_examples(request.query, k=1)
         
-        # 1. Classify Intent
-        intent_obj = intent_classifier.classify(request.query)
+        # 1. Get Analysis Results
+        intent_obj = analysis['intent']
         intent = intent_obj.value
+        entities = analysis['entities']
+        temporal_context = analysis['temporal']
         
-        # 2. Extract Entities
-        entities = entity_extractor.extract(request.query)
-        
-        # 3. Parse Temporal Context
-        temporal_context = temporal_parser.parse(request.query)
+        # 1.1 Override/Refine Intent from Knowledge Base match if high confidence
+        if kb_examples and kb_examples[0].relevance_score > 0.7:
+             kb_match = kb_examples[0]
+             logger.info(f"High-confidence KB match found ({kb_match.relevance_score:.2f}): {kb_match.question}")
+             # The KB example's intent is already classified by HybridSQLRetrieval
         
         # 4. Map to SQL/Pandas Logic
         confidence = 0.95  # Deterministic has high confidence for matched patterns

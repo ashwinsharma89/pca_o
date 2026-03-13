@@ -340,6 +340,74 @@ class HybridSQLRetrieval:
             QueryIntent.AGGREGATION: ['SUM', 'COUNT', 'AVG', 'TOTAL'],
             QueryIntent.BREAKDOWN: ['GROUP BY'],
         }
+        self._local_kb: list[dict[str, Any]] = self._load_local_kb()
+
+    def _load_local_kb(self) -> list[dict[str, Any]]:
+        """Load training questions from data directory."""
+        import json
+        from pathlib import Path
+        # Look for the data directory relative to project root or absolute
+        kb_paths = [
+            Path("/Users/ashwin/Desktop/pca_agent_copy/data"),
+            Path("data")
+        ]
+        examples = []
+        for kb_path in kb_paths:
+            if kb_path.exists():
+                for f in kb_path.glob("*training_questions.json"):
+                    try:
+                        with open(f, 'r') as file:
+                            data = json.load(file)
+                            if "training_questions" in data:
+                                examples.extend(data["training_questions"])
+                    except Exception as e:
+                        logger.error(f"Failed to load KB file {f}: {e}")
+                if examples:
+                    break
+        return examples
+
+    def retrieve_local_examples(self, question: str, k: int = 3) -> list[RetrievalResult]:
+        """Retrieve examples from the local JSON knowledge base."""
+        if not self._local_kb:
+            return []
+            
+        def get_tokens(s):
+            return set(re.findall(r'\w+', s.lower()))
+            
+        q_tokens = get_tokens(question)
+        scored_examples = []
+        
+        for ex in self._local_kb:
+            ex_q = ex.get("question", "")
+            ex_tokens = get_tokens(ex_q)
+            if not ex_tokens:
+                continue
+                
+            intersection = q_tokens.intersection(ex_tokens)
+            union = q_tokens.union(ex_tokens)
+            similarity = len(intersection) / len(union)
+            
+            scored_examples.append({
+                "example": ex,
+                "score": similarity
+            })
+            
+        scored_examples.sort(key=lambda x: x["score"], reverse=True)
+        
+        results = []
+        for item in scored_examples[:k]:
+            if item["score"] < 0.1: # Minimum threshold
+                continue
+            ex = item["example"]
+            results.append(RetrievalResult(
+                question=ex.get("question", ""),
+                sql=ex.get("expected_sql", ""),
+                intent=self.intent_classifier.classify(ex.get("question", "")),
+                complexity=QueryComplexity.MEDIUM,
+                relevance_score=item["score"],
+                metadata=ex
+            ))
+        return results
 
     def analyze_question(self, question: str) -> dict[str, Any]:
         """
@@ -413,10 +481,16 @@ class HybridSQLRetrieval:
         entities = analysis['entities']
         intent = analysis['intent']
 
-        # If no vector store, return analysis only
+        # Step 0: Try local JSON Knowledge Base first
+        local_examples = self.retrieve_local_examples(question, k=k)
+        if any(ex.relevance_score > 0.6 for ex in local_examples):
+            logger.info("Found high-confidence match in local Knowledge Base")
+            return local_examples
+
+        # If no vector store, return local examples anyway
         if not self.vector_store:
-            logger.debug(f"No vector store, returning analysis: {intent.value}")
-            return []
+            logger.debug(f"No vector store, returning {len(local_examples)} local examples")
+            return local_examples
 
         try:
             # Build metadata filter based on extracted entities
